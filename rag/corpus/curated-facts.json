@@ -27,6 +27,15 @@
     "evidenceLevel": "public-profile"
   },
   {
+    "id": "fact-skills",
+    "locale": "zh",
+    "sourceTitle": "公开技能清单",
+    "titlePath": "技能",
+    "content": "方子的技能包括：Vibe coding、OpenClaw、RAG 与 Harness 等大模型应用；PyTorch 与 Lightning 双卡部署、TensorFlow、JAX、MATLAB 与 Simulink 等人工智能框架；NeRF、3DGS、Diffusion、VLA、PyBullet 与 Isaac 等机器人三维感知和仿真工具；PyQt 与 C# 界面开发、STM32、Altium、CATIA 电气建模、CATIA 与 SolidWorks 结构建模、Ansys 静态仿真及 Adams 动态仿真。本科课程为全英教学，CET-4 595 分，CET-6 547 分。",
+    "url": "/#skills",
+    "evidenceLevel": "public-profile"
+  },
+  {
     "id": "fact-research-thread",
     "locale": "zh",
     "sourceTitle": "博士研究主线",
@@ -114,6 +123,15 @@
     "titlePath": "Education",
     "content": "Zi Fang attended Zhenhai High School of Ningbo from 2014 to 2017. He studied Mechanical Engineering at Shanghai Jiao Tong University from 2017 to 2021, joined the pilot honors program, and was named an outstanding graduate of the school. He began his Mechanical Engineering Ph.D. at the university's Robotics Institute in 2021. His dissertation studies implicit 3D thyroid-ultrasound reconstruction and puncture-navigation systems.",
     "url": "/en/#about",
+    "evidenceLevel": "public-profile"
+  },
+  {
+    "id": "fact-skills-en",
+    "locale": "en",
+    "sourceTitle": "Public skills profile",
+    "titlePath": "Skills",
+    "content": "Zi Fang works with LLM applications including Vibe coding, OpenClaw, RAG, and Harness; AI frameworks including PyTorch and Lightning with dual-GPU deployment, TensorFlow, JAX, MATLAB, and Simulink; robotic 3D perception and simulation tools including NeRF, 3DGS, Diffusion, VLA, PyBullet, and Isaac; and interface, embedded, circuit, mechanical-design, and simulation tools including PyQt, C#, STM32, Altium, CATIA, SolidWorks, Ansys, and Adams. He completed an English-taught undergraduate curriculum and scored 595 on CET-4 and 547 on CET-6.",
+    "url": "/en/#skills",
     "evidenceLevel": "public-profile"
   },
   {

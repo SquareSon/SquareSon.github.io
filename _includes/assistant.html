@@ -5,10 +5,6 @@
   data-locale="{% if is_en %}en{% else %}zh{% endif %}"
   data-rag-endpoint="{{ site.rag_api_url }}"
 >
-  <div class="assistant-status" data-mode="static" aria-live="polite">
-    <span class="status-dot" aria-hidden="true"></span>
-    <span data-assistant-status>{% if is_en %}Static FAQ and on-page search are ready{% else %}静态 FAQ 与站内资料搜索已就绪{% endif %}</span>
-  </div>
   <form data-assistant-form>
     <div class="assistant-config">
       <div class="assistant-field">
@@ -17,27 +13,45 @@
           <option value="auto">{% if is_en %}Auto / resilient routing{% else %}自动 / 可靠路由{% endif %}</option>
         </select>
       </div>
+      <div class="assistant-status-field">
+        <span class="assistant-config-label">{% if is_en %}RAG status{% else %}RAG 状态{% endif %}</span>
+        <div class="assistant-status" data-mode="static" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span data-assistant-status>{% if is_en %}Static search ready{% else %}静态检索已就绪{% endif %}</span>
+        </div>
+      </div>
       <div class="assistant-field">
         <label for="assistant-model">{% if is_en %}Model{% else %}模型{% endif %}</label>
         <select id="assistant-model" data-assistant-model disabled>
           <option value="auto">{% if is_en %}Auto / static fallback{% else %}自动 / 静态降级{% endif %}</option>
         </select>
       </div>
-      <button class="assistant-reset" type="button" data-assistant-reset>{% if is_en %}New chat{% else %}新建对话{% endif %}</button>
     </div>
-    <div class="assistant-transcript" data-assistant-transcript role="log" aria-live="polite" aria-label="{% if is_en %}Conversation{% else %}对话记录{% endif %}"></div>
-    <div class="assistant-controls">
-      <div class="assistant-field">
-        <label for="assistant-question">{% if is_en %}Question{% else %}问题{% endif %}</label>
-        <textarea
-          id="assistant-question"
-          data-assistant-question
-          maxlength="1000"
-          required
-          placeholder="{% if is_en %}Ask about research, publications, or projects…{% else %}询问研究方向、论文或项目……{% endif %}"
-        ></textarea>
+    <div class="assistant-chat-window">
+      <div
+        class="assistant-transcript"
+        data-assistant-transcript
+        data-empty-label="{% if is_en %}Your conversation will appear here.{% else %}问答记录将显示在这里。{% endif %}"
+        role="log"
+        aria-live="polite"
+        aria-label="{% if is_en %}Conversation{% else %}对话记录{% endif %}"
+      ></div>
+      <div class="assistant-controls">
+        <div class="assistant-field assistant-question-field">
+          <label for="assistant-question">{% if is_en %}Question{% else %}问题{% endif %}</label>
+          <textarea
+            id="assistant-question"
+            data-assistant-question
+            maxlength="1000"
+            required
+            placeholder="{% if is_en %}Ask about research, publications, projects, or skills…{% else %}询问研究方向、论文、项目或技能……{% endif %}"
+          ></textarea>
+        </div>
+        <div class="assistant-actions">
+          <button class="assistant-submit" type="submit" data-assistant-submit>{% if is_en %}Ask{% else %}提问{% endif %}</button>
+          <button class="assistant-reset" type="button" data-assistant-reset>{% if is_en %}New chat{% else %}新建对话{% endif %}</button>
+        </div>
       </div>
-      <button class="assistant-submit" type="submit" data-assistant-submit>{% if is_en %}Ask{% else %}提问{% endif %}</button>
     </div>
   </form>
   <div class="assistant-suggestions" aria-label="{% if is_en %}Suggested questions{% else %}推荐问题{% endif %}">
@@ -51,11 +65,4 @@
       <button type="button" data-question="UPI-NeRF 如何引入声学物理先验？">UPI-NeRF</button>
     {% endif %}
   </div>
-  <p class="assistant-footnote">
-    {% if is_en %}
-      Answers are restricted to public materials. If the API, provider, or budget is unavailable, this module automatically returns clearly labeled static search results.
-    {% else %}
-      回答仅限公开材料；API、模型供应商或预算不可用时，本模块会自动返回明确标注的静态检索结果。
-    {% endif %}
-  </p>
 </div>

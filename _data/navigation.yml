@@ -9,6 +9,8 @@ zh:
     url: "/#publications"
   - title: "教育"
     url: "/#education"
+  - title: "技能"
+    url: "/#skills"
   - title: "EN"
     url: "/en/"
 
@@ -23,5 +25,7 @@ en:
     url: "/en/#publications"
   - title: "Education"
     url: "/en/#education"
+  - title: "Skills"
+    url: "/en/#skills"
   - title: "中文"
     url: "/"

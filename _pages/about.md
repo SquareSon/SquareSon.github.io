@@ -41,7 +41,7 @@ profile_label: 作者资料
 
 <h1 id="assistant" class="section-title">研究问答</h1>
 
-<p>可以询问我的研究方向、博士论文、代表项目与公开论文。实时服务会先从公开材料中检索证据，再由所选模型回答；服务不可用时自动退化为静态 FAQ 与本页资料搜索。</p>
+<p>部署了接入本地资料静态检索与RAG的聊天机器人，可以询问我的研究方向、项目内容等等。</p>
 
 {% include assistant.html %}
 
@@ -172,3 +172,13 @@ profile_label: 作者资料
   <li><span class="education-period">2017 — 2021</span><span><span class="education-degree">机械工程 · 工学学士</span><br>上海交通大学 · 机械与动力工程学院<br>试点班 · 院优秀毕业生</span></li>
   <li><span class="education-period">2014 — 2017</span><span><span class="education-degree">高中</span><br>宁波市镇海中学</span></li>
 </ul>
+
+<h1 id="skills" class="section-title">技能</h1>
+
+<dl class="skills-list">
+  <div><dt>大模型应用</dt><dd>Vibe coding、OpenClaw、RAG、Harness</dd></div>
+  <div><dt>人工智能</dt><dd>PyTorch 与 Lightning（双卡部署）、TensorFlow、JAX、MATLAB 与 Simulink</dd></div>
+  <div><dt>机器人三维感知</dt><dd>NeRF、3DGS、Diffusion、VLA、PyBullet 与 Isaac 机器人仿真</dd></div>
+  <div><dt>嵌入式与结构设计</dt><dd>PyQt 与 C# 界面开发、STM32、Altium、CATIA 电气建模；CATIA 与 SolidWorks 结构建模、Ansys 静态仿真、Adams 动态仿真</dd></div>
+  <div><dt>外语水平</dt><dd>本科课程全英教学；CET-4 595，CET-6 547</dd></div>
+</dl>

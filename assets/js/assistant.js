@@ -20,13 +20,12 @@
       readyStatic: '静态 FAQ 与站内资料搜索已就绪',
       readyRag: 'RAG 已连接；失败时自动切换为静态检索',
       working: '正在检索公开材料……',
-      noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、GLA-NeRF、UPI-NeRF、论文列表或教育经历。',
+      noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、项目、论文列表、教育经历或技能。',
       staticPrefix: '静态资料检索：',
       source: '来源',
       ask: '提问',
       user: '你',
       assistant: '研究助理',
-      welcome: '可以连续追问；本次对话的上下文会被带入后续问题。点击“新建对话”即可清除。',
       autoSource: '自动 / 可靠路由',
       autoModel: '自动 / 静态降级',
     },
@@ -34,13 +33,12 @@
       readyStatic: 'Static FAQ and on-page search are ready',
       readyRag: 'RAG is connected; static search remains available',
       working: 'Searching public materials…',
-      noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, GLA-NeRF, UPI-NeRF, publications, or education.',
+      noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, projects, publications, education, or skills.',
       staticPrefix: 'Static material search: ',
       source: 'Source',
       ask: 'Ask',
       user: 'You',
       assistant: 'Research assistant',
-      welcome: 'You can ask follow-up questions. This conversation is supplied as context until you start a new chat.',
       autoSource: 'Auto / resilient routing',
       autoModel: 'Auto / static fallback',
     },
@@ -53,6 +51,7 @@
     { keywords: 'upi nerf ultrasound physics acoustic inverse rendering research manuscript', answer: 'UPI-NeRF introduces ultrasound-physics priors into neural inverse rendering to model view-dependent acoustic formation and improve cross-view reconstruction consistency.', label: 'UPI-NeRF · Research manuscript', href: '/en/#selected-work' },
     { keywords: 'publication paper full list thirteen illustrated order', answer: 'The page lists 13 public papers and research manuscripts. Five are illustrated in this order: GLA-NeRF, UPI-NeRF, EIDC, Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction, and Neural-Guided RRT*.', label: 'Publications', href: '/en/#publications' },
     { keywords: 'education school high school university zhenhai ningbo sjtu', answer: 'Zi Fang attended Zhenhai High School of Ningbo from 2014 to 2017, earned a B.Eng. at Shanghai Jiao Tong University from 2017 to 2021, and pursued a Ph.D. there from 2021 to 2026.', label: 'Education', href: '/en/#about' },
+    { keywords: 'skills technical stack large language model llm rag harness openclaw pytorch lightning tensorflow jax matlab simulink nerf 3dgs diffusion vla pybullet isaac pyqt csharp stm32 altium catia solidworks ansys adams english cet', answer: 'Zi Fang works with LLM applications including Vibe coding, OpenClaw, RAG, and Harness; AI frameworks including PyTorch/Lightning, TensorFlow, JAX, and MATLAB/Simulink; robotic 3D perception tools including NeRF, 3DGS, Diffusion, VLA, PyBullet, and Isaac; and embedded, interface, circuit, mechanical-design, and simulation tools including PyQt/C#, STM32, Altium, CATIA, SolidWorks, Ansys, and Adams. He completed an English-taught undergraduate curriculum and scored 595 on CET-4 and 547 on CET-6.', label: 'Skills', href: '/en/#skills' },
   ] : [
     { keywords: '研究 方向 三维 感知 具身 智能 医疗 机器人 超声 重建 配准 语义 导航', answer: '方子的研究由四条相互衔接的方向构成：器械、影像位姿与形变、表征联合优化的 2D/3D 可变形配准；超声规范化增强与多任务二维语义分割；融合声学物理先验的 NeRF/3DGS 三维逆渲染与语义场；折纸穿刺手术机器人与穿刺路径规划。', label: '研究方向', href: '/#research' },
     { keywords: '博士 论文 甲状腺 超声 问题 贡献', answer: '博士论文面向甲状腺超声引导穿刺，研究链条涵盖观测规范化、连续重建与配准、语义建模以及机器人导航。', label: '博士论文概览', href: '/#research' },
@@ -60,6 +59,7 @@
     { keywords: 'upi nerf 超声 物理 声学 逆 渲染 研究 稿件', answer: 'UPI-NeRF 将超声声学物理先验引入神经逆渲染，建模随视角变化的声学成像过程，并增强跨视角重建的一致性。', label: 'UPI-NeRF · 研究稿件', href: '/#selected-work' },
     { keywords: '论文 发表 文章 十三 图文 顺序', answer: '页面收录 13 篇公开论文与研究稿件，其中 5 篇按顺序图文展示：GLA-NeRF、UPI-NeRF、EIDC、Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction，以及 Neural-Guided RRT*。', label: '论文列表', href: '/#publications' },
     { keywords: '教育 经历 高中 学校 镇海 宁波 交大', answer: '方子于 2014—2017 年就读宁波镇海中学，2017—2021 年在上海交通大学攻读学士学位，2021—2026 年继续在上海交通大学攻读博士学位。', label: '教育经历', href: '/#about' },
+    { keywords: '技能 技术栈 大模型 应用 vibe coding openclaw rag harness 人工智能 pytorch lightning tensorflow jax matlab simulink 机器人 三维 感知 nerf 3dgs diffusion vla pybullet isaac 嵌入式 结构 设计 pyqt c# stm32 altium catia solidworks ansys adams 英语 外语 cet', answer: '方子的技能包括：Vibe coding、OpenClaw、RAG 与 Harness 等大模型应用；PyTorch/Lightning、TensorFlow、JAX 与 MATLAB/Simulink 等人工智能框架；NeRF、3DGS、Diffusion、VLA、PyBullet 与 Isaac 等机器人三维感知和仿真工具；以及 PyQt/C#、STM32、Altium、CATIA、SolidWorks、Ansys 与 Adams 等界面、嵌入式、电路、结构设计和仿真工具。本科课程为全英教学，CET-4 595 分、CET-6 547 分。', label: '技能', href: '/#skills' },
   ];
 
   function setMode(mode, text) {
@@ -103,7 +103,7 @@
   function clearConversation() {
     history = [];
     transcript.replaceChildren();
-    appendMessage('assistant', copy.welcome);
+    question.focus();
   }
 
   function tokens(value) {

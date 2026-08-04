@@ -8,6 +8,7 @@ const files = {
   en: await readFile("_pages/en.md", "utf8"),
   css: await readFile("assets/css/main.scss", "utf8"),
   assistant: await readFile("assets/js/assistant.js", "utf8"),
+  assistantInclude: await readFile("_includes/assistant.html", "utf8"),
   license: await readFile("LICENSE", "utf8"),
 };
 
@@ -17,6 +18,12 @@ assert.match(files.layout, /include author-profile\.html/);
 assert.match(files.css, /grid-template-columns:\s*minmax\(170px, 2fr\) minmax\(0, 10fr\)/);
 assert.match(files.assistant, /staticSearch/);
 assert.match(files.assistant, /qwen|models/);
+assert.match(files.assistant, /fact-skills|label: 'Skills'|label: '技能'/);
+assert.doesNotMatch(files.assistant, /welcome:/);
+assert.match(files.assistantInclude, /assistant-chat-window/);
+assert.match(files.assistantInclude, /assistant-status-field/);
+assert.ok(files.assistantInclude.indexOf("data-assistant-submit") < files.assistantInclude.indexOf("data-assistant-reset"));
+assert.doesNotMatch(files.assistantInclude, /assistant-footnote|回答仅限公开材料|Answers are restricted/);
 assert.match(files.license, /Copyright \(c\) 2022 Yi Ren/);
 
 for (const [locale, source] of [["zh", files.zh], ["en", files.en]]) {
@@ -26,6 +33,10 @@ for (const [locale, source] of [["zh", files.zh], ["en", files.en]]) {
   assert.match(source, /UPI-NeRF/);
   assert.match(source, /EIDC|Canonical Echo-Intensity/);
   assert.match(source, /2014 — 2017/);
+  assert.match(source, /id="skills"/);
+  assert.match(source, /Vibe coding/);
+  assert.match(source, /PyTorch/);
+  assert.match(source, /CET-4/);
   assert.match(source, /Zi-Fang-CV\.pdf/);
   assert.match(source, /fangzi508@sjtu\.edu\.cn|include assistant\.html/);
   assert.ok(source.indexOf('id="research"') < source.indexOf('id="assistant"'), `${locale} assistant follows research`);
@@ -34,4 +45,7 @@ for (const [locale, source] of [["zh", files.zh], ["en", files.en]]) {
   assert.doesNotMatch(source, /\b1\d{10}\b|微信同号|patent list/i);
 }
 
-console.log("Jekyll source validation passed: bilingual research projects, 13 unnumbered publications, assistant fallback, and attribution.");
+assert.match(files.zh, /部署了接入本地资料静态检索与RAG的聊天机器人，可以询问我的研究方向、项目内容等等。/);
+assert.match(files.en, /This chatbot connects local-material static retrieval with RAG/);
+
+console.log("Jekyll source validation passed: bilingual research, skills, 13 unnumbered publications, and conversational assistant UI.");

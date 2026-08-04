@@ -41,7 +41,7 @@ profile_label: Author profile
 
 <h1 id="assistant" class="section-title">Research Assistant</h1>
 
-<p>Ask about my research, dissertation, selected projects, or public publications. The live service retrieves evidence from public materials before the selected model answers; if the service is unavailable, it automatically falls back to static FAQ and on-page search.</p>
+<p>This chatbot connects local-material static retrieval with RAG. You can ask about my research interests, project details, and related work.</p>
 
 {% include assistant.html %}
 
@@ -172,3 +172,13 @@ profile_label: Author profile
   <li><span class="education-period">2017 — 2021</span><span><span class="education-degree">B.Eng. · Mechanical Engineering</span><br>School of Mechanical Engineering, Shanghai Jiao Tong University<br>Pilot honors program · Outstanding graduate of the school</span></li>
   <li><span class="education-period">2014 — 2017</span><span><span class="education-degree">High School</span><br>Zhenhai High School of Ningbo</span></li>
 </ul>
+
+<h1 id="skills" class="section-title">Skills</h1>
+
+<dl class="skills-list">
+  <div><dt>LLM applications</dt><dd>Vibe coding, OpenClaw, RAG, and Harness</dd></div>
+  <div><dt>Artificial intelligence</dt><dd>PyTorch and Lightning with dual-GPU deployment, TensorFlow, JAX, MATLAB, and Simulink</dd></div>
+  <div><dt>Robotic 3D perception</dt><dd>NeRF, 3DGS, Diffusion, VLA, PyBullet, and Isaac robot simulation</dd></div>
+  <div><dt>Embedded and mechanical design</dt><dd>PyQt and C# interface development, STM32, Altium, and CATIA electrical modeling; CATIA and SolidWorks mechanical modeling, Ansys static simulation, and Adams dynamic simulation</dd></div>
+  <div><dt>Languages</dt><dd>English-taught undergraduate curriculum; CET-4: 595, CET-6: 547</dd></div>
+</dl>
