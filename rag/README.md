@@ -9,7 +9,7 @@ This directory contains the reproducible, public-only RAG pipeline for the perso
 3. The pipeline stops before references and research-output appendices, removes non-public patterns, and writes stable IDs, hashes, evidence levels, source paths, and index versions.
 4. `npm run rag:seed` updates the D1 migration with the reviewed public corpus and Chinese/English search tokens.
 
-The generated corpus contains 305 chunks: 295 dissertation chunks plus 10 curated bilingual facts. The ingestion audit checks duplicate IDs, phone-like values, patents, and other excluded terms.
+The generated corpus contains 313 chunks: 295 dissertation chunks plus 18 curated bilingual facts. The ingestion audit checks duplicate IDs, phone-like values, patents, and other excluded terms.
 
 ## Retrieval path
 

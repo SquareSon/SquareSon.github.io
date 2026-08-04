@@ -67,7 +67,7 @@ export function ChatAssistant({ locale }: { locale: Locale }) {
       if (!response.ok || !response.body) throw new Error(`RAG_${response.status}`);
       const contentType = response.headers.get("content-type") ?? "";
       if (!contentType.includes("text/event-stream")) {
-        const payload = (await response.json()) as { answer?: string; degraded?: boolean; citations?: Array<{ label: string; href: string }> };
+        const payload = (await response.json()) as { answer?: string; degraded?: boolean; mode?: "policy"; citations?: Array<{ label: string; href: string }> };
         if (payload.degraded || !payload.answer) throw new Error("RAG_DEGRADED");
         const answer = payload.answer;
         setMessages((current) => [
@@ -77,7 +77,7 @@ export function ChatAssistant({ locale }: { locale: Locale }) {
             role: "assistant",
             text: answer,
             source: payload.citations?.[0],
-            mode: "rag",
+            mode: payload.mode === "policy" ? "static" : "rag",
           },
         ]);
         return;

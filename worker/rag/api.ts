@@ -54,6 +54,24 @@ export async function handleRagRequest(
   const locale: Locale = body.locale === "en" ? "en" : "zh";
   if (!question || question.length > 1000) return json({ error: "invalid_query" }, 400, cors);
 
+  const policyAnswer = getPolicyAnswer(question, locale);
+  if (policyAnswer) {
+    return json(
+      {
+        answer: policyAnswer,
+        mode: "policy",
+        citations: [
+          {
+            label: locale === "zh" ? "公开信息与回答边界" : "Public-information and answer policy",
+            href: locale === "zh" ? "/#research" : "/en/#research",
+          },
+        ],
+      },
+      200,
+      cors,
+    );
+  }
+
   if (!(await verifyTurnstile(request, body.turnstileToken, env))) {
     return json({ degraded: true, reason: "turnstile" }, 200, cors);
   }
@@ -110,6 +128,36 @@ export async function handleRagRequest(
     }),
   );
   return json({ degraded: true, reason: "provider_error" }, 200, cors);
+}
+
+function getPolicyAnswer(question: string, locale: Locale) {
+  const normalized = question.normalize("NFKC").toLocaleLowerCase();
+  const asksForPrivateData = /(手机号|电话号码|微信|身份证|家庭住址|phone number|wechat|identity number|home address)/i.test(normalized);
+  const asksForPatents = /(专利|patents?)/i.test(normalized);
+  const triesToOverride = /(忽略.{0,12}(指令|规则)|系统提示词|泄露.{0,8}(提示词|指令)|ignore.{0,20}instructions|reveal.{0,20}(system prompt|instructions))/i.test(normalized);
+  const asksForMedicalAdvice = /(帮我诊断|请诊断|怎么治疗|如何治疗|该吃什么药|用药剂量|我应该用什么药|diagnose me|diagnose my|how (?:should|do) i treat|what medication should i|medication dose)/i.test(normalized);
+
+  if (asksForPrivateData) {
+    return locale === "zh"
+      ? "我不能披露非公开个人信息。本站只公开机构邮箱 fangzi508@sjtu.edu.cn、Google Scholar 和 GitHub 联系入口。"
+      : "I cannot disclose non-public personal information. This site only publishes the institutional email fangzi508@sjtu.edu.cn, Google Scholar, and GitHub contact links.";
+  }
+  if (asksForPatents) {
+    return locale === "zh"
+      ? "专利已明确排除在本站和公开知识库之外，因此我不提供专利列表或相关细节。"
+      : "Patents are explicitly excluded from this site and its public knowledge base, so I do not provide patent lists or details.";
+  }
+  if (triesToOverride) {
+    return locale === "zh"
+      ? "我不会修改公开范围、披露系统指令或绕过证据约束。可以继续询问方子的公开研究、论文与项目。"
+      : "I will not change the public-data boundary, reveal system instructions, or bypass the evidence policy. You may ask about Zi Fang's public research, papers, and projects.";
+  }
+  if (asksForMedicalAdvice) {
+    return locale === "zh"
+      ? "本站只介绍公开科研工作，不能提供个体诊断、治疗方案或用药建议。如有健康问题，请咨询具备资质的医疗专业人员。"
+      : "This site only describes public research and cannot provide personal diagnosis, treatment plans, or medication advice. Please consult a qualified medical professional for health concerns.";
+  }
+  return null;
 }
 
 function corsHeaders(request: Request, env: RagEnv): Record<string, string> | null {

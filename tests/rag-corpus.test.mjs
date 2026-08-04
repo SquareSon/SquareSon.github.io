@@ -6,7 +6,7 @@ const corpus = JSON.parse(await readFile("rag/corpus/public-knowledge.json", "ut
 const migration = await readFile("drizzle/0000_nice_prism.sql", "utf8");
 
 test("public RAG corpus is bounded, attributable, and privacy-safe", () => {
-  assert.equal(corpus.length, 305);
+  assert.equal(corpus.length, 313);
   assert.equal(corpus.filter((item) => item.id.startsWith("thesis-")).length, 295);
   assert.equal(new Set(corpus.map((item) => item.id)).size, corpus.length);
   assert.ok(corpus.every((item) => item.public === true));

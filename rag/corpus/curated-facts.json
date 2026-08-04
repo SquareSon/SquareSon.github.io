@@ -81,6 +81,78 @@
     "evidenceLevel": "google-scholar"
   },
   {
+    "id": "fact-profile-en",
+    "locale": "en",
+    "sourceTitle": "Public profile",
+    "titlePath": "Biography",
+    "content": "Zi Fang is a direct-entry Ph.D. candidate in Mechanical Engineering at the Robotics Institute, School of Mechanical Engineering, Shanghai Jiao Tong University. His research spans 3D perception, embodied intelligence, and medical robotics. His doctoral period is 2021–2026, and his public institutional email is fangzi508@sjtu.edu.cn.",
+    "url": "/en/#about",
+    "evidenceLevel": "public-profile"
+  },
+  {
+    "id": "fact-education-en",
+    "locale": "en",
+    "sourceTitle": "Public education record",
+    "titlePath": "Education",
+    "content": "Zi Fang studied Mechanical Engineering at Shanghai Jiao Tong University from 2017 to 2021, joined the pilot honors program, and was named an outstanding graduate of the school. He began his Mechanical Engineering Ph.D. at the university's Robotics Institute in 2021. His dissertation studies implicit 3D thyroid-ultrasound reconstruction and puncture-navigation systems.",
+    "url": "/en/#about",
+    "evidenceLevel": "public-profile"
+  },
+  {
+    "id": "fact-research-thread-en",
+    "locale": "en",
+    "sourceTitle": "Doctoral research thread",
+    "titlePath": "Research thread",
+    "content": "The doctoral research follows five stages: trustworthy observation, continuous representation, spatial unification, semantic modeling, and physical coordinates. It screens and normalizes ultrasound observations, builds continuous 3D neural-field representations, jointly optimizes multi-sweep poses and deformation, models tissue and needle semantics in canonical space, and connects images, poses, 3D fields, and instrument workpoints in a navigation prototype.",
+    "url": "/en/#research",
+    "evidenceLevel": "thesis-synthesis"
+  },
+  {
+    "id": "fact-evidence-boundary-en",
+    "locale": "en",
+    "sourceTitle": "Dissertation evidence boundary",
+    "titlePath": "Scope of conclusions",
+    "content": "Current evidence supports conclusions at method, module, and phantom proof-of-principle prototype levels. Needle geometry has single-case phantom evidence; 2D advantages of the imaging-plane conditional field cannot be generalized to a direction-independent 3D advantage; component calibration residuals are not end-to-end puncture accuracy; clinical safety has not been experimentally established.",
+    "url": "/en/#research",
+    "evidenceLevel": "thesis-boundary"
+  },
+  {
+    "id": "fact-project-neural-field-en",
+    "locale": "en",
+    "sourceTitle": "Physics-consistent 3D ultrasound neural field",
+    "titlePath": "Representative project",
+    "content": "The physics-consistent 3D ultrasound neural field combines column-level valid-contact screening, a continuous neural field, Rayleigh backscatter, and direction-parameterized reflection. It reconstructs a 3D intensity field while retaining interpretable acoustic image-formation mechanisms. This is doctoral method research and is not presented as a Google Scholar-indexed paper on the site.",
+    "url": "/en/#projects",
+    "evidenceLevel": "doctoral-research"
+  },
+  {
+    "id": "fact-project-gla-en",
+    "locale": "en",
+    "sourceTitle": "GLA-NeRF",
+    "titlePath": "Representative project / Multi-sweep alignment",
+    "content": "GLA-NeRF addresses multi-sweep freehand 3D ultrasound by separating alignment error into sweep-level global rigid bias and frame-level local error. Appearance retrieval, geometric inliers, uncertainty weighting, and continuous-trajectory constraints jointly optimize poses and the neural field in canonical space. The paper appeared in Physics in Medicine & Biology in 2026.",
+    "url": "/en/#projects",
+    "evidenceLevel": "published-paper"
+  },
+  {
+    "id": "fact-project-semantics-en",
+    "locale": "en",
+    "sourceTitle": "Tissue semantics and needle geometry",
+    "titlePath": "Representative project / Semantic modeling",
+    "content": "The tissue-semantics and needle-geometry pipeline combines input-domain normalization, low-label multi-task 2D segmentation, a continuous multi-view conditional semantic field, and needle-geometry recovery. It models the thyroid, vessels, nodules, and puncture needle for 3D anatomy, path planning, and navigation localization.",
+    "url": "/en/#projects",
+    "evidenceLevel": "doctoral-research"
+  },
+  {
+    "id": "fact-project-prototype-en",
+    "locale": "en",
+    "sourceTitle": "Thyroid-ultrasound puncture-navigation prototype",
+    "titlePath": "Representative project / Proof-of-principle prototype",
+    "content": "The navigation prototype integrates freehand ultrasound, binocular near-infrared tracking, N-wire probe calibration, needle-tip pivot calibration, a repeatable thyroid phantom, and four software workbenches. It establishes a physical coordinate chain across images, poses, 3D fields, tissue semantics, and instrument workpoints. Its evidence remains at proof-of-principle and phantom level.",
+    "url": "/en/#projects",
+    "evidenceLevel": "prototype-evidence"
+  },
+  {
     "id": "fact-publications-list",
     "locale": "en",
     "sourceTitle": "Google Scholar public record",
