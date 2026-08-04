@@ -22,7 +22,7 @@
     "locale": "zh",
     "sourceTitle": "公开教育经历",
     "titlePath": "教育经历",
-    "content": "方子于 2017 年至 2021 年在上海交通大学机械与动力工程学院学习机械工程，参加试点班并获院优秀毕业生；2021 年起在上海交通大学机械与动力工程学院机器人所攻读机械工程博士学位。博士课题为甲状腺超声隐式三维重建与穿刺手术导航系统研究。",
+    "content": "方子于 2014 年至 2017 年就读于宁波市镇海中学；2017 年至 2021 年在上海交通大学机械与动力工程学院学习机械工程，参加试点班并获院优秀毕业生；2021 年起在上海交通大学机械与动力工程学院机器人所攻读机械工程博士学位。博士课题为甲状腺超声隐式三维重建与穿刺手术导航系统研究。",
     "url": "/#about",
     "evidenceLevel": "public-profile"
   },
@@ -31,7 +31,7 @@
     "locale": "zh",
     "sourceTitle": "博士研究主线",
     "titlePath": "研究主线",
-    "content": "博士研究沿可信观测、连续表征、空间统一、语义建模、物理坐标五步展开：先识别有效超声观测并规范输入域，再以神经场建立连续三维表征，随后联合优化多扫查位姿与形变，在规范空间中构建组织和针体语义，最后把图像、位姿、三维场和器械工作点连接到导航原理样机。",
+    "content": "博士研究由四条相互连接的项目主线构成：器械与影像位姿估计及位姿、形变、表征联合优化的 2D/3D 可变形配准；超声规范化增强与多任务二维语义分割；结合 NeRF/3DGS 和声学物理先验的三维逆渲染与语义场；折纸穿刺手术机器人与穿刺路径规划。",
     "url": "/#research",
     "evidenceLevel": "thesis-synthesis"
   },
@@ -47,45 +47,45 @@
   {
     "id": "fact-project-neural-field",
     "locale": "zh",
-    "sourceTitle": "物理一致三维超声神经场",
-    "titlePath": "代表项目",
-    "content": "物理一致三维超声神经场把列级有效接触筛选、连续神经场、瑞利背散射和方向参数化反射结合起来，在重建三维强度场的同时保留可解释的声学形成机制。该工作属于博士论文的方法研究，不在网站上表述为 Google Scholar 已收录论文。",
+    "sourceTitle": "三维逆渲染与语义场",
+    "titlePath": "代表研究 / NeRF、3DGS 与声学物理",
+    "content": "NeRF/3DGS 和声学物理先验的三维逆渲染与语义场研究利用位姿—图像对建立连续三维表征，将衰减、瑞利背散射、微表面反射与方向参数化纳入可微渲染，并以连续语义场替代离散体素写入，形成可供路径规划查询的三维解剖结构。UPI-NeRF 是该方向的研究稿件。",
     "url": "/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
     "id": "fact-project-gla",
     "locale": "zh",
-    "sourceTitle": "GLA-NeRF",
-    "titlePath": "代表项目 / 多扫查配准",
-    "content": "GLA-NeRF 面向多扫查自由手三维超声，把对齐偏差分为扫查级全局刚性偏差与帧级局部误差，通过外观检索、几何内点、不确定性加权和连续轨迹约束联合优化位姿与神经场，使多次扫查映射到规范空间。论文发表于 Physics in Medicine & Biology，年份为 2026。",
+    "sourceTitle": "位姿估计与 2D/3D 可变形配准",
+    "titlePath": "代表研究 / 位姿、形变与表征联合优化",
+    "content": "器械、影像位姿估计与 2D/3D 可变形配准研究融合双目近红外相机、IMU 与 N 线探头标定，把多扫查偏差分为 sweep 级全局刚性偏差、frame 级高频抖动和受力条件微分同胚形变场，并通过分层匹配、Lie 群 B 样条、Morph 场与 NeRF/3DGS 联合优化映射到规范空间。GLA-NeRF 发表于 Physics in Medicine & Biology，年份为 2026。",
     "url": "/#selected-work",
     "evidenceLevel": "published-paper"
   },
   {
     "id": "fact-project-semantics",
     "locale": "zh",
-    "sourceTitle": "组织语义与针体几何",
-    "titlePath": "代表项目 / 语义建模",
-    "content": "组织语义与针体几何方法链包括输入域规范化、低标注多任务二维分割、连续多视角条件语义场和针体几何恢复。目标对象包括甲状腺、血管、结节和穿刺针，输出用于三维解剖表达、路径规划和导航定位。",
+    "sourceTitle": "超声规范化与多任务二维语义",
+    "titlePath": "代表研究 / 规范化增强与二维分割",
+    "content": "超声规范化增强与多任务二维语义分割先通过高维表征的流形分析筛除低质量接触，再以 EIDC 图像域成像响应建模和采集条件模拟获得规范回声强度代理；共享编码器与任务分支联合分割甲状腺、结节、血管和穿刺针，并加入语义引导、解剖几何约束与细长针体拓扑监督。",
     "url": "/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
     "id": "fact-project-prototype",
     "locale": "zh",
-    "sourceTitle": "甲状腺超声穿刺导航原理样机",
-    "titlePath": "代表项目 / 原理样机",
-    "content": "导航原理样机集成自由手超声采集、双目近红外外部定位、N 线探头标定、针尖枢轴标定、可重复甲状腺假体和四个软件工作台，建立图像、位姿、三维场、组织语义与器械工作点之间的物理坐标链。该系统的证据是原理样机和假体层级。",
+    "sourceTitle": "折纸穿刺机器人与路径规划",
+    "titlePath": "代表研究 / 具身系统",
+    "content": "折纸穿刺手术机器人与穿刺路径规划研究面向头颈部设计小尺寸五自由度机器人，由折纸支链三自由度并联机构与下层五杆二自由度机构组成。规划部分使用 BiT* 搜索满足柔性针运动约束并避开风险组织的路径，并通过学习模型预测候选入针点与非均匀采样区域。",
     "url": "/#selected-work",
     "evidenceLevel": "prototype-evidence"
   },
   {
     "id": "fact-publications",
     "locale": "zh",
-    "sourceTitle": "Google Scholar 公开论文记录",
+    "sourceTitle": "公开论文与研究稿件",
     "titlePath": "论文成果",
-    "content": "截至 2026 年 8 月 4 日，Zi Fang 的 Google Scholar 主页公开 11 篇论文，涵盖多扫查三维超声、可穿戴穿刺机器人、穿刺路径规划、冠脉介入与分割、多执行器容错控制、紧固件寿命预测和工业机器人故障诊断。其中已公开的一作论文是 GLA-NeRF（2026）、基于 IMU 与降维的螺栓松动寿命预测（2023）和基于降维与随机森林的工业机器人故障诊断（2021）。论文数量、题目、发表载体与年份以 Google Scholar 为唯一权威来源。",
+    "content": "个人主页连续展示 13 项论文与研究稿件，其中 5 项配图工作按顺序为 GLA-NeRF、UPI-NeRF、EIDC、基于 IMU 与降维的螺栓松动寿命预测、Neural-Guided RRT*。UPI-NeRF 在主页中标记为研究稿件；EIDC 的题目为 From B-Mode Images to Canonical Echo-Intensity Representations for Robust Thyroid Ultrasound Segmentation。其余公开论文以紧凑文本形式展示。",
     "url": "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN",
     "evidenceLevel": "google-scholar"
   },
@@ -112,7 +112,7 @@
     "locale": "en",
     "sourceTitle": "Public education record",
     "titlePath": "Education",
-    "content": "Zi Fang studied Mechanical Engineering at Shanghai Jiao Tong University from 2017 to 2021, joined the pilot honors program, and was named an outstanding graduate of the school. He began his Mechanical Engineering Ph.D. at the university's Robotics Institute in 2021. His dissertation studies implicit 3D thyroid-ultrasound reconstruction and puncture-navigation systems.",
+    "content": "Zi Fang attended Zhenhai High School of Ningbo from 2014 to 2017. He studied Mechanical Engineering at Shanghai Jiao Tong University from 2017 to 2021, joined the pilot honors program, and was named an outstanding graduate of the school. He began his Mechanical Engineering Ph.D. at the university's Robotics Institute in 2021. His dissertation studies implicit 3D thyroid-ultrasound reconstruction and puncture-navigation systems.",
     "url": "/en/#about",
     "evidenceLevel": "public-profile"
   },
@@ -121,7 +121,7 @@
     "locale": "en",
     "sourceTitle": "Doctoral research thread",
     "titlePath": "Research thread",
-    "content": "The doctoral research follows five stages: trustworthy observation, continuous representation, spatial unification, semantic modeling, and physical coordinates. It screens and normalizes ultrasound observations, builds continuous 3D neural-field representations, jointly optimizes multi-sweep poses and deformation, models tissue and needle semantics in canonical space, and connects images, poses, 3D fields, and instrument workpoints in a navigation prototype.",
+    "content": "The doctoral work has four connected project directions: instrument and image pose estimation with joint pose, deformation, and representation optimization for 2D/3D deformable registration; ultrasound canonicalization and multi-task 2D semantic segmentation; 3D inverse rendering and semantic fields with NeRF/3DGS and acoustic priors; and an origami puncture robot with puncture-path planning.",
     "url": "/en/#research",
     "evidenceLevel": "thesis-synthesis"
   },
@@ -137,45 +137,45 @@
   {
     "id": "fact-project-neural-field-en",
     "locale": "en",
-    "sourceTitle": "Physics-consistent 3D ultrasound neural field",
-    "titlePath": "Representative project",
-    "content": "The physics-consistent 3D ultrasound neural field combines column-level valid-contact screening, a continuous neural field, Rayleigh backscatter, and direction-parameterized reflection. It reconstructs a 3D intensity field while retaining interpretable acoustic image-formation mechanisms. This is doctoral method research and is not presented as a Google Scholar-indexed paper on the site.",
+    "sourceTitle": "3D inverse rendering and semantic fields",
+    "titlePath": "Selected research / NeRF, 3DGS, and acoustic physics",
+    "content": "The 3D inverse-rendering and semantic-field direction builds continuous representations from image-pose pairs, introduces attenuation, Rayleigh backscatter, microfacet reflection, and direction parameterization into differentiable rendering, and replaces discrete voxel writing with a continuous semantic field for path-planning queries. UPI-NeRF is shown as a research manuscript in this direction.",
     "url": "/en/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
     "id": "fact-project-gla-en",
     "locale": "en",
-    "sourceTitle": "GLA-NeRF",
-    "titlePath": "Representative project / Multi-sweep alignment",
-    "content": "GLA-NeRF addresses multi-sweep freehand 3D ultrasound by separating alignment error into sweep-level global rigid bias and frame-level local error. Appearance retrieval, geometric inliers, uncertainty weighting, and continuous-trajectory constraints jointly optimize poses and the neural field in canonical space. The paper appeared in Physics in Medicine & Biology in 2026.",
+    "sourceTitle": "Pose estimation and 2D/3D deformable registration",
+    "titlePath": "Selected research / Joint pose, deformation, and representation optimization",
+    "content": "The instrument/image pose-estimation and 2D/3D deformable-registration direction combines stereo NIR cameras, an IMU, and N-wire probe calibration. It separates discrepancy into sweep-level rigid bias, frame-level jitter, and force-conditioned diffeomorphic deformation, then combines hierarchical matching, Lie-group B-splines, Morph fields, and NeRF/3DGS optimization in canonical space. GLA-NeRF appeared in Physics in Medicine & Biology in 2026.",
     "url": "/en/#selected-work",
     "evidenceLevel": "published-paper"
   },
   {
     "id": "fact-project-semantics-en",
     "locale": "en",
-    "sourceTitle": "Tissue semantics and needle geometry",
-    "titlePath": "Representative project / Semantic modeling",
-    "content": "The tissue-semantics and needle-geometry pipeline combines input-domain normalization, low-label multi-task 2D segmentation, a continuous multi-view conditional semantic field, and needle-geometry recovery. It models the thyroid, vessels, nodules, and puncture needle for 3D anatomy, path planning, and navigation localization.",
+    "sourceTitle": "Ultrasound canonicalization and multi-task 2D semantics",
+    "titlePath": "Selected research / Canonicalization and segmentation",
+    "content": "The ultrasound-canonicalization and multi-task 2D segmentation direction uses manifold analysis to screen poor contact, EIDC image-domain response modeling and acquisition simulation to form a canonical echo-intensity proxy, and shared-encoder task branches with semantic guidance, anatomical constraints, and needle-topology supervision to segment the thyroid, nodules, vessels, and needle.",
     "url": "/en/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
     "id": "fact-project-prototype-en",
     "locale": "en",
-    "sourceTitle": "Thyroid-ultrasound puncture-navigation prototype",
-    "titlePath": "Representative project / Proof-of-principle prototype",
-    "content": "The navigation prototype integrates freehand ultrasound, binocular near-infrared tracking, N-wire probe calibration, needle-tip pivot calibration, a repeatable thyroid phantom, and four software workbenches. It establishes a physical coordinate chain across images, poses, 3D fields, tissue semantics, and instrument workpoints. Its evidence remains at proof-of-principle and phantom level.",
+    "sourceTitle": "Origami puncture robot and path planning",
+    "titlePath": "Selected research / Embodied system",
+    "content": "The origami puncture-robot and path-planning direction develops a compact five-DoF head-and-neck puncture robot from an origami-chain three-DoF parallel stage and a lower five-bar two-DoF mechanism. BiT* searches for flexible-needle paths that avoid risk structures, while learned models predict candidate entry points and non-uniform sampling regions.",
     "url": "/en/#selected-work",
     "evidenceLevel": "prototype-evidence"
   },
   {
     "id": "fact-publications-list",
     "locale": "en",
-    "sourceTitle": "Google Scholar public record",
+    "sourceTitle": "Public papers and research manuscripts",
     "titlePath": "Publications",
-    "content": "As of 4 August 2026, Zi Fang's Google Scholar profile lists 11 publications spanning multi-sweep 3D ultrasound, wearable puncture robots, puncture path planning, coronary intervention and segmentation, fault-tolerant control, bolted-joint life prediction, and industrial-robot fault diagnosis. His public first-author papers are GLA-NeRF (2026), Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction (2023), and Fault Diagnosis Method for Industrial Robots based on Dimension Reduction and Random Forest (2021). Google Scholar is the authoritative source for titles, venues, years, and publication status.",
+    "content": "The homepage shows 13 papers and research manuscripts in one continuous publication section. The five illustrated works, in order, are GLA-NeRF, UPI-NeRF, EIDC, Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction, and Neural-Guided RRT*. UPI-NeRF is labeled as a research manuscript; EIDC is titled From B-Mode Images to Canonical Echo-Intensity Representations for Robust Thyroid Ultrasound Segmentation. The remaining public papers use compact text entries.",
     "url": "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN",
     "evidenceLevel": "google-scholar"
   }

@@ -20,7 +20,7 @@
       readyStatic: '静态 FAQ 与站内资料搜索已就绪',
       readyRag: 'RAG 已连接；失败时自动切换为静态检索',
       working: '正在检索公开材料……',
-      noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、GLA-NeRF、论文列表或联系方式。',
+      noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、GLA-NeRF、UPI-NeRF、论文列表或教育经历。',
       staticPrefix: '静态资料检索：',
       source: '来源',
       ask: '提问',
@@ -34,7 +34,7 @@
       readyStatic: 'Static FAQ and on-page search are ready',
       readyRag: 'RAG is connected; static search remains available',
       working: 'Searching public materials…',
-      noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, GLA-NeRF, publications, or contact details.',
+      noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, GLA-NeRF, UPI-NeRF, publications, or education.',
       staticPrefix: 'Static material search: ',
       source: 'Source',
       ask: 'Ask',
@@ -47,19 +47,19 @@
   }[locale];
 
   const documents = locale === 'en' ? [
-    { keywords: 'research areas focus 3d perception embodied intelligence medical robotics ultrasound reconstruction registration semantics navigation', answer: 'Zi Fang studies 3D perception, embodied intelligence, and medical robotics. The doctoral work connects trustworthy ultrasound observation, continuous 3D reconstruction, multi-sweep alignment, tissue and needle semantics, and a navigation prototype.', label: 'Research interests', href: '/en/#research' },
-    { keywords: 'thesis dissertation thyroid ultrasound problem contribution', answer: 'The dissertation addresses ultrasound-guided thyroid puncture through a traceable chain from observation and continuous reconstruction to semantic modeling and physical navigation coordinates. Its experiments support method-, module-, and phantom-prototype-level conclusions.', label: 'Dissertation overview', href: '/en/#research' },
+    { keywords: 'research areas focus 3d perception embodied intelligence medical robotics ultrasound reconstruction registration semantics navigation', answer: 'Zi Fang studies four connected directions: joint optimization of instrument pose, image pose, deformation, and representation for deformable 2D/3D registration; ultrasound canonicalization with multi-task 2D semantic segmentation; NeRF/3DGS inverse rendering and semantic fields with acoustic priors; and origami puncture robots with path planning.', label: 'Research interests', href: '/en/#research' },
+    { keywords: 'thesis dissertation thyroid ultrasound problem contribution', answer: 'The dissertation develops an ultrasound-guided thyroid puncture workflow spanning observation normalization, continuous reconstruction and registration, semantic modeling, and robot navigation.', label: 'Dissertation overview', href: '/en/#research' },
     { keywords: 'gla nerf multi sweep registration alignment global local pose', answer: 'GLA-NeRF separates multi-sweep misalignment into global sweep-level bias and local frame-level error, then jointly optimizes poses and a neural field using appearance, geometric consistency, and continuous-trajectory constraints.', label: 'GLA-NeRF · PMB 2026', href: '/en/#selected-work' },
-    { keywords: 'clinical validation accuracy safety evidence phantom prototype', answer: 'No clinical validation is claimed. Current evidence covers methods, modules, and phantom prototypes; component calibration residuals must not be interpreted as end-to-end puncture accuracy or clinical safety.', label: 'Evidence boundary', href: '/en/#about' },
-    { keywords: 'publication paper scholar full list eleven', answer: 'Google Scholar is the authoritative source for publications. The page lists 11 records synchronized on 4 August 2026 and does not treat unpublished work as a publication.', label: 'Publications', href: '/en/#publications' },
-    { keywords: 'contact email collaboration', answer: 'Contact Zi Fang through the institutional email fangzi508@sjtu.edu.cn for discussions on 3D perception, medical imaging, medical robotics, or research collaboration.', label: 'Public contact', href: 'mailto:fangzi508@sjtu.edu.cn' },
+    { keywords: 'upi nerf ultrasound physics acoustic inverse rendering research manuscript', answer: 'UPI-NeRF introduces ultrasound-physics priors into neural inverse rendering to model view-dependent acoustic formation and improve cross-view reconstruction consistency.', label: 'UPI-NeRF · Research manuscript', href: '/en/#selected-work' },
+    { keywords: 'publication paper full list thirteen illustrated order', answer: 'The page lists 13 public papers and research manuscripts. Five are illustrated in this order: GLA-NeRF, UPI-NeRF, EIDC, Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction, and Neural-Guided RRT*.', label: 'Publications', href: '/en/#publications' },
+    { keywords: 'education school high school university zhenhai ningbo sjtu', answer: 'Zi Fang attended Zhenhai High School of Ningbo from 2014 to 2017, earned a B.Eng. at Shanghai Jiao Tong University from 2017 to 2021, and pursued a Ph.D. there from 2021 to 2026.', label: 'Education', href: '/en/#about' },
   ] : [
-    { keywords: '研究 方向 三维 感知 具身 智能 医疗 机器人 超声 重建 配准 语义 导航', answer: '方子的研究围绕三维感知、具身智能与医疗机器人，博士工作把可信超声观测、连续三维重建、多扫查配准、组织与针体语义以及导航原理样机连接成完整方法链。', label: '研究方向', href: '/#research' },
-    { keywords: '博士 论文 甲状腺 超声 问题 贡献', answer: '博士论文面向甲状腺超声引导穿刺，从可信观测和连续三维重建推进到空间统一、语义建模与物理导航坐标。实验结论限定在方法、模块与假体原理样机层面。', label: '博士论文概览', href: '/#research' },
+    { keywords: '研究 方向 三维 感知 具身 智能 医疗 机器人 超声 重建 配准 语义 导航', answer: '方子的研究由四条相互衔接的方向构成：器械、影像位姿与形变、表征联合优化的 2D/3D 可变形配准；超声规范化增强与多任务二维语义分割；融合声学物理先验的 NeRF/3DGS 三维逆渲染与语义场；折纸穿刺手术机器人与穿刺路径规划。', label: '研究方向', href: '/#research' },
+    { keywords: '博士 论文 甲状腺 超声 问题 贡献', answer: '博士论文面向甲状腺超声引导穿刺，研究链条涵盖观测规范化、连续重建与配准、语义建模以及机器人导航。', label: '博士论文概览', href: '/#research' },
     { keywords: 'gla nerf 多扫查 配准 全局 局部 位姿', answer: 'GLA-NeRF 把多扫查偏差分成扫查级全局偏差与帧级局部误差，通过外观、几何一致性和连续轨迹约束联合优化位姿与神经场。', label: 'GLA-NeRF · PMB 2026', href: '/#selected-work' },
-    { keywords: '临床 验证 精度 安全 证据 假体 样机', answer: '现有工作没有宣称完成临床验证。当前证据覆盖方法、模块与假体原理样机；分项标定残差不能解释为端到端穿刺精度或临床安全性。', label: '证据边界', href: '/#about' },
-    { keywords: '论文 发表 文章 学术 scholar 十一', answer: '论文以 Google Scholar 为权威来源。本站列出 2026 年 8 月 4 日同步到的 11 条记录，不把尚未正式发布的工作列为论文。', label: '论文列表', href: '/#publications' },
-    { keywords: '联系 邮箱 合作', answer: '可通过上海交通大学机构邮箱 fangzi508@sjtu.edu.cn 联系方子，讨论三维感知、医学影像、医疗机器人或研究合作。', label: '公开联系方式', href: 'mailto:fangzi508@sjtu.edu.cn' },
+    { keywords: 'upi nerf 超声 物理 声学 逆 渲染 研究 稿件', answer: 'UPI-NeRF 将超声声学物理先验引入神经逆渲染，建模随视角变化的声学成像过程，并增强跨视角重建的一致性。', label: 'UPI-NeRF · 研究稿件', href: '/#selected-work' },
+    { keywords: '论文 发表 文章 十三 图文 顺序', answer: '页面收录 13 篇公开论文与研究稿件，其中 5 篇按顺序图文展示：GLA-NeRF、UPI-NeRF、EIDC、Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction，以及 Neural-Guided RRT*。', label: '论文列表', href: '/#publications' },
+    { keywords: '教育 经历 高中 学校 镇海 宁波 交大', answer: '方子于 2014—2017 年就读宁波镇海中学，2017—2021 年在上海交通大学攻读学士学位，2021—2026 年继续在上海交通大学攻读博士学位。', label: '教育经历', href: '/#about' },
   ];
 
   function setMode(mode, text) {

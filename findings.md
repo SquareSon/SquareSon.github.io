@@ -223,3 +223,27 @@
 - IEEE 官方政策允许作者在个人网站发布符合条件的 Accepted Article，并要求 DOI/版权声明，但非开放获取的 Version of Record 与 proof 不能直接上传；IOP 允许个人网站自存档 Accepted Manuscript，订阅文章的最终排版版则不能按该一般条款上传。因此现阶段不复制用户提供的论文 PDF，只提供 Scholar/DOI 链接，并为每篇论文保留后续逐项确认许可的入口。
 - 公开简历由独立脚本从公开事实生成中英双语 A4 PDF，不复制原简历中的手机号、微信、专利或未正式发布工作。文本扫描与两页渲染复核均通过。
 - RAG 新增中英文求职状态事实，最终为 315 个公开片段（295 个博士论文片段 + 20 个核对事实）；32 个中英文评测问题达到 Recall@1 0.906、Recall@6 1.000、MRR 0.944，无 top-6 miss。
+
+### 指定图件来源（2026-08-05）
+
+- 新版博士论文位于 `/WorkSpace/Data/PersonalHomepage/毕业论文-20260804-15.docx`；论文 PDF 位于 `/WorkSpace/Data/Personal Homepage/Publications/`。
+- 需要精确提取 9 个图件：博士论文图 3.3、3.4、4.5、4.8、4.12；UPI-NeRF Fig. 1；Prediction for Loosening Life Fig. 1；Neural-Guided RRT* Fig. 1 与 Fig. 3。
+- 论文展示按用户给定顺序连续排列：GLA-NeRF、UPI-NeRF、EIDC、Prediction for Loosening Life、Neural-Guided RRT*；不再使用“重点/其他”分组、编号、说明框或卡片底部 DOI/Scholar 链接。
+- DOCX 图件已定位到原始 PNG：图 3.3=`rId21/image8.png`（1341×505），图 3.4=`rId78/image63.png`（1342×747），图 4.5=`rId96/image80.png`（1476×994），图 4.8=`rId99/image83.png`（2700×1650），图 4.12=`rId103/image87.png`（2400×1320）。图 4.5 与紧随其后的图 4.6 在文档中各自为独立图片，前者确定为 `rId96`。
+- PDF 页面视觉复核：UPI-NeRF Fig. 1 位于 PDF 第 3 页上部，为三段式超声神经渲染架构；Neural-Guided RRT* Fig. 1 位于第 2 页右上，为穿刺针空间圆弧轨迹；Fig. 3 位于第 4 页上部，为入口点选择与最优路径预测网络。Prediction PDF 第 1 页没有目标图，文本抽取跨页顺序造成误判，需继续在第 2 页定位实际 Fig. 1。
+- Prediction Fig. 1 确认位于 PDF 第 2 页上部，为“采集—预处理—特征提取/降维—预测”流程图。9 张最终图片已提取并逐张视觉复核；首次 UPI/RRT 裁切带入图注或截断图注，已收紧裁切边界，最终版只保留完整图形且无正文/残缺图注。
+- 简历中的四条项目主线及时间已核对：位姿估计/2D-3D 可变形配准（2023.09—至今）、超声规范化与多任务二维分割（2024.09—2025.09）、NeRF/3DGS 与声学先验三维逆渲染/语义场（2024.06—至今）、折纸穿刺机器人与路径规划（2026.01—至今）。主页中英文代表研究已按这四条主线重写。
+- 简历列出 UPI-NeRF 为研究稿件，EIDC 为 2026 PRAI 工作；本轮按用户明确要求将二者纳入连续论文展示，同时保留 UPI-NeRF 的“研究稿件/Research manuscript”状态，避免把匿名评审稿写成已正式发表。
+- LibreOffice 渲染新版博士论文后复核发现，图 3.3 和图 3.4 含有 Word 层叠加的英文标签与公式；仅复制 DOCX 内部 PNG 会遗漏这些叠加内容。图 4.5、4.8、4.12 的内部 PNG 则已包含完整图形。提取脚本需用渲染后 PDF 裁切覆盖图 3.3/3.4，其余三张继续保留原始 PNG 清晰度。
+- 图 3.3/3.4 最终裁切使用 LibreOffice PDF 中图片对象的精确边界（图 3.3：PDF 第 89 页；图 3.4：第 91 页），已排除页眉、正文和图注，同时完整保留 Word 叠加标签与公式；两张最终图再次视觉复核通过。
+- 页面回归确认共展示 13 条成果，其中 5 条图文展示、8 条无编号紧凑展示；用户点名移除的三段说明、两个分组标题和卡片底部 DOI/Scholar 标签均未进入渲染页面。
+- 线上 RAG 数据层已与页面同步：D1 保持 315 条，Vectorize 保持 315 个 1024 维向量并完成 14 条增量覆盖；高中事实、四条研究主线和五篇图文成果顺序均可被线上检索召回。
+
+### 本地 RTX 5090 与 RAG 可行性（2026-08-05）
+
+- 实机检测到 `NVIDIA GeForce RTX 5090`（驱动 575.64.03），总显存 32607 MiB、空闲 30941 MiB；硬件足以运行本地 BGE-M3 的批量 embedding 和 reranker 实验。当前环境尚未安装 `torch`、`FlagEmbedding`、`faiss` 或 `qdrant-client`，也没有 Ollama；Docker 与 Python/uv 可用。
+- 现有公开语料为 315 个片段；摄取脚本已基于标题路径与正文生成稳定的 SHA-256 `hash`，并将 hash、ID 和 `indexVersion` 写入语料和 D1。D1 种子会以 chunk ID upsert，Worker 通过 BGE-M3 → Vectorize 进行 dense 检索，同时使用 D1 FTS 与静态词法路径，再 RRF 和 rerank。
+- 现有脚本没有保存持久化 document-embedding cache，且没有本地向量索引构建/发布脚本。因此重新运行全文摄取可复用 chunk ID，但仍不能自动避免再次向云端 embedding。
+- 公网 Worker 健康检查在本机实测返回 200，首次字节约 0.516 秒；当前检索绑定（D1、Vectorize、reranker）均为可用。315 块规模下，ANN 查询不太可能是主导延迟；公开问答的模型生成和互联网往返更重要。
+- 官方 BGE-M3 模型卡说明其为多语言 1024 维模型，覆盖 dense/sparse/multi-vector 检索，并建议“混合检索 + 重排”；这与本站当前 dense + FTS + RRF + rerank 设计一致。Cloudflare Vectorize 的索引维度是创建时固定的，模型/维度改变需要新建索引，不能混插不同向量空间。
+- 结论：推荐“本地 GPU 负责离线增量构建和评测，Cloudflare 负责公开在线查询”的混合架构。把公开查询直接改为访问家中设备会增加隧道、可用性、维护和安全风险，且在当前小语料规模下没有确定的访客加速收益。

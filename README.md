@@ -48,7 +48,13 @@ The downloadable bilingual public CV is rebuilt separately so private resume fie
 conda run -n codex-tools python scripts/build-public-cv.py
 ```
 
-The script writes the reviewed site copy to `files/Zi-Fang-CV.pdf`. Publication PDFs supplied as research material are not copied into the public repository by default; the homepage links to Scholar/DOI records until the distributable version and its article-specific licence are confirmed.
+The CV script writes the reviewed site copy to `files/Zi-Fang-CV.pdf`. Publication PDFs supplied as research material are not copied into the public repository by default; the homepage links to public records until the distributable version and its article-specific licence are confirmed.
+
+The nine publication and research-track figures are reproducibly extracted from the authorized thesis and paper sources with:
+
+```bash
+conda run -n codex-tools python scripts/extract-homepage-figures.py
+```
 
 ## Research assistant
 

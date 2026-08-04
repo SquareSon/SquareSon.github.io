@@ -6,6 +6,15 @@
 
 ## 当前阶段
 
+### 指定图件与内容精简（2026-08-05）
+
+- [x] 从新版博士论文与论文 PDF 精确提取 9 个指定图件并完成视觉核对
+- [x] 按简历四条技术主线重写中英文代表研究并替换配图
+- [x] 将论文改为 5 个连续图文条目加无编号紧凑列表，移除说明、分组与底部链接
+- [x] 为中英文教育经历补充 2014—2017 宁波市镇海中学
+- [x] 更新公开 RAG 事实与回归测试
+- [ ] 完成 GitHub Pages 与 Cloudflare 发布、线上核对
+
 ### 内容层级与论文展示增强（2026-08-04）
 
 - [x] 核对新增 PDF 的作者顺序、发表状态与可公开版本
@@ -48,7 +57,7 @@
 - GitHub 仓库：`https://github.com/SquareSon/SquareSon.github.io`
 - 公开主页：`https://squareson.github.io/`
 - 英文主页：`https://squareson.github.io/en/`
-- GitHub Pages 已固定为 Actions 构建，HTTPS 开启；经典 Jekyll 中文页、英文页、11 条论文、媒体资源、静态检索与隐私检查均在线通过。
+- GitHub Pages 已固定为 Actions 构建，HTTPS 开启；经典 Jekyll 中文页、英文页、13 条论文/研究稿件、媒体资源、静态检索与隐私检查均通过本地回归，等待本轮线上发布复核。
 - 静态 FAQ/站内资料搜索已在线；无模型账号时明确标记为静态资料检索，不冒充 AI 回答。
 - Cloudflare Worker、D1/FTS5、315 条 Vectorize/BGE-M3 向量、RRF、BGE 重排、SSE 与四模型适配均已发布，API 为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
 - 生产生成通道已切换为 OpenRouter；Qwen、DeepSeek、GLM、Kimi 四个公开别名均已通过生产流式验证。百炼保留为可切回的单 Key 备选通道。
@@ -322,3 +331,39 @@ PersonalHomePage-0.0.00/
 | `npm audit --omit=dev` 报告 3 个 high 生产依赖问题 | 已解决 | 升级到 Next 16.3.0 后生产审计为 0；未使用 `--force` |
 | 补充 Cloudflare 类型后，TypeScript 仍未自动加载全局类型且检查了无关 starter examples | 已解决 | 在 `tsconfig.json` 显式声明 `@cloudflare/workers-types` 并排除未使用的 `examples/`，随后重跑检查 |
 | Docker Jekyll 容器无法连接 `/var/run/docker.sock` | 已绕过 | 当前用户不在 docker 组且 sudo 需要密码；使用 `/tmp` 隔离 Conda Ruby 环境完成同等本地构建验证 |
+
+## 本地 RTX 5090 混合 RAG 加速方案（2026-08-05，待用户确认）
+
+### 决策
+
+- [x] 核对本机 GPU：RTX 5090、32 GB 显存，当前可用约 30 GB；适合本地批量 embedding、重排评测和实验性检索。
+- [x] 核对现有语料与线上路径：315 个公开知识块；线上继续使用 Cloudflare Workers AI BGE-M3、D1 FTS、Vectorize 与 reranker。
+- [ ] 阶段 A：建立基线。记录 Cloudflare 端到端检索/首 token/总耗时 P50、P95，以及本地 GPU embedding 吞吐与本地向量查询耗时。
+- [ ] 阶段 B：实现本地“离线索引构建器”。仅重新编码新增或内容变化的 chunk，导出可审核、可复现的版本化向量清单。
+- [ ] 阶段 C：实现安全同步。经过 32 题检索回归、数量/哈希校验后，将变更 upsert 到新的 Cloudflare Vectorize 索引和 D1；验证完成才原子切换绑定，旧索引保留用于回滚。
+- [ ] 阶段 D（可选）：部署仅供本人使用的本地检索服务（LAN/Tailscale）；如将它作为公网备用，必须经 Cloudflare Tunnel + Access + 健康检查接入，且 Worker 熔断后回到 Cloudflare/静态检索。
+
+### 架构边界
+
+```text
+公开访客：浏览器 → Cloudflare Worker → Cloudflare 检索/生成 → 回答
+材料更新：本机 RTX 5090 → 增量编码缓存 → 评测/版本清单 → Cloudflare 索引发布
+可选私有实验：本人设备 → LAN/Tailscale → 本地 FAISS/HNSW 检索服务
+```
+
+- 当前语料仅 315 块，向量近邻查询本身不是访问延迟主因；模型生成与公网往返通常更显著。因此不以“公网访问全部改走家中 5090”为首选。
+- 本地 GPU 的首要收益是批量重建、增量更新、模型对比和私有实验，能减少云端 embedding 调用并加快大规模资料更新；公开线上服务保留 Cloudflare 的稳定性、访问边缘性和自动降级。
+- `chunk_id` 和内容 `hash` 已存在，但尚无持久化的本地 embedding 缓存；本方案补齐缓存，不替换现有公开语料安全策略。
+
+### 编码缓存规范
+
+- 文档向量必须“一次编码、重复复用”：缓存键为 `content_hash + embedding_model + model_revision + tokenizer/pooling + chunking_version + normalized_text_version`；仅凭 chunk ID 不足以安全复用。
+- 未变更 chunk 直接复用；新增/改动 chunk 批量重编码；删除 chunk 在候选索引中删除；变更切块规则或 embedding 模型/版本时创建全新索引并全量重建，不混用向量空间。
+- 缓存保存向量、维度、归一化标记、生成时间、来源哈希和索引版本；推荐以 SQLite manifest + `.npy/.parquet` 向量分片实现，并纳入 `.gitignore`，不提交公开仓库。
+- 查询向量按每次问题生成；可仅在 Worker/本地服务中做 5–15 分钟的短期 LRU 缓存，不能把它与文档永久缓存混为一谈。
+
+### 模型与验证原则
+
+- 首轮本地实验优先采用 `BAAI/bge-m3`，它与当前多语言检索策略相符。即使模型同名，也必须用固定样本验证本地输出与 Cloudflare 输出的维度、归一化和召回结果；不假设跨运行环境向量逐元素相同。
+- 先固定 BGE-M3 的 dense 向量，保留现有 D1 FTS + RRF + rerank；不在首轮同时引入多个向量库、embedding 模型或生成模型，避免无法归因的质量变化。
+- 以现有 32 题回归集为门槛，发布候选索引需不低于当前 Recall@1 0.906、Recall@6 1.000、MRR 0.944，并新增中英文、缩写、无答案与引用一致性检查。

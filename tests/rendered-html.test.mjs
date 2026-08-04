@@ -14,8 +14,13 @@ test("Jekyll renders the default Chinese academic homepage", async () => {
   assert.match(html, /研究问答/);
   assert.match(html, /下载公开版简历/);
   assert.match(html, /fangzi508@sjtu\.edu\.cn/);
-  assert.equal((html.match(/class="publication-title"/g) ?? []).length, 11);
-  assert.equal((html.match(/class="paper-box featured-publication"/g) ?? []).length, 3);
+  assert.equal((html.match(/class="publication-title"/g) ?? []).length, 13);
+  assert.equal((html.match(/class="paper-box featured-publication"/g) ?? []).length, 5);
+  assert.match(html, /宁波市镇海中学/);
+  assert.match(html, /publication-gla-nerf\.png/);
+  assert.match(html, /publication-upi-nerf\.png/);
+  assert.match(html, /publication-eidc\.png/);
+  assert.doesNotMatch(html, /证据边界|PDF 说明|重点一作工作|其他公开论文|paper-links/);
   assert.ok(html.indexOf('id="research"') < html.indexOf('id="assistant"'));
   assert.ok(html.indexOf('id="assistant"') < html.indexOf('id="selected-work"'));
   assert.doesNotMatch(html, /让三维感知|Perceive in 3D|codex-preview/i);
@@ -26,12 +31,13 @@ test("Jekyll renders the complete English route and language links", async () =>
   const html = await readFile(new URL("en/index.html", siteRoot), "utf8");
   assert.match(html, /<html lang="en"/);
   assert.match(html, /3D Medical Perception/);
-  assert.match(html, /Evidence boundary/);
   assert.match(html, /Static FAQ and on-page search/);
   assert.match(html, /Download public CV/);
+  assert.match(html, /Zhenhai High School of Ningbo/);
   assert.match(html, /href="\/"[^>]*>中文</);
-  assert.equal((html.match(/class="publication-title"/g) ?? []).length, 11);
-  assert.equal((html.match(/class="paper-box featured-publication"/g) ?? []).length, 3);
+  assert.equal((html.match(/class="publication-title"/g) ?? []).length, 13);
+  assert.equal((html.match(/class="paper-box featured-publication"/g) ?? []).length, 5);
+  assert.doesNotMatch(html, /Evidence boundary|PDF policy|Featured first-author work|Other public papers|paper-links/);
   assert.ok(html.indexOf('id="research"') < html.indexOf('id="assistant"'));
   assert.ok(html.indexOf('id="assistant"') < html.indexOf('id="selected-work"'));
 });
@@ -39,8 +45,15 @@ test("Jekyll renders the complete English route and language links", async () =>
 test("rendered site ships local profile, research media, and native scripts", async () => {
   await Promise.all([
     access(new URL("images/profile/zi-fang.png", siteRoot)),
-    access(new URL("images/research/navigation-prototype.png", siteRoot)),
-    access(new URL("images/research/semantic-workbench.png", siteRoot)),
+    access(new URL("images/research/figures/trajectory-registration.png", siteRoot)),
+    access(new URL("images/research/figures/trajectory-segmentation.png", siteRoot)),
+    access(new URL("images/research/figures/trajectory-semantic-field.png", siteRoot)),
+    access(new URL("images/research/figures/trajectory-puncture-planning.png", siteRoot)),
+    access(new URL("images/research/figures/publication-gla-nerf.png", siteRoot)),
+    access(new URL("images/research/figures/publication-upi-nerf.png", siteRoot)),
+    access(new URL("images/research/figures/publication-eidc.png", siteRoot)),
+    access(new URL("images/research/figures/publication-life-prediction.png", siteRoot)),
+    access(new URL("images/research/figures/publication-neural-rrt.png", siteRoot)),
     access(new URL("files/Zi-Fang-CV.pdf", siteRoot)),
     access(new URL("assets/js/site.js", siteRoot)),
     access(new URL("assets/js/assistant.js", siteRoot)),
