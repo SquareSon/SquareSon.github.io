@@ -81,3 +81,7 @@
 - 2026-08-04：阶段 2–5 完成；已补齐 GitHub Pages Actions、维护说明和 RAG 架构文档，进入远程仓库与托管发布阶段。
 - 2026-08-04：发布前敏感信息扫描发现渲染测试夹具中写有简历手机号明文（页面和语料均未包含）；已改为通用 11 位手机号正则，避免任何私密号码进入公开 Git 历史。
 - 2026-08-04：创建并推送公开仓库 `SquareSon/SquareSon.github.io`；首次 Pages Actions 在服务器渲染测试处失败，因 CI 只构建静态站而测试需要 vinext `dist/server` 产物，已在工作流中增加 Worker 构建。
+- 2026-08-04：修正后的 Pages Actions 全流程成功；线上 `/`、`/en/` 和 Pagefind 均返回 200，内容/OG/静态模式断言通过，线上未发现 11 位手机号。
+- 2026-08-04：将 Pages 发布源固定为 GitHub Actions，HTTPS 已启用，公开主页为 `https://squareson.github.io/`。
+- 2026-08-04：Sites 私有预览创建调用发生传输失败；只读检查确认未创建新站点，且未改动账号中已有的公开 Zi Fang Research 站点。
+- 2026-08-04：Wrangler 身份检查显示当前未登录 Cloudflare；实时 Worker/D1/Vectorize 发布等待用户授权与至少一家模型 API Key，公开站继续按设计提供静态资料降级。

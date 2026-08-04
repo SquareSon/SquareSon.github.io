@@ -21,8 +21,18 @@
 - [x] 阶段 3：RAG 语料与混合检索
 - [x] 阶段 4：多模型 Worker 后端
 - [x] 阶段 5：集成与质量验证
-- [ ] 阶段 6：GitHub Pages 与 Worker 发布（进行中）
-- [ ] 阶段 7：维护交付
+- [ ] 阶段 6：GitHub Pages 与 Worker 发布（Pages 已完成；Worker 等待 Cloudflare 授权与模型密钥）
+- [x] 阶段 7：维护交付
+
+## 当前交付状态（2026-08-04）
+
+- GitHub 仓库：`https://github.com/SquareSon/SquareSon.github.io`
+- 公开主页：`https://squareson.github.io/`
+- 英文主页：`https://squareson.github.io/en/`
+- GitHub Pages 已固定为 Actions 构建，HTTPS 开启；线上中文、英文、Pagefind、OG 图片与隐私检查通过。
+- 静态 FAQ/项目/论文搜索已在线，无模型账号时会明确标记“不是 AI 生成回答”。
+- Worker、D1/FTS、Vectorize/BGE-M3、RRF、BGE 重排、SSE 与四模型适配代码已完成并通过本地构建/运行时冒烟测试。
+- 实时 RAG 发布阻塞：当前 Wrangler 未登录 Cloudflare；尚未写入 Qwen、GLM、DeepSeek、Kimi 任一服务端 API Key。需要用户完成 Cloudflare 授权并通过 Secret Store 配置密钥后继续。
 
 ## 已确认约束
 
