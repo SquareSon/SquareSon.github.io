@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/_site/
+/.jekyll-cache/
+/.sass-cache/
 
 # next.js
 /.next/

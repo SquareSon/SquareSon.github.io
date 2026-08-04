@@ -15,7 +15,7 @@ The generated corpus contains 313 chunks: 295 dissertation chunks plus 18 curate
 
 The Worker uses one evidence layer for every answer model:
 
-1. Bundled lexical retrieval is always available.
+1. Bundled lexical retrieval provides a server-side baseline.
 2. D1 FTS5 adds exact keyword and name matching when `DB` is bound.
 3. Workers AI BGE-M3 plus Vectorize adds dense multilingual recall when `AI` and `VECTOR_INDEX` are bound.
 4. Reciprocal Rank Fusion combines available rankings.
@@ -28,7 +28,7 @@ Embedding and reranking run on Cloudflare's managed infrastructure. No local GPU
 
 `worker/rag/providers.ts` exposes four server-side OpenAI-compatible adapters. Model names, endpoints, and auto-routing order are environment variables, so provider upgrades require no browser release. Explicit model selection never silently switches to another provider; `auto` may try the next configured provider.
 
-The API returns `degraded: true` when credentials are absent, quota is exhausted, retrieval has insufficient evidence, Turnstile fails, or providers are unavailable. The browser then answers from the bundled FAQ/projects/publications search and labels the response as non-AI static research mode.
+The API returns `degraded: true` when credentials are absent, quota is exhausted, retrieval has insufficient evidence, Turnstile fails, or providers are unavailable. The Jekyll browser client then answers from its compact FAQ/on-page index and labels the response as static material search.
 
 ## API
 
@@ -40,4 +40,6 @@ Questions are limited to 1,000 characters. Usage records contain only a salted c
 
 ## Deployment inputs
 
-Copy `.env.example` for local development. In production, add API keys and `RATE_LIMIT_SALT` as encrypted Worker secrets. `wrangler.rag.example.jsonc` documents the D1, Workers AI, and Vectorize bindings; replace the D1 ID and keep secrets out of Git.
+The production bindings are defined in `wrangler.jsonc`: D1 `zi-fang-public-rag`, Vectorize `zi-fang-public-rag-v1`, and Workers AI. The public API is `https://zi-fang-research-assistant.zi-fang-research.workers.dev`.
+
+Copy `.env.example` only as a checklist. Add provider keys, `RATE_LIMIT_SALT`, and optional Turnstile credentials with `wrangler secret put`; never commit them or place them in the browser bundle.

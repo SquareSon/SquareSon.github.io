@@ -2,6 +2,25 @@
 
 ## 2026-08-04
 
+- 用户否定当前页面设计，要求以 `RayeRen/acad-homepage.github.io` 的经典学术主页架构重做；已停止沿原视觉方向继续迭代。
+- 检查 Wrangler 身份：Cloudflare OAuth 已成功，所需 Worker/D1/Workers AI 权限可用。
+- 只读克隆参考仓库到临时目录 `/tmp/rayeren-acad-homepage.8eyZBI`，确认其为模块化 Jekyll 学术主页，而非单页作品集架构；进入结构、许可与内容映射审计。
+- 读取参考仓库的中英文文档、MIT License、站点配置、导航、主页 Markdown、默认布局、顶部栏和作者侧栏，并核对官方截图；确定采用真实 Jekyll 模板迁移，而不是在原 Next 页面上模拟样式。
+- 审阅参考站 Sass 栅格、响应断点、论文条目、原始脚本和 Scholar workflow；记录 2/12 + 10/12 桌面布局、14px 字号以及 925px/768px 断点，参考架构审计完成。
+- 完成现有双语内容、论文、教育、FAQ 与媒体资源的经典学术信息架构映射；重新读取 Scholar 核对 11 条成果及作者/载体/年份。
+- 核对旧 Worker 与 Pages workflow：确定保留 RAG 核心、移除 vinext 耦合；本机用 Docker 验证 Jekyll，线上改用官方 Jekyll Pages Action。
+- 已完成 Jekyll 根配置、经典双栏布局、顶部导航、作者侧栏、中英文主页、11 条论文、代表研究、教育经历、原生聊天 UI 与静态 FAQ/站内检索脚本的初版实现。
+- Cloudflare 新建 APAC D1 `zi-fang-public-rag` 和 Vectorize `zi-fang-public-rag-v1`，并为向量元数据 `public` 创建 boolean 索引；进入独立 Worker 配置与部署。
+- 将 Worker 从 vinext 页面运行层解耦，新增真实 Cloudflare 绑定配置；Jekyll 源检查、Worker 类型检查/打包和 RAG 评测通过。
+- Docker Jekyll 构建因本机 socket 权限失败且 sudo 需要密码；没有重复相同调用，改用临时 Conda Ruby 环境验证。
+- 在 `/tmp` 隔离环境安装 Ruby/Jekyll 依赖并完成真实 Jekyll 3.10.0 构建；完整 npm 回归 6/6 通过，准备写入 D1 并发布 Worker。
+- D1 远程迁移成功，313 条知识片段、FTS5 与用量表已写入；清除旧 vinext Wrangler 重定向后成功上传独立 Worker。
+- 首次注册账号级 `zi-fang-research.workers.dev` 并发布 `zi-fang-research-assistant` 触发器；等待 DNS/TLS 传播，同时准备 Vectorize 批量嵌入。
+- Cloudflare 子域传播完成；线上 `/api/health`、模型不可用降级和隐私拒答验证通过。
+- 使用 Workers AI 为 313 个公开片段生成 BGE-M3 1024 维向量并完成 Vectorize upsert；向量总数复核为 313。
+- 删除旧 Next/vinext 页面、Sites 托管配置与旧 public 资产，保留 Git 历史可恢复性；README 已改为 Jekyll + 独立 Worker 维护说明。
+- 升级 Cloudflare 开发依赖并修复间接依赖 advisory，`npm audit` 为 0；清理后重新完成 Jekyll 构建、类型检查、RAG 评测与 6/6 自动化测试。
+
 - 读取 `planning-with-files` 与 `codebase-orientation` 技能说明。
 - 检查目标代码目录：目录存在且为空。
 - 检查用户给出的材料目录：路径不存在，准备只读定位实际位置。

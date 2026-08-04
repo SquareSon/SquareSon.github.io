@@ -1,0 +1,21 @@
+{% assign is_en = false %}{% if page.lang == 'en' %}{% assign is_en = true %}{% endif %}
+<div class="profile_box" itemscope itemtype="https://schema.org/Person">
+  <div class="author__avatar">
+    <img src="{{ site.author.avatar | relative_url }}" alt="Zi Fang / 方子" itemprop="image" width="220" height="220">
+  </div>
+  <div class="author__content">
+    <h2 class="author__name" itemprop="name">{% if is_en %}Zi Fang{% else %}方子{% endif %}</h2>
+    <p class="author__name-en">{% if is_en %}方子{% else %}Zi Fang{% endif %}</p>
+    <p class="author__bio" itemprop="jobTitle">{% if is_en %}{{ site.author.bio_en }}{% else %}{{ site.author.bio_zh }}{% endif %}</p>
+  </div>
+  <button class="profile-toggle" type="button" aria-expanded="false" aria-controls="author-links">
+    {% if is_en %}Contact & links{% else %}联系方式与链接{% endif %}
+  </button>
+  <ul id="author-links" class="author__urls">
+    <li class="author__affiliation">{% if is_en %}{{ site.author.employer_en }}{% else %}{{ site.author.employer_zh }}{% endif %}</li>
+    <li><span aria-hidden="true">⌖</span> {% if is_en %}{{ site.author.location_en }}{% else %}{{ site.author.location_zh }}{% endif %}</li>
+    <li><a href="mailto:{{ site.author.email }}"><span aria-hidden="true">✉</span> Email</a></li>
+    <li><a href="{{ site.author.scholar }}" rel="me"><span aria-hidden="true">▤</span> Google Scholar</a></li>
+    <li><a href="{{ site.author.github }}" rel="me"><span aria-hidden="true">⌘</span> GitHub</a></li>
+  </ul>
+</div>

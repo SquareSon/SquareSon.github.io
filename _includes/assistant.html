@@ -1,0 +1,53 @@
+{% assign is_en = false %}{% if page.lang == 'en' %}{% assign is_en = true %}{% endif %}
+<div
+  class="assistant-panel"
+  data-assistant
+  data-locale="{% if is_en %}en{% else %}zh{% endif %}"
+  data-rag-endpoint="{{ site.rag_api_url }}"
+>
+  <div class="assistant-status" data-mode="static" aria-live="polite">
+    <span class="status-dot" aria-hidden="true"></span>
+    <span data-assistant-status>{% if is_en %}Static FAQ and on-page search are ready{% else %}静态 FAQ 与站内资料搜索已就绪{% endif %}</span>
+  </div>
+  <form data-assistant-form>
+    <div class="assistant-controls">
+      <div class="assistant-field">
+        <label for="assistant-model">{% if is_en %}Model{% else %}模型{% endif %}</label>
+        <select id="assistant-model" data-assistant-model disabled>
+          <option value="auto">{% if is_en %}Auto / static fallback{% else %}自动 / 静态降级{% endif %}</option>
+        </select>
+      </div>
+      <div class="assistant-field">
+        <label for="assistant-question">{% if is_en %}Question{% else %}问题{% endif %}</label>
+        <textarea
+          id="assistant-question"
+          data-assistant-question
+          maxlength="1000"
+          required
+          placeholder="{% if is_en %}Ask about research, publications, or projects…{% else %}询问研究方向、论文或项目……{% endif %}"
+        ></textarea>
+      </div>
+      <button class="assistant-submit" type="submit" data-assistant-submit>{% if is_en %}Ask{% else %}提问{% endif %}</button>
+    </div>
+  </form>
+  <div class="assistant-suggestions" aria-label="{% if is_en %}Suggested questions{% else %}推荐问题{% endif %}">
+    {% if is_en %}
+      <button type="button" data-question="What are Zi Fang's main research areas?">Research areas</button>
+      <button type="button" data-question="What is the core idea behind GLA-NeRF?">GLA-NeRF</button>
+      <button type="button" data-question="Has the system completed clinical validation?">Evidence boundary</button>
+    {% else %}
+      <button type="button" data-question="方子的主要研究方向是什么？">研究方向</button>
+      <button type="button" data-question="GLA-NeRF 的核心思路是什么？">GLA-NeRF</button>
+      <button type="button" data-question="系统是否已经完成临床验证？">证据边界</button>
+    {% endif %}
+  </div>
+  <div class="assistant-answer" data-assistant-answer role="status" aria-live="polite"></div>
+  <ul class="assistant-citations" data-assistant-citations aria-label="{% if is_en %}Sources{% else %}来源{% endif %}"></ul>
+  <p class="assistant-footnote">
+    {% if is_en %}
+      Answers are restricted to public materials. If the API, provider, or budget is unavailable, this module automatically returns clearly labeled static search results.
+    {% else %}
+      回答仅限公开材料；API、模型供应商或预算不可用时，本模块会自动返回明确标注的静态检索结果。
+    {% endif %}
+  </p>
+</div>

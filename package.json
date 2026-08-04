@@ -1,49 +1,31 @@
 {
   "name": "zi-fang-personal-homepage",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
-    "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
-    "build:pages": "GITHUB_PAGES=true next build && pagefind --site out && node scripts/prepare-pages.mjs",
-    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run build && npm run build:pages && npm run rag:eval && node --test tests/*.test.mjs",
+    "worker:dev": "wrangler dev",
+    "worker:build": "esbuild worker/index.ts --bundle --format=esm --platform=browser --target=es2023 --outfile=dist/worker.js",
+    "worker:deploy": "wrangler deploy",
+    "test": "npm run worker:build && npm run rag:eval && node --test tests/*.test.mjs",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate",
+    "validate:site": "node scripts/validate-site.mjs",
     "rag:ingest": "node rag/scripts/ingest.mjs",
     "rag:seed": "node rag/scripts/build-d1-seed.mjs",
     "rag:eval": "node rag/scripts/evaluate-retrieval.mjs"
   },
-  "dependencies": {
-    "drizzle-orm": "0.45.2",
-    "next": "^16.3.0",
-    "react": "19.2.6",
-    "react-dom": "19.2.6"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.37.1",
-    "@cloudflare/workers-types": "^4.20260702.1",
-    "@tailwindcss/postcss": "4.2.1",
-    "@types/node": "22.19.19",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "6.0.2",
-    "@vitejs/plugin-rsc": "0.5.26",
-    "drizzle-kit": "0.31.10",
-    "eslint": "9.39.4",
-    "eslint-config-next": "16.2.6",
+    "@cloudflare/workers-types": "5.20260804.1",
+    "esbuild": "^0.25.9",
     "mammoth": "^1.12.0",
-    "pagefind": "^1.4.0",
-    "react-server-dom-webpack": "19.2.6",
-    "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
-    "vinext": "0.0.50",
-    "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "wrangler": "4.118.0"
+  },
+  "overrides": {
+    "undici": "7.29.0"
   },
   "type": "module"
 }

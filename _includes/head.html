@@ -1,0 +1,16 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+{% seo %}
+<link rel="icon" href="{{ '/favicon.svg' | relative_url }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+<link rel="canonical" href="{{ page.url | replace: 'index.html', '' | absolute_url }}">
+{% if page.lang == 'en' %}
+<link rel="alternate" hreflang="zh-CN" href="{{ '/' | absolute_url }}">
+<link rel="alternate" hreflang="en" href="{{ '/en/' | absolute_url }}">
+{% else %}
+<link rel="alternate" hreflang="zh-CN" href="{{ '/' | absolute_url }}">
+<link rel="alternate" hreflang="en" href="{{ '/en/' | absolute_url }}">
+{% endif %}
+<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>

@@ -30,30 +30,30 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Validate source
+      - name: Validate source and RAG
         run: |
-          npm run lint
+          npm run validate:site
           npm run typecheck
-
-      - name: Build Worker and static site
-        env:
-          NEXT_PUBLIC_RAG_API_URL: ${{ vars.RAG_API_URL }}
-        run: |
-          npm run build
-          npm run build:pages
-
-      - name: Run rendered and corpus tests
-        run: |
+          npm run worker:build
           npm run rag:eval
-          node --test tests/*.test.mjs
+          node --test tests/rag-corpus.test.mjs
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Build Jekyll site
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Test rendered pages
+        run: node --test tests/rendered-html.test.mjs
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: out
+          path: _site
 
   deploy:
     environment:

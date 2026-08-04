@@ -1,0 +1,17 @@
+{% assign nav_items = site.data.navigation[page.nav_key] | default: site.data.navigation.zh %}
+<header class="masthead">
+  <div class="masthead__inner-wrap">
+    <nav class="greedy-nav" aria-label="{{ page.nav_label | default: '主导航' }}">
+      <a class="site-title" href="{% if page.lang == 'en' %}{{ '/en/' | relative_url }}{% else %}{{ '/' | relative_url }}{% endif %}">Zi Fang</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-links">
+        <span class="sr-only">{{ page.menu_label | default: "打开导航" }}</span>
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+      <ul id="site-nav-links" class="visible-links">
+        {% for link in nav_items %}
+          <li class="masthead__menu-item{% if forloop.last %} language-link{% endif %}"><a href="{{ link.url | relative_url }}">{{ link.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>

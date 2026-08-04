@@ -1,5 +1,36 @@
 # 调研发现
 
+## 经典学术主页重构基线（2026-08-04）
+
+- 用户明确认为当前页面方向不合格，要求采用 `RayeRen/acad-homepage.github.io` 的经典学术主页架构；原有纸张科技风、研究链首屏和大卡片布局不再作为视觉基线。
+- Cloudflare OAuth 当前已成功，账号具备 Workers、D1、Workers AI、AI Search、Secrets Store 等写入权限，实时 RAG 发布不再受账号登录阻塞。
+- 参考仓库当前提交为 `2cc1577`，是 Jekyll 站点：核心由 `_config.yml`、`_data/navigation.yml`、`_layouts/default.html`、`_includes/{masthead,author-profile,sidebar,seo}`、`_pages/about.md` 和模块化 Sass 组成。
+- 参考仓库的基本范式是固定顶部导航 + 左侧作者资料栏 + 右侧长篇学术内容，而不是全屏产品首屏；论文、经历、服务等以 Markdown 标题和紧凑列表为主。
+- 参考仓库自带 Academicons、Font Awesome、本地字体、Google Scholar 抓取与 GitHub Pages/Jekyll 运行脚本。下一步需核对许可证、具体内容模块与响应式规则，再决定是保留现有 Next/Worker 运行层并复刻架构，还是迁移为 Jekyll + 独立聊天脚本。
+- 参考仓库使用 MIT License（Copyright 2022 Yi Ren），允许复制和修改，但必须保留版权与许可文本；正式迁移应保留原 `LICENSE` 并另行说明本站内容版权归属。
+- 其内容主模板是 `_pages/about.md`：About 长文本、News 紧凑时间线、带图 `paper-box` 的精选论文、普通论文列表、Honors、Education、Talks、Internships。实际设计重点不是动画或视觉装饰，而是学术事实的连续阅读效率。
+- 截图显示桌面为白底窄顶栏、约 20% 左侧人物栏、约 80% 主内容；头像、单位简介、地点与学术链接始终可见。平板保持两栏，手机把人物资料压到正文上方并让论文图文纵向排列。
+- 结合用户“在他之上进行修改”的措辞，最忠实的实现不是在 Next 页面中仿造外观，而是把公开站根目录迁移到该 Jekyll 模板，直接复用其布局/Sass/响应式机制；RAG 改为独立 Cloudflare Worker，前端聊天用原生 JS 嵌入 Jekyll 页面。
+- 参考站样式参数：正文基准字号 14px，最大内容宽度 1280px，桌面左栏 2/12、正文 10/12，925px 以下改为上下布局；白底、灰色正文、深蓝链接，论文条目在 768px 以上采用约 40% 图片 + 60% 文字。
+- 参考站交互以轻量导航、平滑锚点、移动端作者联系方式展开为主；迁移时不必继承其旧版 jQuery、Stickyfill 与 Magnific Popup 依赖，可用原生 CSS/JS 保持同等结构并改善可维护性与无障碍性。
+- 参考仓库的 Scholar crawler 是每日 GitHub Action，依赖 `GOOGLE_SCHOLAR_ID` 并强推统计分支；首版以 Google Scholar 页面为论文状态权威来源，但不把这个脆弱爬虫作为页面构建的硬依赖。
+- 现有内容可无损映射为经典信息架构：About 使用研究定位与证据边界，Research Interests 使用三条研究主线，Selected Work 使用 GLA-NeRF/三维超声/导航样机图文条目，Publications 使用 11 条 Scholar 记录，Education 使用两段交大经历，Assistant 作为正文末尾的嵌入模块。
+- 2026-08-04 再次定向读取 Google Scholar 成功：页面仍为 Zi Fang / Shanghai Jiao Tong University / verified sjtu.edu.cn，显示 11 条论文记录；已取得每条的作者缩写、载体、年份和 Scholar 详情链接。引用数属于动态字段，不写死进主页。
+- 本机没有 Ruby/Bundler，但 Docker 可用；本地可用官方 Jekyll 容器验证构建，GitHub Actions 使用 `actions/jekyll-build-pages`，无需把 Ruby 安装到用户系统。
+- 现有 RAG Worker 的检索、四模型适配、策略拒答和流式协议可以保留；只需移除 vinext 页面处理与图片优化，把 `worker/index.ts` 改为独立 API Worker。
+- Cloudflare 官方模型页确认 `@cf/baai/bge-m3` 仍是托管的多语言 embedding 模型；Vectorize 索引维度一经创建不可修改。按 BGE-M3 的 1024 维输出创建 cosine 索引，并在插入向量前为 `public` 建立 boolean metadata index。
+- Cloudflare 账号此前没有 D1 或 Vectorize 资源；已新建 APAC D1 `zi-fang-public-rag`（ID `7a591cec-2182-46b9-88a8-bb8e3bec91b5`）和 1024 维 cosine Vectorize `zi-fang-public-rag-v1`。
+- 本机 Docker CLI 存在，但当前用户不在 `docker` 组，socket 仅允许 `root:docker`，且 sudo 需要密码；容器构建首次调用因此在连接 API 前失败，没有创建或修改容器。改用 `/tmp` 下的隔离 Conda Ruby 环境进行本地 Jekyll 构建，不改用户系统环境。
+- 隔离 Ruby 首次安装 Jekyll 时依次暴露缺少 C 编译器、C++ 编译器和 `kramdown-parser-gfm`；均只在 `/tmp/zi-fang-jekyll-ruby-20260804` 中补齐。最终 Jekyll 3.10.0 构建成功，未修改系统 Ruby 或全局 gem。
+- 渲染回归共 6 项通过：中文默认页、完整英文页、11 条双语论文、经典侧栏/论文条目、媒体和原生脚本、313 条语料审计、D1 seed 以及 10 类隐私/注入/医疗越权拒答。
+- D1 migration 在远程成功执行 323 条命令，313 个知识片段与 FTS5/usage 表已落库。
+- Worker 首次上传受旧 `.wrangler/deploy/config.json` 干扰而指向 vinext 产物；已终止该错误上传并删除仅属于旧构建的重定向文件。显式配置的新 Worker 随后成功上传，未创建错误 Worker。
+- 账号此前尚未注册 `workers.dev`。使用 Wrangler OAuth token 调用 Cloudflare 官方 API 注册 `zi-fang-research.workers.dev`，再以 triggers 部署现有版本；公开 API 地址为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
+- 子域刚创建时本机代理返回 TLS handshake failure、直连 DNS 尚未解析，符合 Cloudflare“DNS 需要几分钟传播”的提示；需等待传播后再做健康检查，不能把该瞬时状态误判为 Worker 代码失败。
+- DNS/TLS 传播完成后线上健康检查返回 200：D1 FTS、Vectorize、BGE reranker 均为可用状态，provider 列表为空（尚未配置四家模型密钥）。普通问题返回 `degraded: model_unavailable`，隐私索取在线返回确定性拒答。
+- Workers AI 已为全部 313 个片段生成 1024 维 BGE-M3 embedding；首次 100 条/批 insert 在 200 条后因代理断开，改用 50 条/批幂等 upsert 后 Vectorize `totalCount` 为 313。
+- 清理旧 Node 依赖后发现 Wrangler 4.92.0 的开发依赖含高危 advisory；升级到 Wrangler 4.118.0 与 Workers Types 5.20260804.1，并将其 Miniflare 链中的 `undici` 覆盖到已修复的 7.29.0，最终 `npm audit` 为 0。
+
 ## 本地现状
 
 - `/WorkSpace/Program/PersonalHomePage-0.0.00` 存在且当前为空。

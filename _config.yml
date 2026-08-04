@@ -1,0 +1,77 @@
+title: "Zi Fang | 方子"
+title_separator: "·"
+description: "Zi Fang's academic homepage: 3D perception, embodied intelligence, and medical robotics."
+url: "https://squareson.github.io"
+baseurl: ""
+repository: "SquareSon/SquareSon.github.io"
+locale: "zh-CN"
+timezone: "Asia/Shanghai"
+
+author:
+  name: "方子 / Zi Fang"
+  avatar: "/images/profile/zi-fang.png"
+  bio_zh: "上海交通大学机械工程博士研究生"
+  bio_en: "Ph.D. Candidate in Mechanical Engineering"
+  employer_zh: "上海交通大学 · 机器人研究所"
+  employer_en: "Shanghai Jiao Tong University · Robotics Institute"
+  location_zh: "中国 · 上海"
+  location_en: "Shanghai, China"
+  email: "fangzi508@sjtu.edu.cn"
+  github: "https://github.com/SquareSon"
+  scholar: "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN"
+
+# Populated after the standalone Cloudflare Worker is deployed. The assistant
+# remains useful as static FAQ and on-page search while this is empty.
+rag_api_url: "https://zi-fang-research-assistant.zi-fang-research.workers.dev"
+
+collections:
+  pages:
+    output: true
+    permalink: /:path/
+
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+sass:
+  style: compressed
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+exclude:
+  - app
+  - build
+  - components
+  - content
+  - db
+  - drizzle
+  - node_modules
+  - out
+  - public
+  - rag
+  - scripts
+  - tests
+  - worker
+  - .env.example
+  - .openai
+  - findings.md
+  - progress.md
+  - task_plan.md
+  - README.md
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - wrangler.jsonc
+  - wrangler.rag.example.jsonc
+  - Gemfile
+  - Gemfile.lock

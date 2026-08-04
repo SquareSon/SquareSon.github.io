@@ -6,6 +6,16 @@
 
 ## 当前阶段
 
+### 经典学术主页重构（2026-08-04 用户纠偏）
+
+- [x] 确认当前 Cloudflare 授权状态
+- [x] 审计 `RayeRen/acad-homepage.github.io` 的页面结构、组件、样式与许可
+- [x] 将现有内容映射到经典学术主页信息架构
+- [x] 重构前端并保留双语、RAG 与静态降级
+- [ ] 完整回归、线上替换与 Cloudflare RAG 发布（Worker/RAG 已发布，等待 Pages 替换）
+
+用户明确否定当前“作品集/产品页”视觉方向，要求以 `RayeRen/acad-homepage.github.io` 的经典架构为基线修改。后续不再在原视觉上做局部美化，而是执行结构性迁移。
+
 - [x] 初始化调研工作区与范围
 - [x] 定位并盘点个人材料
 - [x] 提取、核对论文与简历信息
@@ -302,3 +312,4 @@ PersonalHomePage-0.0.00/
 | 首次 TypeScript 检查发现 5 个类型错误 | 处理中 | 修正可选回答与项目图片的类型收窄；为 starter Worker/DB 补充 Cloudflare 类型依赖后重跑 |
 | `npm audit --omit=dev` 报告 3 个 high 生产依赖问题 | 已解决 | 升级到 Next 16.3.0 后生产审计为 0；未使用 `--force` |
 | 补充 Cloudflare 类型后，TypeScript 仍未自动加载全局类型且检查了无关 starter examples | 已解决 | 在 `tsconfig.json` 显式声明 `@cloudflare/workers-types` 并排除未使用的 `examples/`，随后重跑检查 |
+| Docker Jekyll 容器无法连接 `/var/run/docker.sock` | 已绕过 | 当前用户不在 docker 组且 sudo 需要密码；使用 `/tmp` 隔离 Conda Ruby 环境完成同等本地构建验证 |
