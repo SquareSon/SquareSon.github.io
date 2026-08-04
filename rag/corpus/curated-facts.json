@@ -1,0 +1,92 @@
+[
+  {
+    "id": "fact-profile",
+    "locale": "zh",
+    "sourceTitle": "公开个人资料",
+    "titlePath": "个人简介",
+    "content": "方子，英文名 Zi Fang，上海交通大学机械与动力工程学院机器人研究所机械工程直博生。研究方向为三维感知、具身智能与医疗机器人，博士阶段为 2021 年至 2026 年。公开机构邮箱为 fangzi508@sjtu.edu.cn。",
+    "url": "/#about",
+    "evidenceLevel": "public-profile"
+  },
+  {
+    "id": "fact-education",
+    "locale": "zh",
+    "sourceTitle": "公开教育经历",
+    "titlePath": "教育经历",
+    "content": "方子于 2017 年至 2021 年在上海交通大学机械与动力工程学院学习机械工程，参加试点班并获院优秀毕业生；2021 年起在上海交通大学机械与动力工程学院机器人所攻读机械工程博士学位。博士课题为甲状腺超声隐式三维重建与穿刺手术导航系统研究。",
+    "url": "/#about",
+    "evidenceLevel": "public-profile"
+  },
+  {
+    "id": "fact-research-thread",
+    "locale": "zh",
+    "sourceTitle": "博士研究主线",
+    "titlePath": "研究主线",
+    "content": "博士研究沿可信观测、连续表征、空间统一、语义建模、物理坐标五步展开：先识别有效超声观测并规范输入域，再以神经场建立连续三维表征，随后联合优化多扫查位姿与形变，在规范空间中构建组织和针体语义，最后把图像、位姿、三维场和器械工作点连接到导航原理样机。",
+    "url": "/#research",
+    "evidenceLevel": "thesis-synthesis"
+  },
+  {
+    "id": "fact-evidence-boundary",
+    "locale": "zh",
+    "sourceTitle": "博士论文证据边界",
+    "titlePath": "结论适用范围",
+    "content": "当前结果支持方法、模块和假体原理样机层面的结论。针体几何只有单病例假体证据；成像平面条件场的二维优势不能外推为方向无关三维优势；分项标定残差不能外推为端到端穿刺精度；临床安全性不在现有实测范围内。",
+    "url": "/#research",
+    "evidenceLevel": "thesis-boundary"
+  },
+  {
+    "id": "fact-project-neural-field",
+    "locale": "zh",
+    "sourceTitle": "物理一致三维超声神经场",
+    "titlePath": "代表项目",
+    "content": "物理一致三维超声神经场把列级有效接触筛选、连续神经场、瑞利背散射和方向参数化反射结合起来，在重建三维强度场的同时保留可解释的声学形成机制。该工作属于博士论文的方法研究，不在网站上表述为 Google Scholar 已收录论文。",
+    "url": "/#projects",
+    "evidenceLevel": "doctoral-research"
+  },
+  {
+    "id": "fact-project-gla",
+    "locale": "zh",
+    "sourceTitle": "GLA-NeRF",
+    "titlePath": "代表项目 / 多扫查配准",
+    "content": "GLA-NeRF 面向多扫查自由手三维超声，把对齐偏差分为扫查级全局刚性偏差与帧级局部误差，通过外观检索、几何内点、不确定性加权和连续轨迹约束联合优化位姿与神经场，使多次扫查映射到规范空间。论文发表于 Physics in Medicine & Biology，年份为 2026。",
+    "url": "/#projects",
+    "evidenceLevel": "published-paper"
+  },
+  {
+    "id": "fact-project-semantics",
+    "locale": "zh",
+    "sourceTitle": "组织语义与针体几何",
+    "titlePath": "代表项目 / 语义建模",
+    "content": "组织语义与针体几何方法链包括输入域规范化、低标注多任务二维分割、连续多视角条件语义场和针体几何恢复。目标对象包括甲状腺、血管、结节和穿刺针，输出用于三维解剖表达、路径规划和导航定位。",
+    "url": "/#projects",
+    "evidenceLevel": "doctoral-research"
+  },
+  {
+    "id": "fact-project-prototype",
+    "locale": "zh",
+    "sourceTitle": "甲状腺超声穿刺导航原理样机",
+    "titlePath": "代表项目 / 原理样机",
+    "content": "导航原理样机集成自由手超声采集、双目近红外外部定位、N 线探头标定、针尖枢轴标定、可重复甲状腺假体和四个软件工作台，建立图像、位姿、三维场、组织语义与器械工作点之间的物理坐标链。该系统的证据是原理样机和假体层级。",
+    "url": "/#projects",
+    "evidenceLevel": "prototype-evidence"
+  },
+  {
+    "id": "fact-publications",
+    "locale": "zh",
+    "sourceTitle": "Google Scholar 公开论文记录",
+    "titlePath": "论文成果",
+    "content": "截至 2026 年 8 月 4 日，Zi Fang 的 Google Scholar 主页公开 11 篇论文，涵盖多扫查三维超声、可穿戴穿刺机器人、穿刺路径规划、冠脉介入与分割、多执行器容错控制、紧固件寿命预测和工业机器人故障诊断。论文数量、题目、发表载体与年份以 Google Scholar 为唯一权威来源。",
+    "url": "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN",
+    "evidenceLevel": "google-scholar"
+  },
+  {
+    "id": "fact-publications-list",
+    "locale": "en",
+    "sourceTitle": "Google Scholar public record",
+    "titlePath": "Publications",
+    "content": "As of 4 August 2026, Zi Fang's Google Scholar profile lists 11 publications spanning multi-sweep 3D ultrasound, wearable puncture robots, puncture path planning, coronary intervention and segmentation, fault-tolerant control, bolted-joint life prediction, and industrial-robot fault diagnosis. Google Scholar is the authoritative source for titles, venues, years, and publication status.",
+    "url": "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN",
+    "evidenceLevel": "google-scholar"
+  }
+]

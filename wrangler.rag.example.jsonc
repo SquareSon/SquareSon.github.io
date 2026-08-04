@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zi-fang-personal-homepage",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-07-31",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "dist/client"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "vectorize": [
+    {
+      "binding": "VECTOR_INDEX",
+      "index_name": "zi-fang-public-rag-v1"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zi-fang-public-rag",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "vars": {
+    "AUTO_PROVIDER_ORDER": "qwen,glm,deepseek,kimi",
+    "ALLOWED_ORIGINS": "https://squareson.github.io",
+    "HOURLY_CLIENT_LIMIT": "20",
+    "DAILY_REQUEST_LIMIT": "250"
+  }
+}

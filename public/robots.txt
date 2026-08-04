@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://squareson.github.io/sitemap.xml

@@ -1,0 +1,26 @@
+version: 1
+updated_at: 2026-08-04
+owner: Zi Fang
+public:
+  - english_name
+  - chinese_name
+  - profile_photo
+  - institutional_email
+  - education
+  - research_interests
+  - doctoral_thesis
+  - thesis_figures
+  - projects
+  - publications_verified_by_google_scholar
+excluded:
+  - phone
+  - wechat
+  - patents
+  - private_identifiers
+  - unpublished_work_as_publication
+publication_authority: https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN
+rag_policy:
+  evidence_only: true
+  cite_sources: true
+  refuse_when_unsupported: true
+  medical_advice: false
