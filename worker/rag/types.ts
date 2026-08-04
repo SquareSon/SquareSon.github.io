@@ -62,6 +62,9 @@ export interface RagEnv {
   RATE_LIMIT_SALT?: string;
   HOURLY_CLIENT_LIMIT?: string;
   DAILY_REQUEST_LIMIT?: string;
+  LOCAL_RAG_URL?: string;
+  LOCAL_RAG_HMAC_SECRET?: string;
+  LOCAL_RAG_TIMEOUT_MS?: string;
 }
 
 export interface WorkerContext {

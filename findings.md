@@ -247,3 +247,33 @@
 - 公网 Worker 健康检查在本机实测返回 200，首次字节约 0.516 秒；当前检索绑定（D1、Vectorize、reranker）均为可用。315 块规模下，ANN 查询不太可能是主导延迟；公开问答的模型生成和互联网往返更重要。
 - 官方 BGE-M3 模型卡说明其为多语言 1024 维模型，覆盖 dense/sparse/multi-vector 检索，并建议“混合检索 + 重排”；这与本站当前 dense + FTS + RRF + rerank 设计一致。Cloudflare Vectorize 的索引维度是创建时固定的，模型/维度改变需要新建索引，不能混插不同向量空间。
 - 结论：推荐“本地 GPU 负责离线增量构建和评测，Cloudflare 负责公开在线查询”的混合架构。把公开查询直接改为访问家中设备会增加隧道、可用性、维护和安全风险，且在当前小语料规模下没有确定的访客加速收益。
+
+### 本地在线检索迁移约束（2026-08-05）
+
+- 用户决定将 embedding、FAISS 向量检索、SQLite FTS5 关键词检索和 BGE reranker 均迁至本机；Cloudflare 仅负责公共网关、RAG 编排和云端生成模型。
+- `Env_RAG` 已在 `/WorkSpace/PythonEnvironment/CondaEnvironment/Env_RAG` 创建，Python 3.11。CUDA 编译器为 12.8，GPU 驱动为 575.64.03。PyTorch 官方说明较新的 Blackwell GPU 应使用 CUDA 13.0+ wheel，但对应 Linux 驱动要求至少 580.65.06；因此当前兼容组合应固定为 PyTorch 2.11.0 的 CUDA 12.8 wheel，而不是升级到默认 CUDA 13 wheel。
+- FastAPI 本地服务可通过 Cloudflare Tunnel 仅建立出站加密连接，无需开放路由器入站端口；生产命名 tunnel 需要一个由 Cloudflare 管理的域名/zone。现有 `squareson.github.io` 属于 GitHub Pages，不能直接成为此 tunnel hostname。
+- 当前语料规模仅 315 chunk，首版本地向量索引应选择持久化 FAISS `IndexFlatIP`（精确检索）+ SQLite FTS5，避免为小规模数据增加 Qdrant 运维；GPU 用于 BGE-M3 embedding 与 BGE reranker。
+- `Env_RAG` 已完成依赖安装与运行验证：PyTorch `2.11.0+cu128`、FlagEmbedding `1.4.0`、FAISS CPU `1.15.0`、FastAPI `0.141.1`；`torch.cuda.is_available()` 为真，GPU 为 RTX 5090（compute capability 12.0），FP16 CUDA 矩阵乘法通过。FAISS 在此规模作为本地精确 CPU 索引已足够，GPU 只承担真正算力密集的 embedding 与 rerank。
+- Cloudflare OAuth 已登录到 `fangzi508.508@gmail.com` 的账号，具备 zone 只读与 Tunnel/connectivity 管理权限；当前账号没有已创建 Tunnel。站点配置仅使用 GitHub Pages 域名 `squareson.github.io`，未发现自定义 `CNAME` 配置，因此尚不能确认用户拥有可用于正式 Tunnel 的 Cloudflare 托管域名。
+- 用户决定：本地检索不可用时，聊天框显示明确的不可用错误、保留提问和聊天历史、提供重试及站内资料搜索入口；不自动回退到 Cloudflare 检索，也不允许云端模型无证据回答。
+- Cloudflare Registrar 可直接购买或续费 400 余种受支持顶级域名，并要求 Cloudflare nameservers；也可在第三方注册商购买后仅把 DNS 托管到 Cloudflare。生产本地 RAG 需要一个 Cloudflare 托管 zone 来创建 `rag.<root-domain>` Tunnel hostname；临时 Quick Tunnel 仅用于开发。若将根域名同时用于 GitHub Pages，推荐 `www.<root-domain>` 指向 `squareson.github.io`，而把 `rag.<root-domain>` 独立留给 Tunnel。GitHub 官方建议在配置 DNS 前先在仓库 Pages 设置中验证自定义域名，避免子域名接管风险。
+- `square-son.com` DNS 实测已由 `gwen.ns.cloudflare.com` 与 `chuck.ns.cloudflare.com` 托管，满足命名 Tunnel 的域名先决条件。2026-08-05 检查时根域、`www` 和 `rag` 均无 A/AAAA/CNAME，HTTPS/HTTP 尚不可访问；这是新域名尚未部署记录的预期状态，不是注册失败。Cloudflare 账号当前也没有既有 Tunnel。
+
+### 聊天模块与主页技能更新（2026-08-05）
+
+- 当前聊天模块把连接状态单独置于配置栏上方，“新建对话”位于配置栏，提问输入与提交按钮在下方；初始化时还会插入一条“研究助理”欢迎消息。用户要求状态与 API 来源同排、新建对话与提问按钮同排，并移除欢迎消息及底部降级说明。
+- `task_plan.md`、`findings.md`、`progress.md` 已存在另一项“本地在线检索迁移”的未提交内容；本轮必须保留这些修改，并在发布时只暂存主页/RAG 相关文件。
+- 简历“技能/证书及其他”原页列出 5 组公开技能：大模型应用（Vibe coding、OpenClaw、RAG、Harness）；人工智能（PyTorch/Lightning 双卡部署、TensorFlow、JAX、MATLAB/Simulink）；机器人三维感知（NeRF、3DGS、Diffusion、VLA、PyBullet、Isaac）；嵌入式与结构设计（PyQt/C#、STM32、Altium、CATIA、SolidWorks、Ansys、Adams）；外语（本科课程全英教学、CET-4 595、CET-6 547）。
+- 技能模块只公开上述专业信息；电话、微信、籍贯、意向城市、专利等字段继续排除。
+- 聊天区采用一个统一边框的“会话窗口”：上部为可滚动问答历史，下部为输入与操作栏；空会话只显示中性占位文字，不再伪造一条助手欢迎消息。配置行按 API 来源、RAG 状态、模型三列排列；“提问”和“新建对话”按该顺序并排。
+- 技能模块适合放在教育经历之后，并在中英文导航增加对应锚点；使用分组列表而非把工具堆成一段，保持经典学术主页的紧凑排版。
+- 新增中英文技能事实后，公开语料从 315 增至 317 个 chunk（295 个论文 chunk + 22 个双语人工事实）；技能查询同时进入浏览器静态检索和 Cloudflare RAG 数据源。
+- Cloudflare D1 与 Vectorize 均已核对为 317 条，技能向量 mutation 为 `deb348dd-ca35-491f-93aa-ff7181ffe037`；线上 DeepSeek 回答准确引用 `fact-skills`。
+
+### 本地 RAG 部署核验（2026-08-05）
+
+- 本机 `Env_RAG` 使用 PyTorch `2.11.0+cu128`、FlagEmbedding `1.4.0`、FAISS `1.15.0` 和 Transformers `5.14.1`。FlagEmbedding 的旧 `FlagReranker` 与 Transformers 5 不兼容，改为对同一 `BAAI/bge-reranker-base` 直接调用标准 tokenizer/sequence-classification 模型；重排模型与算法边界未变。
+- 首次模型下载需要 SOCKS 支持，已在 Env_RAG 安装 `socksio`。BGE-M3 与 reranker 本体均已缓存；常驻服务启动时不再下载语料向量。
+- Cloudflare Tunnel 的 ingress 配置 API 可由现有 connectivity 权限写入，且服务实测 healthy。现有 OAuth token 对 Cloudflare DNS 写入返回 403，Access organization API 也返回 403；这是范围限制，不是域名或 Tunnel 异常。
+- GitHub Pages API 已成功登记 `www.square-son.com` 为仓库自定义域名；DNS 尚未存在，因此暂未启用 HTTPS 强制。

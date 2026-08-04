@@ -6,6 +6,14 @@
 
 ## 当前阶段
 
+### 聊天框与技能模块更新（2026-08-05）
+
+- [x] 从公开简历核对并提取技能内容
+- [x] 重构聊天框：状态与 API 同排、历史记录为主体、新建对话移至提问按钮旁
+- [x] 删除用户指定的说明、欢迎消息与脚注，并同步英文版
+- [x] 将技能加入中英文主页并同步公开 RAG、静态检索与自动测试
+- [x] 完成本地回归、Cloudflare 数据同步及 GitHub Pages 发布
+
 ### 指定图件与内容精简（2026-08-05）
 
 - [x] 从新版博士论文与论文 PDF 精确提取 9 个指定图件并完成视觉核对
@@ -59,7 +67,7 @@
 - 英文主页：`https://squareson.github.io/en/`
 - GitHub Pages 已固定为 Actions 构建，HTTPS 开启；经典 Jekyll 中文页、英文页、13 条论文/研究稿件、媒体资源、静态检索与隐私检查均已通过本地及线上复核。
 - 静态 FAQ/站内资料搜索已在线；无模型账号时明确标记为静态资料检索，不冒充 AI 回答。
-- Cloudflare Worker、D1/FTS5、315 条 Vectorize/BGE-M3 向量、RRF、BGE 重排、SSE 与四模型适配均已发布，API 为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
+- Cloudflare Worker、D1/FTS5、317 条 Vectorize/BGE-M3 向量、RRF、BGE 重排、SSE 与四模型适配均已发布，API 为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
 - 生产生成通道已切换为 OpenRouter；Qwen、DeepSeek、GLM、Kimi 四个公开别名均已通过生产流式验证。百炼保留为可切回的单 Key 备选通道。
 
 ## 已确认约束
@@ -331,6 +339,9 @@ PersonalHomePage-0.0.00/
 | `npm audit --omit=dev` 报告 3 个 high 生产依赖问题 | 已解决 | 升级到 Next 16.3.0 后生产审计为 0；未使用 `--force` |
 | 补充 Cloudflare 类型后，TypeScript 仍未自动加载全局类型且检查了无关 starter examples | 已解决 | 在 `tsconfig.json` 显式声明 `@cloudflare/workers-types` 并排除未使用的 `examples/`，随后重跑检查 |
 | Docker Jekyll 容器无法连接 `/var/run/docker.sock` | 已绕过 | 当前用户不在 docker 组且 sudo 需要密码；使用 `/tmp` 隔离 Conda Ruby 环境完成同等本地构建验证 |
+| 本轮首次写入规划记录时补丁上下文不匹配 | 已解决 | 失败未产生部分写入；改用当前文件中的稳定章节标题和末尾行作为小范围锚点 |
+| 按旧印象读取 `rag/scripts/ingest-public-materials.mjs` 与 `seed-d1.mjs` 失败 | 已解决 | 文件不存在且无修改产生；改用 `rg --files rag scripts` 查询当前真实脚本名后继续 |
+| D1 远程 upsert 上传完成后 Wrangler 报 `fetch failed` | 已解决 | 查询确认整库文件未生效；改为只上传两条新增技能事实的小型增量 SQL，2 条语句成功写入 |
 
 ## 本地 RTX 5090 混合 RAG 加速方案（2026-08-05，待用户确认）
 
@@ -367,3 +378,50 @@ PersonalHomePage-0.0.00/
 - 首轮本地实验优先采用 `BAAI/bge-m3`，它与当前多语言检索策略相符。即使模型同名，也必须用固定样本验证本地输出与 Cloudflare 输出的维度、归一化和召回结果；不假设跨运行环境向量逐元素相同。
 - 先固定 BGE-M3 的 dense 向量，保留现有 D1 FTS + RRF + rerank；不在首轮同时引入多个向量库、embedding 模型或生成模型，避免无法归因的质量变化。
 - 以现有 32 题回归集为门槛，发布候选索引需不低于当前 Recall@1 0.906、Recall@6 1.000、MRR 0.944，并新增中英文、缩写、无答案与引用一致性检查。
+
+## 本地在线检索迁移（2026-08-05，待用户确认隧道域名后实施）
+
+### 目标与边界
+
+- [x] 用户决定将向量检索、关键词检索、embedding 和 rerank 全部改由本机 RTX 5090 承担；Cloudflare 仅保留公共 API 网关、会话/限流/安全策略、RAG 编排和云端回答模型调用。
+- [x] 创建隔离 Conda 环境 `Env_RAG`（Python 3.11）；已安装并验证 CUDA PyTorch、FlagEmbedding、FAISS、FastAPI。PyTorch `2.11.0+cu128` 成功识别 RTX 5090（compute capability 12.0），FP16 GPU 矩阵计算通过。
+- [x] 确定可长期使用的 Cloudflare 托管域名/隧道 hostname：`square-son.com` 已委派到 Cloudflare nameservers；规划使用 `www.square-son.com` 承载 GitHub Pages、`rag.square-son.com` 承载命名 Tunnel。本轮检查未发现 A/AAAA/CNAME 记录或既有 Tunnel，尚未修改公共 DNS。
+- [x] 公网故障策略已确认：本地服务不可用时，聊天框明确报告“本地资料检索服务暂不可用”，保留本轮问题与聊天记录，并提供重试和站内资料搜索入口；不静默切换到 Cloudflare 检索或让云端模型在无证据下作答。
+
+### 目标架构
+
+```text
+浏览器 → Cloudflare Worker（Turnstile、限流、会话、模型路由）
+       → 私有 tunnel hostname → 本机 FastAPI RAG 服务（仅回传证据）
+       → OpenRouter / 百炼（仅用证据生成答案）
+
+本机服务：SQLite FTS5 + FAISS IndexFlatIP + BGE-M3 + BGE reranker
+```
+
+- 本地服务只接受 Worker 签名后的 `/v1/retrieve` 和 `/v1/health` 请求；不接受浏览器直接请求，不保存问题正文或聊天记录。
+- FastAPI 绑定 `127.0.0.1`；`cloudflared` 仅建立出站连接。生产 tunnel hostname 由 Cloudflare Access 服务令牌和 Worker HMAC 时间戳/nonce 双重保护，禁止开放端口、禁止把 tunnel token 或密钥提交到 Git。
+- embedding 使用本地 `BAAI/bge-m3` 的 FP16 dense 向量；关键词路径使用 SQLite FTS5；向量库首版采用持久化 FAISS `IndexFlatIP`（315 chunk 下精确检索足够快），而非引入额外 Qdrant 服务。
+- rerank 以本地 BGE reranker 对 RRF 后的前 12 个候选重排，返回最多 6 个带来源与 hash 的证据；Cloudflare Worker 继续构造提示词、执行医疗/隐私/注入策略并调用云端模型。
+
+### 交付阶段
+
+1. **GPU 环境与基准**：完成 Env_RAG 安装，验证 CUDA、BGE-M3 与 BGE reranker；测量首次加载、热态 query embedding、FAISS、FTS、rerank 的 P50/P95。
+2. **版本化本地索引**：实现 `rag/local/`，以内容 hash 为缓存键写入 SQLite manifest 和 `.npy` 向量文件；生成 SQLite FTS 与 FAISS 候选索引，支持仅更新变化 chunk。
+3. **本地检索 API**：实现健康检查和受签名检索接口，加入请求上限、超时、结构化日志与优雅启动/关闭；不会包含云端模型 Key。
+4. **安全连接与 Worker 改造**：创建命名 Tunnel、Access 服务令牌和 Worker secret；Worker 改为请求本地证据服务，移除线上常规路径对 Vectorize、D1 FTS、Workers AI embedding/rerank 的调用。
+5. **回归与灰度**：本地/云端双跑 32 题，核对引用、拒答和性能；先以内部开关灰度，连续健康检查通过后切换默认路径。
+6. **运行保障**：把本地服务和 cloudflared 配为系统服务，加入 GPU/磁盘/模型健康监控；服务或 Tunnel 失败时明确进入静态资料模式（或按用户选择启用云端检索备用）。
+
+### 风险与准入
+
+- 当前 315 chunk 的在线检索不会因 GPU 获得数量级公网加速；本方案的首要动机应是数据主权、避免云端 embedding/rerank 费用和未来语料扩容，而不是当前访客延迟。
+- 本地服务必须长期在线；重启、休眠、断网、驱动升级、磁盘满或 Tunnel 失连都会让 RAG 进入降级。此时前端显示可理解的资料服务错误与重试操作，而非把静态检索结果伪装成模型回答；需要 UPS/自动启动/监控，才能把稳定性接近托管服务。
+- PyTorch 2.12 起 CUDA 12.8 wheel 已停止常规发布，而本机驱动 575.64.03 低于 CUDA 13.0 所需的 580.65.06；因此本阶段固定 PyTorch 2.11.0 + CUDA 12.8 wheel，避免驱动升级成为隐性前置条件。
+
+### 实施记录（2026-08-05）
+
+- [x] 本地索引已基于 317 条公开块构建：内容哈希 embedding 缓存、FAISS `IndexFlatIP` 与 SQLite FTS5 均在 `rag/local/runtime/`，不进入 Git。
+- [x] 本地检索服务已作为 `zi-fang-rag.service` 常驻；BGE-M3 embedding、FAISS、FTS5 与 BGE reranker 均在 RTX 5090 执行。签名检索实测返回 6 条可追溯证据，端到端本机延迟约 296ms。
+- [x] 命名 Tunnel `zi-fang-local-rag`（`ed07e558-17a4-46ef-a1c7-35e98788e252`）已配置仅转发至 `127.0.0.1:8788`，并由 `zi-fang-tunnel.service` 常驻；接口要求 Worker HMAC 时间戳与 nonce，未签名请求实测返回 401。
+- [x] GitHub Pages 自定义域名已登记为 `www.square-son.com`；Worker 已配置目标 hostname `https://rag.square-son.com` 与同源名单，尚未部署该新 Worker 版本，以避免在 DNS 未创建时让线上问答退化。
+- [ ] Cloudflare 当前 OAuth 令牌只有 Zone 读取权限，无法创建 DNS 记录或 Access 应用；待在 Cloudflare DNS 中创建 `www`、根域和 `rag` 记录后，部署 Worker、推送站点并开启 Pages HTTPS。

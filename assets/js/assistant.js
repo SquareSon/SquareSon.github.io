@@ -19,6 +19,8 @@
     zh: {
       readyStatic: '静态 FAQ 与站内资料搜索已就绪',
       readyRag: 'RAG 已连接；失败时自动切换为静态检索',
+      localUnavailable: '本地资料检索服务暂不可用',
+      localUnavailableAnswer: '目前无法连接本地资料检索服务。为避免没有依据的生成回答，系统未调用模型。请稍后重试，或使用站内资料搜索。',
       working: '正在检索公开材料……',
       noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、项目、论文列表、教育经历或技能。',
       staticPrefix: '静态资料检索：',
@@ -32,6 +34,8 @@
     en: {
       readyStatic: 'Static FAQ and on-page search are ready',
       readyRag: 'RAG is connected; static search remains available',
+      localUnavailable: 'Local material retrieval is temporarily unavailable',
+      localUnavailableAnswer: 'The local material retrieval service is unavailable. To avoid an unsupported generated answer, no model was called. Please try again later or use the on-page material search.',
       working: 'Searching public materials…',
       noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, projects, publications, education, or skills.',
       staticPrefix: 'Static material search: ',
@@ -235,7 +239,15 @@
       history.push({ role: 'user', content: value }, { role: 'assistant', content: answer });
       history = history.slice(-6);
       setMode('rag', copy.readyRag);
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === 'local_retrieval_unavailable') {
+        reply.content.textContent = copy.localUnavailableAnswer;
+        renderSources(reply.sources, []);
+        history.push({ role: 'user', content: value }, { role: 'assistant', content: copy.localUnavailableAnswer });
+        history = history.slice(-6);
+        setMode('error', copy.localUnavailable);
+        return;
+      }
       const result = staticSearch(value);
       reply.content.textContent = result.answer;
       renderSources(reply.sources, result.sources);

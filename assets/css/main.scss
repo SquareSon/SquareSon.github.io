@@ -721,6 +721,7 @@ li { margin-bottom: 0.38em; }
 
 .assistant-status[data-mode="rag"] .status-dot { background: #2b8056; }
 .assistant-status[data-mode="static"] .status-dot { background: #b37a24; }
+.assistant-status[data-mode="error"] .status-dot { background: #b34040; }
 
 .assistant-config {
   display: grid;

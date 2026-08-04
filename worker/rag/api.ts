@@ -1,5 +1,5 @@
 import { getGatewayCatalog, getProviderCandidates, getProviderCatalog, normalizeProviderStream, requestProvider } from "./providers";
-import { retrieveEvidence } from "./retrieval";
+import { LocalRetrievalUnavailable, retrieveEvidence } from "./retrieval";
 import type { ChatHistoryMessage, GatewayId, Locale, RagEnv, WorkerContext } from "./types";
 
 const localRateWindow = new Map<string, { hour: string; count: number }>();
@@ -22,10 +22,8 @@ export async function handleRagRequest(
         ok: true,
         corpus: "public-knowledge",
         retrieval: {
-          staticLexical: true,
-          d1Fts: Boolean(env.DB),
-          vectorize: Boolean(env.AI && env.VECTOR_INDEX),
-          reranker: Boolean(env.AI),
+          backend: "local",
+          localEndpointConfigured: Boolean(env.LOCAL_RAG_URL && env.LOCAL_RAG_HMAC_SECRET),
         },
         providers: getProviderCatalog(env).map(({ id, label }) => ({ id, label })),
         gateways: getGatewayCatalog(env),
@@ -101,7 +99,15 @@ export async function handleRagRequest(
   const providers = getProviderCandidates(requestedModel, env, requestedGateway);
   if (!providers.length) return json({ degraded: true, reason: "model_unavailable" }, 200, cors);
 
-  const evidence = await retrieveEvidence(question, locale, env);
+  let evidence;
+  try {
+    evidence = await retrieveEvidence(question, locale, env);
+  } catch (error) {
+    if (error instanceof LocalRetrievalUnavailable) {
+      return json({ degraded: true, reason: "local_retrieval_unavailable" }, 200, cors);
+    }
+    return json({ degraded: true, reason: "local_retrieval_unavailable" }, 200, cors);
+  }
   if (!evidence.length) return json({ degraded: true, reason: "insufficient_evidence" }, 200, cors);
 
   for (const provider of providers) {

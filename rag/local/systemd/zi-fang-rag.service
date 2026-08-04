@@ -1,0 +1,17 @@
+[Unit]
+Description=Zi Fang local GPU RAG retrieval service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/WorkSpace/Program/PersonalHomePage-0.0.00
+EnvironmentFile=%h/.config/zi-fang-rag/local.env
+ExecStart=/WorkSpace/PythonEnvironment/CondaEnvironment/Env_RAG/bin/python -m uvicorn rag.local.api:app --host 127.0.0.1 --port 8788 --proxy-headers
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=300
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

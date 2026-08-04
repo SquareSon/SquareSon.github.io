@@ -5,6 +5,10 @@
 - 已使用只读检查确认本机拥有 RTX 5090（32 GB 显存），适合本地离线 embedding、rerank 和索引实验。
 - 已审计当前 RAG：公开线上检索正常，315 个公开 chunk 已拥有稳定内容 hash，但尚未有可跨次运行复用的本地 embedding 缓存。
 - 已将“本地增量构建缓存 + 评测 + Cloudflare 蓝绿发布，线上保持 Cloudflare”的建议、缓存键和阶段计划写入 `task_plan.md`；未修改线上代码、未重建索引、未部署。
+- 用户要求将向量/关键词检索、embedding 与 rerank 全部本地化，Cloudflare 保留网关、编排与云端模型调用；已创建并验证隔离 Conda 环境 `Env_RAG`（Python 3.11，PyTorch 2.11.0+cu128、FlagEmbedding、FAISS、FastAPI）。RTX 5090 CUDA/FP16 计算通过；尚未修改 RAG 代码、启动本地服务或切换线上流量。
+- 已只读核对 Cloudflare 登录、主页域名与 Tunnel 列表：账号可管理 Tunnel，但目前无既有 Tunnel；未发现可确认的自定义 Cloudflare 域名。用户选择本地检索故障时聊天框明确报错并提供重试/站内搜索，不使用云端检索备用。
+- 已核对官方域名注册、Cloudflare Tunnel 和 GitHub Pages 自定义域名规则；推荐以一个 Cloudflare 托管的根域名同时承载 `www` 主页与独立 `rag` Tunnel 子域名，尚未购买或配置域名。
+- 用户已购买 `square-son.com`；只读 DNS 验证显示其已委派给 Cloudflare，且目前没有根域、`www` 或 `rag` 服务记录、没有既有 Tunnel。域名可用于后续部署，但本轮未执行 DNS、GitHub Pages 或 Worker 写入。
 
 ## 2026-08-04
 
@@ -132,3 +136,10 @@
 - 2026-08-05：使用 Playwright 检查 1440px 桌面端与 390px 中英文移动端；研究问答位置、5 篇论文顺序、9 张图片加载和响应式排版均通过。仅本地预览域名访问线上 Worker 时出现预期 CORS，并正常降级为静态检索。
 - 2026-08-05：Cloudflare OAuth 权限确认成功；远程 D1 已 upsert 315 条公开知识，14 条变化向量更新到 mutation `1c0b9e8a-834f-4557-813b-b139b716453d`，Worker 版本 `fa4c605d-dcc8-48a9-bf10-8f2b043cc11b` 已部署。DeepSeek、GLM、Kimi 在线检索新高中事实成功；Qwen 单次供应商错误按既定路由/静态方案降级。
 - 2026-08-05：提交 `0be63c0` 已推送至 `main`；GitHub Pages Actions 运行 `30932591069` 的构建与部署全部成功。线上中英文页面均返回 200，13 条成果、5 个连续图文条目顺序、问答位置、高中经历、9 张 PNG 资源及被移除文案均复核通过。
+- 2026-08-05：开始按最新反馈调整聊天模块与技能内容；已确认现有配置、状态、欢迎消息、输入区和底部说明的 DOM/CSS 分布，并保留工作区中另一项本地 RAG 迁移的未提交规划内容。
+- 2026-08-05：使用 PDF 文本抽取和两页渲染双重核对简历技能区，确定 5 组可公开技能内容；未将电话、微信、籍贯、意向城市或专利纳入主页。
+- 2026-08-05：完成聊天 UI、双语说明、导航与技能模块实现；初始化欢迎消息和底部说明已移除。公开 RAG 已重新生成并写入 317 条 D1 seed，其中论文 295 条、双语人工事实 22 条。
+- 2026-08-05：Jekyll 构建、8 项测试、TypeScript 与依赖审计通过；34 题检索 Recall@1=0.971、Recall@6=1.000、MRR=0.985。Cloudflare D1/Vectorize 已更新至 317 条，Worker 版本 `9bbb8553-5db4-4bae-a2d8-ad4c45a53e19` 上线，技能问题可在线引用 `fact-skills` 回答。
+- 2026-08-05：主页提交 `4c21cc6` 已推送至 `main`，GitHub Pages Actions `30935095058` 构建与部署成功。线上中英文页面、聊天结构、技能内容与 CSS 均返回 200；被删除的欢迎消息和脚注无残留。规划文件中另一项本地 RAG 迁移修改保持未提交。
+- 2026-08-05：完成本地 GPU RAG 服务实现与实机验证：317 条公开块已建本地 embedding 缓存、FAISS 与 FTS5 索引；BGE-M3 与 BGE reranker 在 RTX 5090 上工作，受 HMAC 签名的实测检索约 296ms 并返回 6 条来源证据。
+- 2026-08-05：创建并启用命名 Tunnel `zi-fang-local-rag` 与两个用户级 systemd 服务；Tunnel ingress 仅指向 127.0.0.1 检索端口。GitHub Pages 已登记 `www.square-son.com`。Cloudflare OAuth 缺少 Zone DNS Edit / Access 编辑权限，DNS、最终 Worker 部署及 Pages HTTPS 强制等待该外部授权或手工记录创建。

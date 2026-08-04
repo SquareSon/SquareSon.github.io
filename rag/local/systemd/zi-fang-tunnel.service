@@ -1,0 +1,15 @@
+[Unit]
+Description=Cloudflare Tunnel for Zi Fang local RAG
+After=network-online.target zi-fang-rag.service
+Wants=network-online.target zi-fang-rag.service
+
+[Service]
+Type=simple
+WorkingDirectory=/WorkSpace/Program/PersonalHomePage-0.0.00
+ExecStart=/usr/bin/npx wrangler tunnel run ed07e558-17a4-46ef-a1c7-35e98788e252 --log-level warn
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

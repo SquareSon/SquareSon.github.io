@@ -47,3 +47,8 @@ next-env.d.ts
 /output/
 /tmp/
 /work/
+
+# Local GPU RAG runtime and secrets
+/rag/local/runtime/
+/rag/local/*.env
+/rag/local/__pycache__/
