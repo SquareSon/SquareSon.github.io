@@ -13,7 +13,7 @@
 - [x] 将论文改为 5 个连续图文条目加无编号紧凑列表，移除说明、分组与底部链接
 - [x] 为中英文教育经历补充 2014—2017 宁波市镇海中学
 - [x] 更新公开 RAG 事实与回归测试
-- [ ] 完成 GitHub Pages 与 Cloudflare 发布、线上核对
+- [x] 完成 GitHub Pages 与 Cloudflare 发布、线上核对
 
 ### 内容层级与论文展示增强（2026-08-04）
 
@@ -57,7 +57,7 @@
 - GitHub 仓库：`https://github.com/SquareSon/SquareSon.github.io`
 - 公开主页：`https://squareson.github.io/`
 - 英文主页：`https://squareson.github.io/en/`
-- GitHub Pages 已固定为 Actions 构建，HTTPS 开启；经典 Jekyll 中文页、英文页、13 条论文/研究稿件、媒体资源、静态检索与隐私检查均通过本地回归，等待本轮线上发布复核。
+- GitHub Pages 已固定为 Actions 构建，HTTPS 开启；经典 Jekyll 中文页、英文页、13 条论文/研究稿件、媒体资源、静态检索与隐私检查均已通过本地及线上复核。
 - 静态 FAQ/站内资料搜索已在线；无模型账号时明确标记为静态资料检索，不冒充 AI 回答。
 - Cloudflare Worker、D1/FTS5、315 条 Vectorize/BGE-M3 向量、RRF、BGE 重排、SSE 与四模型适配均已发布，API 为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
 - 生产生成通道已切换为 OpenRouter；Qwen、DeepSeek、GLM、Kimi 四个公开别名均已通过生产流式验证。百炼保留为可切回的单 Key 备选通道。
