@@ -42,11 +42,19 @@ npm test
 
 The ingestion source defaults to `/WorkSpace/Data/PersonalHomepage` and can be overridden with `PERSONAL_HOMEPAGE_DATA_DIR`.
 
+The downloadable bilingual public CV is rebuilt separately so private resume fields never enter the site:
+
+```bash
+conda run -n codex-tools python scripts/build-public-cv.py
+```
+
+The script writes the reviewed site copy to `files/Zi-Fang-CV.pdf`. Publication PDFs supplied as research material are not copied into the public repository by default; the homepage links to Scholar/DOI records until the distributable version and its article-specific licence are confirmed.
+
 ## Research assistant
 
 The site calls the standalone API at `https://zi-fang-research-assistant.zi-fang-research.workers.dev`. D1 FTS5, Vectorize, BGE-M3 embeddings, and BGE reranking are deployed on Cloudflare; no local GPU is required.
 
-Qwen, GLM, DeepSeek, and Kimi are supported by server-side adapters. Until one or more provider secrets are configured, the API intentionally returns a degraded status and the browser answers through clearly labeled static FAQ/on-page search. Credentials must never be placed in Jekyll, GitHub Pages, or browser JavaScript.
+Qwen, GLM, DeepSeek, and Kimi are exposed through reviewed server-side aliases. The production gateway is OpenRouter, with Alibaba Cloud Model Studio retained as an alternative single-key gateway. Until the active gateway secret is configured, the API intentionally returns a degraded status and the browser answers through clearly labeled static FAQ/on-page search. Credentials must never be placed in Jekyll, GitHub Pages, or browser JavaScript.
 
 See [`rag/README.md`](rag/README.md) for retrieval, model switching, citations, safety boundaries, and secret configuration.
 

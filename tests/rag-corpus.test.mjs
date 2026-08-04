@@ -6,8 +6,10 @@ const corpus = JSON.parse(await readFile("rag/corpus/public-knowledge.json", "ut
 const migration = await readFile("drizzle/0000_nice_prism.sql", "utf8");
 
 test("public RAG corpus is bounded, attributable, and privacy-safe", () => {
-  assert.equal(corpus.length, 313);
+  assert.equal(corpus.length, 315);
   assert.equal(corpus.filter((item) => item.id.startsWith("thesis-")).length, 295);
+  assert.ok(corpus.some((item) => item.id === "fact-job-search"));
+  assert.ok(corpus.some((item) => item.id === "fact-job-search-en"));
   assert.equal(new Set(corpus.map((item) => item.id)).size, corpus.length);
   assert.ok(corpus.every((item) => item.public === true));
   assert.ok(corpus.every((item) => item.hash && item.sourceTitle && item.titlePath && item.searchText));

@@ -6,6 +6,7 @@ export interface ProviderConfig {
   apiKey: string;
   baseUrl: string;
   model: string;
+  gateway: "bailian" | "openrouter";
 }
 
 const aliases: Record<string, ProviderId> = {
@@ -30,7 +31,7 @@ export function getProviderCandidates(requested: string, env: RagEnv) {
     return id ? providers.filter((provider) => provider.id === id) : [];
   }
 
-  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "qwen,glm,deepseek,kimi")
+  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "qwen,deepseek,glm,kimi")
     .split(",")
     .map((value) => value.trim())
     .filter((value): value is ProviderId => value in { qwen: 1, glm: 1, deepseek: 1, kimi: 1 });
@@ -55,11 +56,29 @@ export async function requestProvider(
       stream: true,
       temperature: 0.2,
       max_tokens: 1000,
+      ...(provider.gateway === "openrouter"
+        ? {
+            provider: {
+              data_collection: "deny",
+              zdr: true,
+            },
+          }
+        : {}),
     }),
     signal: AbortSignal.timeout(35_000),
   });
 
   if (!response.ok || !response.body) {
+    const detail = response.body ? (await response.text()).slice(0, 600) : "empty_response_body";
+    console.warn(
+      JSON.stringify({
+        event: "model_provider_error",
+        provider: provider.id,
+        model: provider.model,
+        status: response.status,
+        detail,
+      }),
+    );
     await response.body?.cancel();
     throw new Error(`Provider ${provider.id} returned ${response.status}`);
   }
@@ -144,45 +163,63 @@ export function normalizeProviderStream(
 }
 
 function getProviderConfigs(env: RagEnv): ProviderConfig[] {
-  const providers: Array<ProviderConfig | null> = [
-    env.DASHSCOPE_API_KEY
-      ? {
-          id: "qwen",
-          label: "Qwen",
-          apiKey: env.DASHSCOPE_API_KEY,
-          baseUrl: env.DASHSCOPE_BASE_URL ?? "https://dashscope.aliyuncs.com/compatible-mode/v1",
-          model: env.QWEN_MODEL ?? "qwen3.7-plus",
-        }
-      : null,
-    env.ZHIPU_API_KEY
-      ? {
-          id: "glm",
-          label: "GLM",
-          apiKey: env.ZHIPU_API_KEY,
-          baseUrl: env.ZHIPU_BASE_URL ?? "https://open.bigmodel.cn/api/paas/v4",
-          model: env.GLM_MODEL ?? "glm-5",
-        }
-      : null,
-    env.DEEPSEEK_API_KEY
-      ? {
-          id: "deepseek",
-          label: "DeepSeek",
-          apiKey: env.DEEPSEEK_API_KEY,
-          baseUrl: env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com",
-          model: env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
-        }
-      : null,
-    env.MOONSHOT_API_KEY
-      ? {
-          id: "kimi",
-          label: "Kimi",
-          apiKey: env.MOONSHOT_API_KEY,
-          baseUrl: env.MOONSHOT_BASE_URL ?? "https://api.moonshot.cn/v1",
-          model: env.KIMI_MODEL ?? "kimi-k2.5",
-        }
-      : null,
+  if (env.MODEL_GATEWAY === "openrouter" && env.OPENROUTER_API_KEY) {
+    return [
+      {
+        id: "qwen",
+        label: "Qwen",
+        apiKey: env.OPENROUTER_API_KEY,
+        baseUrl: "https://openrouter.ai/api/v1",
+        model: env.OPENROUTER_QWEN_MODEL ?? "qwen/qwen3.7-flash",
+        gateway: "openrouter",
+      },
+      {
+        id: "deepseek",
+        label: "DeepSeek",
+        apiKey: env.OPENROUTER_API_KEY,
+        baseUrl: "https://openrouter.ai/api/v1",
+        model: env.OPENROUTER_DEEPSEEK_MODEL ?? "deepseek/deepseek-v4-flash-0731",
+        gateway: "openrouter",
+      },
+      {
+        id: "glm",
+        label: "GLM",
+        apiKey: env.OPENROUTER_API_KEY,
+        baseUrl: "https://openrouter.ai/api/v1",
+        model: env.OPENROUTER_GLM_MODEL ?? "z-ai/glm-5.2",
+        gateway: "openrouter",
+      },
+      {
+        id: "kimi",
+        label: "Kimi",
+        apiKey: env.OPENROUTER_API_KEY,
+        baseUrl: "https://openrouter.ai/api/v1",
+        model: env.OPENROUTER_KIMI_MODEL ?? "moonshotai/kimi-k3",
+        gateway: "openrouter",
+      },
+    ];
+  }
+
+  if (!env.DASHSCOPE_API_KEY) return [];
+
+  // One Model Studio workspace provides the reviewed public-model allowlist.
+  // The browser can choose a label, but it can never supply an arbitrary model
+  // ID, endpoint, or credential.
+  const apiKey = env.DASHSCOPE_API_KEY;
+  const baseUrl = env.DASHSCOPE_BASE_URL ?? "https://dashscope.aliyuncs.com/compatible-mode/v1";
+  return [
+    { id: "qwen", label: "Qwen", apiKey, baseUrl, model: env.QWEN_MODEL ?? "qwen3.7-flash", gateway: "bailian" },
+    {
+      id: "deepseek",
+      label: "DeepSeek",
+      apiKey,
+      baseUrl,
+      model: env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
+      gateway: "bailian",
+    },
+    { id: "glm", label: "GLM", apiKey, baseUrl, model: env.GLM_MODEL ?? "glm-5.2", gateway: "bailian" },
+    { id: "kimi", label: "Kimi", apiKey, baseUrl, model: env.KIMI_MODEL ?? "kimi/kimi-k3", gateway: "bailian" },
   ];
-  return providers.filter((provider): provider is ProviderConfig => provider !== null);
 }
 
 function buildMessages(question: string, locale: Locale, evidence: Evidence[]) {

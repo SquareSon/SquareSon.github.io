@@ -19,6 +19,7 @@ author:
   email: "fangzi508@sjtu.edu.cn"
   github: "https://github.com/SquareSon"
   scholar: "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN"
+  cv: "/files/Zi-Fang-CV.pdf"
 
 # Populated after the standalone Cloudflare Worker is deployed. The assistant
 # remains useful as static FAQ and on-page search while this is empty.
@@ -55,12 +56,15 @@ exclude:
   - content
   - db
   - drizzle
+  - dist
   - node_modules
   - out
+  - output
   - public
   - rag
   - scripts
   - tests
+  - tmp
   - worker
   - .env.example
   - .openai

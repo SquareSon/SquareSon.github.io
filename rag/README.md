@@ -9,7 +9,7 @@ This directory contains the reproducible, public-only RAG pipeline for the perso
 3. The pipeline stops before references and research-output appendices, removes non-public patterns, and writes stable IDs, hashes, evidence levels, source paths, and index versions.
 4. `npm run rag:seed` updates the D1 migration with the reviewed public corpus and Chinese/English search tokens.
 
-The generated corpus contains 313 chunks: 295 dissertation chunks plus 18 curated bilingual facts. The ingestion audit checks duplicate IDs, phone-like values, patents, and other excluded terms.
+The generated corpus contains 315 chunks: 295 dissertation chunks plus 20 curated bilingual facts. The ingestion audit checks duplicate IDs, phone-like values, patents, and other excluded terms.
 
 ## Retrieval path
 
@@ -26,7 +26,7 @@ Embedding and reranking run on Cloudflare's managed infrastructure. No local GPU
 
 ## Generation and degradation
 
-`worker/rag/providers.ts` exposes four server-side OpenAI-compatible adapters. Model names, endpoints, and auto-routing order are environment variables, so provider upgrades require no browser release. Explicit model selection never silently switches to another provider; `auto` may try the next configured provider.
+`worker/rag/providers.ts` exposes four reviewed model aliases. The active gateway is selected server-side through `MODEL_GATEWAY`: the current OpenRouter gateway uses `qwen/qwen3.7-flash`, `deepseek/deepseek-v4-flash-0731`, `z-ai/glm-5.2`, and `moonshotai/kimi-k3`; the retained Model Studio gateway uses its equivalent four aliases. The browser can select only an alias; credentials, endpoints, and real model IDs remain server-side. OpenRouter requests require no data collection and zero-retention routing. Explicit model selection never silently switches to another model family; `auto` may try the next configured provider.
 
 The API returns `degraded: true` when credentials are absent, quota is exhausted, retrieval has insufficient evidence, Turnstile fails, or providers are unavailable. The Jekyll browser client then answers from its compact FAQ/on-page index and labels the response as static material search.
 
@@ -42,4 +42,4 @@ Questions are limited to 1,000 characters. Usage records contain only a salted c
 
 The production bindings are defined in `wrangler.jsonc`: D1 `zi-fang-public-rag`, Vectorize `zi-fang-public-rag-v1`, and Workers AI. The public API is `https://zi-fang-research-assistant.zi-fang-research.workers.dev`.
 
-Copy `.env.example` only as a checklist. Add provider keys, `RATE_LIMIT_SALT`, and optional Turnstile credentials with `wrangler secret put`; never commit them or place them in the browser bundle.
+Copy `.env.example` only as a checklist. Add the selected gateway secret (`OPENROUTER_API_KEY` or `DASHSCOPE_API_KEY`), `RATE_LIMIT_SALT`, and optional Turnstile credentials with `wrangler secret put`; never commit them or place them in the browser bundle. A Model Studio model must be activated in the selected workspace before its corresponding public alias can answer.

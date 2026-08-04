@@ -1,5 +1,14 @@
 # 调研发现
 
+## 论文展示与版本边界（2026-08-04）
+
+- 新增目录为 `/WorkSpace/Data/Personal Homepage/Publications`，共 12 份 PDF。与 2026-08-04 Google Scholar 11 条记录交叉后，公开已发表的一作成果为 GLA-NeRF（2026）、螺栓松动寿命预测（2023）和工业机器人故障诊断（2021）。
+- EIDC、UPI-NeRF 和 UlRe-NeRF 的本地 PDF 显示为投稿/评审稿：UPI-NeRF 明示“[removed for peer review]”，GLA-NeRF 与 UPI-NeRF 仍含期刊占位符，EIDC/UlRe-NeRF 也未进入 Scholar 公开成果列表。可用其内容理解博士研究脉络，但不应在“论文”中表述为已发表成果或直接公开评审 PDF。
+- RayeRen 线上主页的关键模式是：少量重点论文用大图、标题、作者、项目/论文链接和一至两条贡献说明展开；长尾成果则压缩为会议/期刊标签、文本与超链接。本站将用 3 篇 Scholar 已收录的一作论文做图文精选，其余 8 篇保持紧凑列表。
+- IEEE 官方政策区分 preprint、author-submitted article、accepted article 和 Version of Record（VOR）；一般允许作者在个人网站发布 accepted article（需 DOI 与 IEEE 版权声明），但非开放许可的 VOR 不得在线发布，article proof 也不得上线。
+- IOP 官方政策允许具名作者在个人网站立即放置 Accepted Manuscript，但订阅文章的 Final Published Version 不得上线；金色 OA/CC 许可的 VOR 可按具体许可共享。
+- 因本地 IEEE PDF 明显包含期刊/会议正式排版，GLA-NeRF PDF 又未能仅凭文件确认为有完整自存档声明的 Accepted Manuscript，当前安全默认是只提供 Scholar/出版社/DOI 链接，不把这批 PDF 复制到 GitHub Pages。
+
 ## 经典学术主页重构基线（2026-08-04）
 
 - 用户明确认为当前页面方向不合格，要求采用 `RayeRen/acad-homepage.github.io` 的经典学术主页架构；原有纸张科技风、研究链首屏和大卡片布局不再作为视觉基线。
@@ -206,3 +215,11 @@
 - 为避免英文查询在无向量绑定时只能依赖跨语言 embedding，人工核对事实扩充为 9 组中英文对照（18 个片段）；人物、教育、研究链、证据边界、四个项目与论文概览均可直接进行英文关键词召回。
 - 30 个中英文离线事实问题上，静态词法基线达到 Recall@1 0.933、Recall@6 1.000、MRR 0.957；该基线是向量/RRF/重排启用前的最低回归门槛。
 - 另对 10 个隐私索取、专利索取、提示词注入和个体医疗建议问题增加确定性策略响应；这些请求不进入模型和配额链路。
+
+### 内容层级、公开简历与论文版本（2026-08-04）
+
+- Google Scholar 的 11 条权威记录中，Zi Fang 为第一作者的工作共 3 篇：GLA-NeRF（PMB 2026）、螺栓松动寿命预测（IEEE TIM 2023）和工业机器人故障诊断（M2VIP 2021）。它们均已改为带独立视觉摘要、作者/期刊信息和研究贡献说明的重点条目；其余 8 篇使用紧凑文本链接。
+- 新增 PDF 中还包含未被 Scholar 收录的投稿/研究稿件；它们可用于理解博士工作的技术脉络，但不会进入“公开论文”列表。
+- IEEE 官方政策允许作者在个人网站发布符合条件的 Accepted Article，并要求 DOI/版权声明，但非开放获取的 Version of Record 与 proof 不能直接上传；IOP 允许个人网站自存档 Accepted Manuscript，订阅文章的最终排版版则不能按该一般条款上传。因此现阶段不复制用户提供的论文 PDF，只提供 Scholar/DOI 链接，并为每篇论文保留后续逐项确认许可的入口。
+- 公开简历由独立脚本从公开事实生成中英双语 A4 PDF，不复制原简历中的手机号、微信、专利或未正式发布工作。文本扫描与两页渲染复核均通过。
+- RAG 新增中英文求职状态事实，最终为 315 个公开片段（295 个博士论文片段 + 20 个核对事实）；32 个中英文评测问题达到 Recall@1 0.906、Recall@6 1.000、MRR 0.944，无 top-6 miss。

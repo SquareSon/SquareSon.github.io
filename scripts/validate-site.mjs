@@ -20,9 +20,13 @@ assert.match(files.assistant, /qwen|models/);
 assert.match(files.license, /Copyright \(c\) 2022 Yi Ren/);
 
 for (const [locale, source] of [["zh", files.zh], ["en", files.en]]) {
-  assert.equal((source.match(/<li><a class="publication-title"/g) ?? []).length, 11, `${locale} publication count`);
+  assert.equal((source.match(/class="publication-title"/g) ?? []).length, 11, `${locale} publication count`);
+  assert.equal((source.match(/class="paper-box featured-publication"/g) ?? []).length, 3, `${locale} featured first-author count`);
   assert.match(source, /GLA-NeRF/);
+  assert.match(source, /Zi-Fang-CV\.pdf/);
   assert.match(source, /fangzi508@sjtu\.edu\.cn|include assistant\.html/);
+  assert.ok(source.indexOf('id="research"') < source.indexOf('id="assistant"'), `${locale} assistant follows research`);
+  assert.ok(source.indexOf('id="assistant"') < source.indexOf('id="selected-work"'), `${locale} assistant precedes selected work`);
   assert.doesNotMatch(source, /\b1\d{10}\b|微信同号|patent list/i);
 }
 

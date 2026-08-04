@@ -24,7 +24,8 @@
     }
   ],
   "vars": {
-    "AUTO_PROVIDER_ORDER": "qwen,glm,deepseek,kimi",
+    "MODEL_GATEWAY": "openrouter",
+    "AUTO_PROVIDER_ORDER": "qwen,deepseek,glm,kimi",
     "ALLOWED_ORIGINS": "https://squareson.github.io,http://localhost:4000,http://127.0.0.1:4000",
     "HOURLY_CLIENT_LIMIT": "20",
     "DAILY_REQUEST_LIMIT": "250"

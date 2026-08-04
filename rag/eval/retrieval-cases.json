@@ -1,5 +1,6 @@
 [
   { "id": "zh-profile", "locale": "zh", "query": "方子的英文名和公开邮箱是什么？", "expectedIds": ["fact-profile"] },
+  { "id": "zh-job-search", "locale": "zh", "query": "方子现在在找什么方向的工作？", "expectedIds": ["fact-job-search"] },
   { "id": "zh-education", "locale": "zh", "query": "方子的本科和博士教育经历", "expectedIds": ["fact-education"] },
   { "id": "zh-thread", "locale": "zh", "query": "博士研究的五步技术路线是什么？", "expectedIds": ["fact-research-thread"] },
   { "id": "zh-boundary", "locale": "zh", "query": "系统是否完成临床验证和端到端穿刺精度验证？", "expectedIds": ["fact-evidence-boundary"], "expectedTitleIncludes": ["主要结论"] },
@@ -9,6 +10,7 @@
   { "id": "zh-prototype", "locale": "zh", "query": "导航原理样机集成了哪些硬件和标定？", "expectedIds": ["fact-project-prototype"] },
   { "id": "zh-publications", "locale": "zh", "query": "Google Scholar 公开了多少篇论文？", "expectedIds": ["fact-publications"] },
   { "id": "en-profile", "locale": "en", "query": "What is Zi Fang's institutional email and research focus?", "expectedIds": ["fact-profile-en"] },
+  { "id": "en-job-search", "locale": "en", "query": "Is Zi Fang looking for research or algorithm roles?", "expectedIds": ["fact-job-search-en"] },
   { "id": "en-education", "locale": "en", "query": "Where did Zi Fang study for his bachelor's and Ph.D.?", "expectedIds": ["fact-education-en"] },
   { "id": "en-thread", "locale": "en", "query": "What are the five stages of the doctoral research thread?", "expectedIds": ["fact-research-thread-en"] },
   { "id": "en-boundary", "locale": "en", "query": "Has the prototype established clinical safety or end-to-end puncture accuracy?", "expectedIds": ["fact-evidence-boundary-en"] },

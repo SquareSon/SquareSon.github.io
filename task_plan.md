@@ -6,6 +6,15 @@
 
 ## 当前阶段
 
+### 内容层级与论文展示增强（2026-08-04）
+
+- [x] 核对新增 PDF 的作者顺序、发表状态与可公开版本
+- [x] 将“研究问答”移至“研究方向”与“代表研究”之间
+- [x] 根据博士论文与简历重写代表研究的工作脉络
+- [x] 将全部一作论文改为图文精选项，其余论文保持紧凑链接列表
+- [x] 生成脱敏的公开版简历 PDF 并提供中英文下载入口
+- [ ] 完成 Jekyll/测试回归、版权说明、GitHub Pages 发布与线上核对
+
 ### 经典学术主页重构（2026-08-04 用户纠偏）
 
 - [x] 确认当前 Cloudflare 授权状态
@@ -41,8 +50,8 @@
 - 英文主页：`https://squareson.github.io/en/`
 - GitHub Pages 已固定为 Actions 构建，HTTPS 开启；经典 Jekyll 中文页、英文页、11 条论文、媒体资源、静态检索与隐私检查均在线通过。
 - 静态 FAQ/站内资料搜索已在线；无模型账号时明确标记为静态资料检索，不冒充 AI 回答。
-- Cloudflare Worker、D1/FTS5、313 条 Vectorize/BGE-M3 向量、RRF、BGE 重排、SSE 与四模型适配均已发布，API 为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
-- 当前尚未写入 Qwen、GLM、DeepSeek、Kimi 任一生成模型 API Key，因此模型列表为空并自动静态降级；后续通过 `wrangler secret put` 加入任一密钥即可启用对应模型，无需改前端架构。
+- Cloudflare Worker、D1/FTS5、315 条 Vectorize/BGE-M3 向量、RRF、BGE 重排、SSE 与四模型适配均已发布，API 为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
+- 生产生成通道已切换为 OpenRouter；Qwen、DeepSeek、GLM、Kimi 四个公开别名均已通过生产流式验证。百炼保留为可切回的单 Key 备选通道。
 
 ## 已确认约束
 

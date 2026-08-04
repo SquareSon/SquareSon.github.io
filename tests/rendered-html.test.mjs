@@ -10,10 +10,14 @@ test("Jekyll renders the default Chinese academic homepage", async () => {
   assert.match(html, /<html lang="zh-CN"/);
   assert.match(html, /三维感知、具身智能与医疗机器人/);
   assert.match(html, /class="sidebar sticky"/);
-  assert.match(html, /class="paper-box"/);
+  assert.match(html, /class="paper-box(?:\s|\")/);
   assert.match(html, /研究问答/);
+  assert.match(html, /下载公开版简历/);
   assert.match(html, /fangzi508@sjtu\.edu\.cn/);
   assert.equal((html.match(/class="publication-title"/g) ?? []).length, 11);
+  assert.equal((html.match(/class="paper-box featured-publication"/g) ?? []).length, 3);
+  assert.ok(html.indexOf('id="research"') < html.indexOf('id="assistant"'));
+  assert.ok(html.indexOf('id="assistant"') < html.indexOf('id="selected-work"'));
   assert.doesNotMatch(html, /让三维感知|Perceive in 3D|codex-preview/i);
   assert.doesNotMatch(html, /\b1\d{10}\b|微信同号/);
 });
@@ -24,8 +28,12 @@ test("Jekyll renders the complete English route and language links", async () =>
   assert.match(html, /3D Medical Perception/);
   assert.match(html, /Evidence boundary/);
   assert.match(html, /Static FAQ and on-page search/);
+  assert.match(html, /Download public CV/);
   assert.match(html, /href="\/"[^>]*>中文</);
   assert.equal((html.match(/class="publication-title"/g) ?? []).length, 11);
+  assert.equal((html.match(/class="paper-box featured-publication"/g) ?? []).length, 3);
+  assert.ok(html.indexOf('id="research"') < html.indexOf('id="assistant"'));
+  assert.ok(html.indexOf('id="assistant"') < html.indexOf('id="selected-work"'));
 });
 
 test("rendered site ships local profile, research media, and native scripts", async () => {
@@ -33,6 +41,7 @@ test("rendered site ships local profile, research media, and native scripts", as
     access(new URL("images/profile/zi-fang.png", siteRoot)),
     access(new URL("images/research/navigation-prototype.png", siteRoot)),
     access(new URL("images/research/semantic-workbench.png", siteRoot)),
+    access(new URL("files/Zi-Fang-CV.pdf", siteRoot)),
     access(new URL("assets/js/site.js", siteRoot)),
     access(new URL("assets/js/assistant.js", siteRoot)),
     access(new URL("LICENSE", projectRoot)),

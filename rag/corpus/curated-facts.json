@@ -4,7 +4,16 @@
     "locale": "zh",
     "sourceTitle": "公开个人资料",
     "titlePath": "个人简介",
-    "content": "方子，英文名 Zi Fang，上海交通大学机械与动力工程学院机器人研究所机械工程直博生。研究方向为三维感知、具身智能与医疗机器人，博士阶段为 2021 年至 2026 年。公开机构邮箱为 fangzi508@sjtu.edu.cn。",
+    "content": "方子，英文名 Zi Fang，上海交通大学机械与动力工程学院机器人研究所机械工程直博生，预计 2026 年 12 月毕业。他目前正在求职、找工作，寻找算法/研究岗位，重点关注三维感知与具身智能，并希望将这些能力用于医疗机器人等真实物理系统。公开机构邮箱为 fangzi508@sjtu.edu.cn。",
+    "url": "/#about",
+    "evidenceLevel": "public-profile"
+  },
+  {
+    "id": "fact-job-search",
+    "locale": "zh",
+    "sourceTitle": "公开求职信息",
+    "titlePath": "求职方向 / 工作意向",
+    "content": "方子目前正在求职、找工作，寻找算法或研究类岗位。他的求职方向和工作兴趣重点是三维感知与具身智能，也希望把这些能力用于医疗机器人等真实物理系统。预计毕业时间为 2026 年 12 月，可通过公开机构邮箱 fangzi508@sjtu.edu.cn 联系。",
     "url": "/#about",
     "evidenceLevel": "public-profile"
   },
@@ -41,7 +50,7 @@
     "sourceTitle": "物理一致三维超声神经场",
     "titlePath": "代表项目",
     "content": "物理一致三维超声神经场把列级有效接触筛选、连续神经场、瑞利背散射和方向参数化反射结合起来，在重建三维强度场的同时保留可解释的声学形成机制。该工作属于博士论文的方法研究，不在网站上表述为 Google Scholar 已收录论文。",
-    "url": "/#projects",
+    "url": "/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
@@ -50,7 +59,7 @@
     "sourceTitle": "GLA-NeRF",
     "titlePath": "代表项目 / 多扫查配准",
     "content": "GLA-NeRF 面向多扫查自由手三维超声，把对齐偏差分为扫查级全局刚性偏差与帧级局部误差，通过外观检索、几何内点、不确定性加权和连续轨迹约束联合优化位姿与神经场，使多次扫查映射到规范空间。论文发表于 Physics in Medicine & Biology，年份为 2026。",
-    "url": "/#projects",
+    "url": "/#selected-work",
     "evidenceLevel": "published-paper"
   },
   {
@@ -59,7 +68,7 @@
     "sourceTitle": "组织语义与针体几何",
     "titlePath": "代表项目 / 语义建模",
     "content": "组织语义与针体几何方法链包括输入域规范化、低标注多任务二维分割、连续多视角条件语义场和针体几何恢复。目标对象包括甲状腺、血管、结节和穿刺针，输出用于三维解剖表达、路径规划和导航定位。",
-    "url": "/#projects",
+    "url": "/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
@@ -68,7 +77,7 @@
     "sourceTitle": "甲状腺超声穿刺导航原理样机",
     "titlePath": "代表项目 / 原理样机",
     "content": "导航原理样机集成自由手超声采集、双目近红外外部定位、N 线探头标定、针尖枢轴标定、可重复甲状腺假体和四个软件工作台，建立图像、位姿、三维场、组织语义与器械工作点之间的物理坐标链。该系统的证据是原理样机和假体层级。",
-    "url": "/#projects",
+    "url": "/#selected-work",
     "evidenceLevel": "prototype-evidence"
   },
   {
@@ -76,7 +85,7 @@
     "locale": "zh",
     "sourceTitle": "Google Scholar 公开论文记录",
     "titlePath": "论文成果",
-    "content": "截至 2026 年 8 月 4 日，Zi Fang 的 Google Scholar 主页公开 11 篇论文，涵盖多扫查三维超声、可穿戴穿刺机器人、穿刺路径规划、冠脉介入与分割、多执行器容错控制、紧固件寿命预测和工业机器人故障诊断。论文数量、题目、发表载体与年份以 Google Scholar 为唯一权威来源。",
+    "content": "截至 2026 年 8 月 4 日，Zi Fang 的 Google Scholar 主页公开 11 篇论文，涵盖多扫查三维超声、可穿戴穿刺机器人、穿刺路径规划、冠脉介入与分割、多执行器容错控制、紧固件寿命预测和工业机器人故障诊断。其中已公开的一作论文是 GLA-NeRF（2026）、基于 IMU 与降维的螺栓松动寿命预测（2023）和基于降维与随机森林的工业机器人故障诊断（2021）。论文数量、题目、发表载体与年份以 Google Scholar 为唯一权威来源。",
     "url": "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN",
     "evidenceLevel": "google-scholar"
   },
@@ -85,7 +94,16 @@
     "locale": "en",
     "sourceTitle": "Public profile",
     "titlePath": "Biography",
-    "content": "Zi Fang is a direct-entry Ph.D. candidate in Mechanical Engineering at the Robotics Institute, School of Mechanical Engineering, Shanghai Jiao Tong University. His research spans 3D perception, embodied intelligence, and medical robotics. His doctoral period is 2021–2026, and his public institutional email is fangzi508@sjtu.edu.cn.",
+    "content": "Zi Fang is a direct-entry Ph.D. candidate in Mechanical Engineering at the Robotics Institute, School of Mechanical Engineering, Shanghai Jiao Tong University, expecting to graduate in December 2026. He is actively seeking research and algorithm roles in 3D perception and embodied intelligence, with medical robotics as a key application area. His public institutional email is fangzi508@sjtu.edu.cn.",
+    "url": "/en/#about",
+    "evidenceLevel": "public-profile"
+  },
+  {
+    "id": "fact-job-search-en",
+    "locale": "en",
+    "sourceTitle": "Public job-search information",
+    "titlePath": "Job search / career interests",
+    "content": "Zi Fang is actively seeking research or algorithm roles. His main job-search and career interests are 3D perception and embodied intelligence, with medical robotics and other real-world physical systems as important application areas. He expects to graduate in December 2026 and can be contacted through his public institutional email, fangzi508@sjtu.edu.cn.",
     "url": "/en/#about",
     "evidenceLevel": "public-profile"
   },
@@ -122,7 +140,7 @@
     "sourceTitle": "Physics-consistent 3D ultrasound neural field",
     "titlePath": "Representative project",
     "content": "The physics-consistent 3D ultrasound neural field combines column-level valid-contact screening, a continuous neural field, Rayleigh backscatter, and direction-parameterized reflection. It reconstructs a 3D intensity field while retaining interpretable acoustic image-formation mechanisms. This is doctoral method research and is not presented as a Google Scholar-indexed paper on the site.",
-    "url": "/en/#projects",
+    "url": "/en/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
@@ -131,7 +149,7 @@
     "sourceTitle": "GLA-NeRF",
     "titlePath": "Representative project / Multi-sweep alignment",
     "content": "GLA-NeRF addresses multi-sweep freehand 3D ultrasound by separating alignment error into sweep-level global rigid bias and frame-level local error. Appearance retrieval, geometric inliers, uncertainty weighting, and continuous-trajectory constraints jointly optimize poses and the neural field in canonical space. The paper appeared in Physics in Medicine & Biology in 2026.",
-    "url": "/en/#projects",
+    "url": "/en/#selected-work",
     "evidenceLevel": "published-paper"
   },
   {
@@ -140,7 +158,7 @@
     "sourceTitle": "Tissue semantics and needle geometry",
     "titlePath": "Representative project / Semantic modeling",
     "content": "The tissue-semantics and needle-geometry pipeline combines input-domain normalization, low-label multi-task 2D segmentation, a continuous multi-view conditional semantic field, and needle-geometry recovery. It models the thyroid, vessels, nodules, and puncture needle for 3D anatomy, path planning, and navigation localization.",
-    "url": "/en/#projects",
+    "url": "/en/#selected-work",
     "evidenceLevel": "doctoral-research"
   },
   {
@@ -149,7 +167,7 @@
     "sourceTitle": "Thyroid-ultrasound puncture-navigation prototype",
     "titlePath": "Representative project / Proof-of-principle prototype",
     "content": "The navigation prototype integrates freehand ultrasound, binocular near-infrared tracking, N-wire probe calibration, needle-tip pivot calibration, a repeatable thyroid phantom, and four software workbenches. It establishes a physical coordinate chain across images, poses, 3D fields, tissue semantics, and instrument workpoints. Its evidence remains at proof-of-principle and phantom level.",
-    "url": "/en/#projects",
+    "url": "/en/#selected-work",
     "evidenceLevel": "prototype-evidence"
   },
   {
@@ -157,7 +175,7 @@
     "locale": "en",
     "sourceTitle": "Google Scholar public record",
     "titlePath": "Publications",
-    "content": "As of 4 August 2026, Zi Fang's Google Scholar profile lists 11 publications spanning multi-sweep 3D ultrasound, wearable puncture robots, puncture path planning, coronary intervention and segmentation, fault-tolerant control, bolted-joint life prediction, and industrial-robot fault diagnosis. Google Scholar is the authoritative source for titles, venues, years, and publication status.",
+    "content": "As of 4 August 2026, Zi Fang's Google Scholar profile lists 11 publications spanning multi-sweep 3D ultrasound, wearable puncture robots, puncture path planning, coronary intervention and segmentation, fault-tolerant control, bolted-joint life prediction, and industrial-robot fault diagnosis. His public first-author papers are GLA-NeRF (2026), Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction (2023), and Fault Diagnosis Method for Industrial Robots based on Dimension Reduction and Random Forest (2021). Google Scholar is the authoritative source for titles, venues, years, and publication status.",
     "url": "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN",
     "evidenceLevel": "google-scholar"
   }
