@@ -53,7 +53,11 @@ async def retrieve(request: Request):
         raise HTTPException(status_code=400, detail="invalid_request") from error
 
     started = time.perf_counter()
-    evidence = RETRIEVER.retrieve(payload.query, "en" if payload.locale == "en" else "zh")
+    try:
+        evidence = RETRIEVER.retrieve(payload.query, "en" if payload.locale == "en" else "zh")
+    except Exception as error:
+        print(json.dumps({"event": "retrieve_failed", "errorType": type(error).__name__}))
+        raise HTTPException(status_code=503, detail="local_retrieval_processing_failed") from error
     latency_ms = round((time.perf_counter() - started) * 1000, 1)
     print(json.dumps({"event": "retrieve", "evidenceCount": len(evidence), "latencyMs": latency_ms}))
     return {"evidence": [item.public_dict() for item in evidence], "latencyMs": latency_ms}

@@ -18,9 +18,18 @@
   const copy = {
     zh: {
       readyStatic: '静态 FAQ 与站内资料搜索已就绪',
-      readyRag: 'RAG 已连接；失败时自动切换为静态检索',
+      readyRag: 'RAG 已连接；异常时将明确说明原因',
       localUnavailable: '本地资料检索服务暂不可用',
+      requestFailedStatus: '请求处理失败',
       localUnavailableAnswer: '目前无法连接本地资料检索服务。为避免没有依据的生成回答，系统未调用模型。请稍后重试，或使用站内资料搜索。',
+      localProcessingFailed: '本地 RAG 编码或重排发生错误，系统未调用模型。请稍后重试；若持续出现，请检查本机检索服务日志。',
+      requestFailed: '本次请求未完成：',
+      emptyModelResponse: '模型未返回可显示的内容。本次请求未形成回答，请重试或切换模型。',
+      providerError: '所选模型服务返回错误，系统未生成回答。请更换模型或 API 来源后重试。',
+      modelUnavailable: '所选模型当前不可用，系统未生成回答。请更换模型或 API 来源后重试。',
+      budgetOrRateLimit: '当前请求触发了预算或访问频率限制，系统未生成回答。请稍后重试。',
+      turnstile: '人机验证未通过或已过期，系统未生成回答。请刷新页面后重试。',
+      insufficientEvidence: '公开资料中没有足够证据支持回答，系统未调用模型。请换一种问法。',
       working: '正在检索公开材料……',
       noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、项目、论文列表、教育经历或技能。',
       staticPrefix: '静态资料检索：',
@@ -33,9 +42,18 @@
     },
     en: {
       readyStatic: 'Static FAQ and on-page search are ready',
-      readyRag: 'RAG is connected; static search remains available',
+      readyRag: 'RAG is connected; any error will be shown clearly',
       localUnavailable: 'Local material retrieval is temporarily unavailable',
+      requestFailedStatus: 'Request processing failed',
       localUnavailableAnswer: 'The local material retrieval service is unavailable. To avoid an unsupported generated answer, no model was called. Please try again later or use the on-page material search.',
+      localProcessingFailed: 'Local RAG encoding or reranking failed. No model was called; please retry later and check the local retrieval service logs if it persists.',
+      requestFailed: 'The request did not complete: ',
+      emptyModelResponse: 'The model returned no displayable content. No answer was produced; please retry or switch models.',
+      providerError: 'The selected model service returned an error. No answer was generated; choose another model or API source and retry.',
+      modelUnavailable: 'The selected model is unavailable. No answer was generated; choose another model or API source and retry.',
+      budgetOrRateLimit: 'The request hit a budget or rate limit. No answer was generated; please retry later.',
+      turnstile: 'Human verification failed or expired. No answer was generated; refresh the page and retry.',
+      insufficientEvidence: 'The public materials do not provide enough evidence for an answer, so no model was called. Please rephrase the question.',
       working: 'Searching public materials…',
       noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, projects, publications, education, or skills.',
       staticPrefix: 'Static material search: ',
@@ -191,7 +209,7 @@
       const part = await reader.read();
       if (part.done) break;
       buffer += decoder.decode(part.value, { stream: true });
-      const events = buffer.split('\n\n');
+      const events = buffer.split(/\r?\n\r?\n/);
       buffer = events.pop() || '';
       for (const event of events) {
         const data = event.split('\n').filter((line) => line.startsWith('data:')).map((line) => line.slice(5).trim()).join('');
@@ -205,7 +223,7 @@
           sources.push({ label: payload.label, href: payload.href });
           renderSources(message.sources, sources);
         } else if (payload.type === 'degraded') {
-          throw new Error('stream_degraded');
+          throw new Error(payload.reason || 'stream_degraded');
         }
       }
     }
@@ -240,20 +258,24 @@
       history = history.slice(-6);
       setMode('rag', copy.readyRag);
     } catch (error) {
-      if (error instanceof Error && error.message === 'local_retrieval_unavailable') {
-        reply.content.textContent = copy.localUnavailableAnswer;
-        renderSources(reply.sources, []);
-        history.push({ role: 'user', content: value }, { role: 'assistant', content: copy.localUnavailableAnswer });
-        history = history.slice(-6);
-        setMode('error', copy.localUnavailable);
-        return;
-      }
-      const result = staticSearch(value);
-      reply.content.textContent = result.answer;
-      renderSources(reply.sources, result.sources);
-      history.push({ role: 'user', content: value }, { role: 'assistant', content: result.answer });
+      const code = error instanceof Error ? error.message : 'request_failed';
+      const messages = {
+        local_retrieval_unavailable: copy.localUnavailableAnswer,
+        local_retrieval_processing_failed: copy.localProcessingFailed,
+        provider_error: copy.providerError,
+        model_unavailable: copy.modelUnavailable,
+        budget_or_rate_limit: copy.budgetOrRateLimit,
+        turnstile: copy.turnstile,
+        insufficient_evidence: copy.insufficientEvidence,
+        empty_model_response: copy.emptyModelResponse,
+        stream_error: copy.providerError,
+      };
+      const errorAnswer = messages[code] || `${copy.requestFailed}${code}`;
+      reply.content.textContent = errorAnswer;
+      renderSources(reply.sources, []);
+      history.push({ role: 'user', content: value }, { role: 'assistant', content: errorAnswer });
       history = history.slice(-6);
-      setMode('static', copy.readyStatic);
+      setMode('error', code.startsWith('local_retrieval_') ? copy.localUnavailable : copy.requestFailedStatus);
     } finally {
       submit.disabled = false;
       submit.textContent = copy.ask;

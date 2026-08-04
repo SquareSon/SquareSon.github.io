@@ -104,7 +104,7 @@ export async function handleRagRequest(
     evidence = await retrieveEvidence(question, locale, env);
   } catch (error) {
     if (error instanceof LocalRetrievalUnavailable) {
-      return json({ degraded: true, reason: "local_retrieval_unavailable" }, 200, cors);
+      return json({ degraded: true, reason: error.reason }, 200, cors);
     }
     return json({ degraded: true, reason: "local_retrieval_unavailable" }, 200, cors);
   }

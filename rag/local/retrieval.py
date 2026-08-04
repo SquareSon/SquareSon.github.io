@@ -124,6 +124,20 @@ class LocalRetriever:
                     use_fp16=True,
                     local_files_only=True,
                 )
+                original_pad = self._embedding_model.tokenizer.pad
+
+                def compatible_pad(encoded_inputs: Any, *args: Any, **kwargs: Any):
+                    # Transformers 5 no longer accepts FlagEmbedding's legacy
+                    # list[dict] batch. Convert it to the equivalent dict[list]
+                    # form while retaining BGE-M3's own GPU encoding path.
+                    if isinstance(encoded_inputs, list) and encoded_inputs:
+                        encoded_inputs = {
+                            key: [item[key] for item in encoded_inputs]
+                            for key in encoded_inputs[0]
+                        }
+                    return original_pad(encoded_inputs, *args, **kwargs)
+
+                self._embedding_model.tokenizer.pad = compatible_pad
             if self._reranker is None:
                 self._reranker_tokenizer = AutoTokenizer.from_pretrained(
                     RERANKER_MODEL,
@@ -177,7 +191,7 @@ class LocalRetriever:
     def _rank_dense(self, question: str) -> list[str]:
         assert self._embedding_model is not None
         assert self._index is not None
-        vector = self._embedding_model.encode([question], batch_size=1, max_length=1024)["dense_vecs"]
+        vector = self._embedding_model.encode([question], batch_size=1, max_length=512)["dense_vecs"]
         query = np.asarray(vector, dtype=np.float32)
         faiss.normalize_L2(query)
         _, indices = self._index.search(query, min(12, len(self._ids)))
@@ -224,7 +238,10 @@ class LocalRetriever:
             passages,
             padding=True,
             truncation=True,
-            max_length=1024,
+            # bge-reranker-base (XLM-R) supports at most 514 positions.
+            # Passing 1024 lets long passages create invalid positional ids
+            # and triggers a CUDA device-side assertion on the GPU.
+            max_length=512,
             return_tensors="pt",
         )
         encoded = {key: value.to(self._device) for key, value in encoded.items()}

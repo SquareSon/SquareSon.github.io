@@ -114,6 +114,10 @@ export function normalizeProviderStream(
   const reader = upstream.body!.getReader();
   let buffer = "";
   let answerLength = 0;
+  let lastPayloadShape = "none";
+  let contentDeltaCount = 0;
+  let nonEmptyContentDeltaCount = 0;
+  let reasoningDeltaCount = 0;
 
   return new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -133,7 +137,9 @@ export function normalizeProviderStream(
           const { value, done } = await reader.read();
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
-          const events = buffer.split("\n\n");
+          // OpenRouter and Model Studio may use CRLF-delimited SSE. Splitting
+          // only on LF leaves an otherwise successful stream buffered.
+          const events = buffer.split(/\r?\n\r?\n/);
           buffer = events.pop() ?? "";
 
           for (const event of events) {
@@ -148,7 +154,11 @@ export function normalizeProviderStream(
               const payload = JSON.parse(data) as {
                 choices?: Array<{ delta?: { content?: string | null } }>;
               };
+              lastPayloadShape = describePayload(payload);
               const text = payload.choices?.[0]?.delta?.content;
+              contentDeltaCount += 1;
+              if (text) nonEmptyContentDeltaCount += 1;
+              if (payload.choices?.[0]?.delta && "reasoning_content" in payload.choices[0].delta) reasoningDeltaCount += 1;
               if (text) {
                 answerLength += text.length;
                 controller.enqueue(encodeEvent(encoder, { type: "delta", text }));
@@ -159,6 +169,40 @@ export function normalizeProviderStream(
           }
         }
 
+        // Some compatible OpenAI gateways close immediately after their last
+        // `data:` payload instead of adding one final blank SSE separator.
+        // Parse that remaining event rather than silently discarding it.
+        const trailingData = buffer
+          .split(/\r?\n/)
+          .filter((line) => line.startsWith("data:"))
+          .map((line) => line.slice(5).trim())
+          .join("");
+        if (trailingData && trailingData !== "[DONE]") {
+          try {
+            const payload = JSON.parse(trailingData) as {
+              choices?: Array<{ delta?: { content?: string | null } }>;
+            };
+            lastPayloadShape = describePayload(payload);
+            const text = payload.choices?.[0]?.delta?.content;
+            contentDeltaCount += 1;
+            if (text) nonEmptyContentDeltaCount += 1;
+            if (payload.choices?.[0]?.delta && "reasoning_content" in payload.choices[0].delta) reasoningDeltaCount += 1;
+            if (text) {
+              answerLength += text.length;
+              controller.enqueue(encodeEvent(encoder, { type: "delta", text }));
+            }
+          } catch {
+            // Preserve the explicit empty-response error below if the vendor
+            // ends the stream with a non-content event.
+          }
+        }
+
+        if (answerLength === 0) {
+          console.warn(JSON.stringify({ event: "model_stream_empty", provider: provider.id, model: provider.model, lastPayloadShape, contentDeltaCount, nonEmptyContentDeltaCount, reasoningDeltaCount }));
+          controller.enqueue(encodeEvent(encoder, { type: "degraded", reason: "empty_model_response" }));
+          onComplete({ answerLength, status: "stream_error" });
+          return;
+        }
         controller.enqueue(
           encodeEvent(encoder, {
             type: "done",
@@ -168,7 +212,7 @@ export function normalizeProviderStream(
         );
         onComplete({ answerLength, status: "ok" });
       } catch {
-        controller.enqueue(encodeEvent(encoder, { type: "degraded" }));
+        controller.enqueue(encodeEvent(encoder, { type: "degraded", reason: "stream_error" }));
         onComplete({ answerLength, status: "stream_error" });
       } finally {
         controller.close();
@@ -280,4 +324,12 @@ function buildMessages(question: string, locale: Locale, evidence: Evidence[], h
 
 function encodeEvent(encoder: TextEncoder, payload: Record<string, unknown>) {
   return encoder.encode(`data: ${JSON.stringify(payload)}\n\n`);
+}
+
+function describePayload(payload: Record<string, unknown>) {
+  const firstChoice = Array.isArray(payload.choices) && payload.choices[0] && typeof payload.choices[0] === "object"
+    ? (payload.choices[0] as Record<string, unknown>)
+    : {};
+  const delta = firstChoice.delta && typeof firstChoice.delta === "object" ? (firstChoice.delta as Record<string, unknown>) : {};
+  return JSON.stringify({ top: Object.keys(payload).sort(), choice: Object.keys(firstChoice).sort(), delta: Object.keys(delta).sort() });
 }

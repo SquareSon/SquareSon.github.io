@@ -1,8 +1,8 @@
 import type { Evidence, Locale, RagEnv } from "./types";
 
 export class LocalRetrievalUnavailable extends Error {
-  constructor() {
-    super("local_retrieval_unavailable");
+  constructor(readonly reason: "local_retrieval_unavailable" | "local_retrieval_processing_failed" = "local_retrieval_unavailable") {
+    super(reason);
   }
 }
 
@@ -32,7 +32,9 @@ export async function retrieveEvidence(question: string, locale: Locale, env: Ra
     });
     if (!response.ok) {
       console.warn(JSON.stringify({ event: "local_retrieval_http_error", status: response.status }));
-      throw new LocalRetrievalUnavailable();
+      throw new LocalRetrievalUnavailable(
+        response.status === 503 ? "local_retrieval_processing_failed" : "local_retrieval_unavailable",
+      );
     }
     const payload = (await response.json()) as { evidence?: unknown };
     if (!Array.isArray(payload.evidence)) {
