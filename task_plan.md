@@ -32,7 +32,7 @@
 - GitHub Pages 已固定为 Actions 构建，HTTPS 开启；线上中文、英文、Pagefind、OG 图片与隐私检查通过。
 - 静态 FAQ/项目/论文搜索已在线，无模型账号时会明确标记“不是 AI 生成回答”。
 - Worker、D1/FTS、Vectorize/BGE-M3、RRF、BGE 重排、SSE 与四模型适配代码已完成并通过本地构建/运行时冒烟测试。
-- 实时 RAG 发布阻塞：当前 Wrangler 未登录 Cloudflare；尚未写入 Qwen、GLM、DeepSeek、Kimi 任一服务端 API Key。需要用户完成 Cloudflare 授权并通过 Secret Store 配置密钥后继续。
+- 实时 RAG 发布阻塞：当前 Wrangler 未登录 Cloudflare；两次 OAuth 均因未收到浏览器授权回调而超时，且尚未写入 Qwen、GLM、DeepSeek、Kimi 任一服务端 API Key。需要用户完成 Cloudflare 授权并通过 Secret Store 配置密钥后继续。
 
 ## 已确认约束
 
