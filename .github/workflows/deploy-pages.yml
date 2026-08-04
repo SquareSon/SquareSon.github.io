@@ -35,10 +35,12 @@ jobs:
           npm run lint
           npm run typecheck
 
-      - name: Build static site
+      - name: Build Worker and static site
         env:
           NEXT_PUBLIC_RAG_API_URL: ${{ vars.RAG_API_URL }}
-        run: npm run build:pages
+        run: |
+          npm run build
+          npm run build:pages
 
       - name: Run rendered and corpus tests
         run: node --test tests/*.test.mjs
