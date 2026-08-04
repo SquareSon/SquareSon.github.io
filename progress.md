@@ -20,6 +20,8 @@
 - 使用 Workers AI 为 313 个公开片段生成 BGE-M3 1024 维向量并完成 Vectorize upsert；向量总数复核为 313。
 - 删除旧 Next/vinext 页面、Sites 托管配置与旧 public 资产，保留 Git 历史可恢复性；README 已改为 Jekyll + 独立 Worker 维护说明。
 - 升级 Cloudflare 开发依赖并修复间接依赖 advisory，`npm audit` 为 0；清理后重新完成 Jekyll 构建、类型检查、RAG 评测与 6/6 自动化测试。
+- 提交 `3703c3f` 并推送 `main`；GitHub Pages Actions 的依赖安装、内容/RAG 校验、Jekyll 构建、渲染测试、artifact 上传和部署全部成功。
+- 线上复核通过：中文/英文经典布局、11 条论文、Worker 地址和 CSS 均已生效，旧产品化首屏不存在，未发现手机号样式字符串。
 
 - 读取 `planning-with-files` 与 `codebase-orientation` 技能说明。
 - 检查目标代码目录：目录存在且为空。

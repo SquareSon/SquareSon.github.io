@@ -12,7 +12,7 @@
 - [x] 审计 `RayeRen/acad-homepage.github.io` 的页面结构、组件、样式与许可
 - [x] 将现有内容映射到经典学术主页信息架构
 - [x] 重构前端并保留双语、RAG 与静态降级
-- [ ] 完整回归、线上替换与 Cloudflare RAG 发布（Worker/RAG 已发布，等待 Pages 替换）
+- [x] 完整回归、线上替换与 Cloudflare RAG 发布
 
 用户明确否定当前“作品集/产品页”视觉方向，要求以 `RayeRen/acad-homepage.github.io` 的经典架构为基线修改。后续不再在原视觉上做局部美化，而是执行结构性迁移。
 
@@ -31,7 +31,7 @@
 - [x] 阶段 3：RAG 语料与混合检索
 - [x] 阶段 4：多模型 Worker 后端
 - [x] 阶段 5：集成与质量验证
-- [ ] 阶段 6：GitHub Pages 与 Worker 发布（Pages 已完成；Worker 等待 Cloudflare 授权与模型密钥）
+- [x] 阶段 6：GitHub Pages 与 Worker 发布（生成模型密钥可后续按需加入）
 - [x] 阶段 7：维护交付
 
 ## 当前交付状态（2026-08-04）
@@ -39,10 +39,10 @@
 - GitHub 仓库：`https://github.com/SquareSon/SquareSon.github.io`
 - 公开主页：`https://squareson.github.io/`
 - 英文主页：`https://squareson.github.io/en/`
-- GitHub Pages 已固定为 Actions 构建，HTTPS 开启；线上中文、英文、Pagefind、OG 图片与隐私检查通过。
-- 静态 FAQ/项目/论文搜索已在线，无模型账号时会明确标记“不是 AI 生成回答”。
-- Worker、D1/FTS、Vectorize/BGE-M3、RRF、BGE 重排、SSE 与四模型适配代码已完成并通过本地构建/运行时冒烟测试。
-- 实时 RAG 发布阻塞：当前 Wrangler 未登录 Cloudflare；两次 OAuth 均因未收到浏览器授权回调而超时，且尚未写入 Qwen、GLM、DeepSeek、Kimi 任一服务端 API Key。需要用户完成 Cloudflare 授权并通过 Secret Store 配置密钥后继续。
+- GitHub Pages 已固定为 Actions 构建，HTTPS 开启；经典 Jekyll 中文页、英文页、11 条论文、媒体资源、静态检索与隐私检查均在线通过。
+- 静态 FAQ/站内资料搜索已在线；无模型账号时明确标记为静态资料检索，不冒充 AI 回答。
+- Cloudflare Worker、D1/FTS5、313 条 Vectorize/BGE-M3 向量、RRF、BGE 重排、SSE 与四模型适配均已发布，API 为 `https://zi-fang-research-assistant.zi-fang-research.workers.dev`。
+- 当前尚未写入 Qwen、GLM、DeepSeek、Kimi 任一生成模型 API Key，因此模型列表为空并自动静态降级；后续通过 `wrangler secret put` 加入任一密钥即可启用对应模型，无需改前端架构。
 
 ## 已确认约束
 
