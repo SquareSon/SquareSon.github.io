@@ -81,3 +81,48 @@ test("standalone Worker deterministically refuses unsafe requests", async () => 
     assert.doesNotMatch(payload.answer, /\b1\d{10}\b/);
   }
 });
+
+test("standalone Worker answers approved model-status questions without RAG evidence", async () => {
+  const workerUrl = new URL("../dist/worker.js", import.meta.url);
+  workerUrl.searchParams.set("model-status", `${process.pid}-${Date.now()}`);
+  const { default: worker } = await import(workerUrl.href);
+  const response = await worker.fetch(
+    new Request("http://localhost/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query: "现在是哪个模型？", locale: "zh", model: "deepseek" }),
+    }),
+    {
+      DASHSCOPE_API_KEY: "test-key",
+      OPENROUTER_API_KEY: "test-key",
+      MODEL_GATEWAY: "openrouter",
+    },
+    { waitUntil() {}, passThroughOnException() {} },
+  );
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.mode, "system");
+  assert.match(payload.answer, /DeepSeek/);
+  assert.match(payload.answer, /deepseek\/deepseek-v4-flash-0731/);
+});
+
+test("standalone Worker exposes only configured models for each approved API source", async () => {
+  const workerUrl = new URL("../dist/worker.js", import.meta.url);
+  workerUrl.searchParams.set("gateway-catalog", `${process.pid}-${Date.now()}`);
+  const { default: worker } = await import(workerUrl.href);
+  const env = {
+    DASHSCOPE_API_KEY: "test-key",
+    OPENROUTER_API_KEY: "test-key",
+    MODEL_GATEWAY: "openrouter",
+  };
+  const context = { waitUntil() {}, passThroughOnException() {} };
+
+  const [openrouterResponse, bailianResponse] = await Promise.all([
+    worker.fetch(new Request("http://localhost/api/models?source=openrouter"), env, context),
+    worker.fetch(new Request("http://localhost/api/models?source=bailian"), env, context),
+  ]);
+  const [openrouter, bailian] = await Promise.all([openrouterResponse.json(), bailianResponse.json()]);
+  assert.equal(openrouter.models[0].model, "qwen/qwen3.7-flash");
+  assert.equal(bailian.models[0].model, "qwen3.7-flash");
+  assert.deepEqual(openrouter.gateways.map((item) => item.id), ["openrouter", "bailian"]);
+});

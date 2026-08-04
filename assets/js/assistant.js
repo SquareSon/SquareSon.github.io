@@ -5,13 +5,15 @@
   const locale = root.dataset.locale === 'en' ? 'en' : 'zh';
   const endpoint = (root.dataset.ragEndpoint || '').replace(/\/$/, '');
   const form = root.querySelector('[data-assistant-form]');
-  const question = root.querySelector('[data-assistant-question]');
+  const source = root.querySelector('[data-assistant-source]');
   const model = root.querySelector('[data-assistant-model]');
+  const question = root.querySelector('[data-assistant-question]');
   const submit = root.querySelector('[data-assistant-submit]');
-  const answer = root.querySelector('[data-assistant-answer]');
-  const citations = root.querySelector('[data-assistant-citations]');
+  const reset = root.querySelector('[data-assistant-reset]');
+  const transcript = root.querySelector('[data-assistant-transcript]');
   const status = root.querySelector('.assistant-status');
   const statusText = root.querySelector('[data-assistant-status]');
+  let history = [];
 
   const copy = {
     zh: {
@@ -22,6 +24,11 @@
       staticPrefix: '静态资料检索：',
       source: '来源',
       ask: '提问',
+      user: '你',
+      assistant: '研究助理',
+      welcome: '可以连续追问；本次对话的上下文会被带入后续问题。点击“新建对话”即可清除。',
+      autoSource: '自动 / 可靠路由',
+      autoModel: '自动 / 静态降级',
     },
     en: {
       readyStatic: 'Static FAQ and on-page search are ready',
@@ -31,76 +38,72 @@
       staticPrefix: 'Static material search: ',
       source: 'Source',
       ask: 'Ask',
+      user: 'You',
+      assistant: 'Research assistant',
+      welcome: 'You can ask follow-up questions. This conversation is supplied as context until you start a new chat.',
+      autoSource: 'Auto / resilient routing',
+      autoModel: 'Auto / static fallback',
     },
   }[locale];
 
   const documents = locale === 'en' ? [
-    {
-      keywords: 'research areas focus 3d perception embodied intelligence medical robotics ultrasound reconstruction registration semantics navigation',
-      answer: 'Zi Fang studies 3D perception, embodied intelligence, and medical robotics. The doctoral work connects trustworthy ultrasound observation, continuous 3D reconstruction, multi-sweep alignment, tissue and needle semantics, and a navigation prototype.',
-      label: 'Research interests', href: '/en/#research',
-    },
-    {
-      keywords: 'thesis dissertation thyroid ultrasound problem contribution',
-      answer: 'The dissertation addresses ultrasound-guided thyroid puncture through a traceable chain from observation and continuous reconstruction to semantic modeling and physical navigation coordinates. Its experiments support method-, module-, and phantom-prototype-level conclusions.',
-      label: 'Dissertation overview', href: '/en/#research',
-    },
-    {
-      keywords: 'gla nerf multi sweep registration alignment global local pose',
-      answer: 'GLA-NeRF separates multi-sweep misalignment into global sweep-level bias and local frame-level error, then jointly optimizes poses and a neural field using appearance, geometric consistency, and continuous-trajectory constraints.',
-      label: 'GLA-NeRF · PMB 2026', href: '/en/#selected-work',
-    },
-    {
-      keywords: 'clinical validation accuracy safety evidence phantom prototype',
-      answer: 'No clinical validation is claimed. Current evidence covers methods, modules, and phantom prototypes; component calibration residuals must not be interpreted as end-to-end puncture accuracy or clinical safety.',
-      label: 'Evidence boundary', href: '/en/#about',
-    },
-    {
-      keywords: 'publication paper scholar full list eleven',
-      answer: 'Google Scholar is the authoritative source for publications. The page lists 11 records synchronized on 4 August 2026 and does not treat unpublished work as a publication.',
-      label: 'Publications', href: '/en/#publications',
-    },
-    {
-      keywords: 'contact email collaboration',
-      answer: 'Contact Zi Fang through the institutional email fangzi508@sjtu.edu.cn for discussions on 3D perception, medical imaging, medical robotics, or research collaboration.',
-      label: 'Public contact', href: 'mailto:fangzi508@sjtu.edu.cn',
-    },
+    { keywords: 'research areas focus 3d perception embodied intelligence medical robotics ultrasound reconstruction registration semantics navigation', answer: 'Zi Fang studies 3D perception, embodied intelligence, and medical robotics. The doctoral work connects trustworthy ultrasound observation, continuous 3D reconstruction, multi-sweep alignment, tissue and needle semantics, and a navigation prototype.', label: 'Research interests', href: '/en/#research' },
+    { keywords: 'thesis dissertation thyroid ultrasound problem contribution', answer: 'The dissertation addresses ultrasound-guided thyroid puncture through a traceable chain from observation and continuous reconstruction to semantic modeling and physical navigation coordinates. Its experiments support method-, module-, and phantom-prototype-level conclusions.', label: 'Dissertation overview', href: '/en/#research' },
+    { keywords: 'gla nerf multi sweep registration alignment global local pose', answer: 'GLA-NeRF separates multi-sweep misalignment into global sweep-level bias and local frame-level error, then jointly optimizes poses and a neural field using appearance, geometric consistency, and continuous-trajectory constraints.', label: 'GLA-NeRF · PMB 2026', href: '/en/#selected-work' },
+    { keywords: 'clinical validation accuracy safety evidence phantom prototype', answer: 'No clinical validation is claimed. Current evidence covers methods, modules, and phantom prototypes; component calibration residuals must not be interpreted as end-to-end puncture accuracy or clinical safety.', label: 'Evidence boundary', href: '/en/#about' },
+    { keywords: 'publication paper scholar full list eleven', answer: 'Google Scholar is the authoritative source for publications. The page lists 11 records synchronized on 4 August 2026 and does not treat unpublished work as a publication.', label: 'Publications', href: '/en/#publications' },
+    { keywords: 'contact email collaboration', answer: 'Contact Zi Fang through the institutional email fangzi508@sjtu.edu.cn for discussions on 3D perception, medical imaging, medical robotics, or research collaboration.', label: 'Public contact', href: 'mailto:fangzi508@sjtu.edu.cn' },
   ] : [
-    {
-      keywords: '研究 方向 三维 感知 具身 智能 医疗 机器人 超声 重建 配准 语义 导航',
-      answer: '方子的研究围绕三维感知、具身智能与医疗机器人，博士工作把可信超声观测、连续三维重建、多扫查配准、组织与针体语义以及导航原理样机连接成完整方法链。',
-      label: '研究方向', href: '/#research',
-    },
-    {
-      keywords: '博士 论文 甲状腺 超声 问题 贡献',
-      answer: '博士论文面向甲状腺超声引导穿刺，从可信观测和连续三维重建推进到空间统一、语义建模与物理导航坐标。实验结论限定在方法、模块与假体原理样机层面。',
-      label: '博士论文概览', href: '/#research',
-    },
-    {
-      keywords: 'gla nerf 多扫查 配准 全局 局部 位姿',
-      answer: 'GLA-NeRF 把多扫查偏差分成扫查级全局偏差与帧级局部误差，通过外观、几何一致性和连续轨迹约束联合优化位姿与神经场。',
-      label: 'GLA-NeRF · PMB 2026', href: '/#selected-work',
-    },
-    {
-      keywords: '临床 验证 精度 安全 证据 假体 样机',
-      answer: '现有工作没有宣称完成临床验证。当前证据覆盖方法、模块与假体原理样机；分项标定残差不能解释为端到端穿刺精度或临床安全性。',
-      label: '证据边界', href: '/#about',
-    },
-    {
-      keywords: '论文 发表 文章 学术 scholar 十一',
-      answer: '论文以 Google Scholar 为权威来源。本站列出 2026 年 8 月 4 日同步到的 11 条记录，不把尚未正式发布的工作列为论文。',
-      label: '论文列表', href: '/#publications',
-    },
-    {
-      keywords: '联系 邮箱 合作',
-      answer: '可通过上海交通大学机构邮箱 fangzi508@sjtu.edu.cn 联系方子，讨论三维感知、医学影像、医疗机器人或研究合作。',
-      label: '公开联系方式', href: 'mailto:fangzi508@sjtu.edu.cn',
-    },
+    { keywords: '研究 方向 三维 感知 具身 智能 医疗 机器人 超声 重建 配准 语义 导航', answer: '方子的研究围绕三维感知、具身智能与医疗机器人，博士工作把可信超声观测、连续三维重建、多扫查配准、组织与针体语义以及导航原理样机连接成完整方法链。', label: '研究方向', href: '/#research' },
+    { keywords: '博士 论文 甲状腺 超声 问题 贡献', answer: '博士论文面向甲状腺超声引导穿刺，从可信观测和连续三维重建推进到空间统一、语义建模与物理导航坐标。实验结论限定在方法、模块与假体原理样机层面。', label: '博士论文概览', href: '/#research' },
+    { keywords: 'gla nerf 多扫查 配准 全局 局部 位姿', answer: 'GLA-NeRF 把多扫查偏差分成扫查级全局偏差与帧级局部误差，通过外观、几何一致性和连续轨迹约束联合优化位姿与神经场。', label: 'GLA-NeRF · PMB 2026', href: '/#selected-work' },
+    { keywords: '临床 验证 精度 安全 证据 假体 样机', answer: '现有工作没有宣称完成临床验证。当前证据覆盖方法、模块与假体原理样机；分项标定残差不能解释为端到端穿刺精度或临床安全性。', label: '证据边界', href: '/#about' },
+    { keywords: '论文 发表 文章 学术 scholar 十一', answer: '论文以 Google Scholar 为权威来源。本站列出 2026 年 8 月 4 日同步到的 11 条记录，不把尚未正式发布的工作列为论文。', label: '论文列表', href: '/#publications' },
+    { keywords: '联系 邮箱 合作', answer: '可通过上海交通大学机构邮箱 fangzi508@sjtu.edu.cn 联系方子，讨论三维感知、医学影像、医疗机器人或研究合作。', label: '公开联系方式', href: 'mailto:fangzi508@sjtu.edu.cn' },
   ];
 
   function setMode(mode, text) {
     status.dataset.mode = mode;
     statusText.textContent = text;
+  }
+
+  function scrollTranscript() {
+    transcript.scrollTop = transcript.scrollHeight;
+  }
+
+  function appendMessage(role, text = '') {
+    const message = document.createElement('article');
+    message.className = `assistant-message assistant-message--${role}`;
+    const label = document.createElement('div');
+    label.className = 'assistant-message-label';
+    label.textContent = role === 'user' ? copy.user : copy.assistant;
+    const content = document.createElement('div');
+    content.className = 'assistant-message-content';
+    content.textContent = text;
+    const sources = document.createElement('ul');
+    sources.className = 'assistant-message-sources';
+    message.append(label, content, sources);
+    transcript.appendChild(message);
+    scrollTranscript();
+    return { content, sources };
+  }
+
+  function renderSources(container, sources) {
+    container.replaceChildren();
+    sources.forEach((item) => {
+      const row = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = item.href || '#';
+      link.textContent = `${copy.source}: ${item.label}`;
+      row.appendChild(link);
+      container.appendChild(row);
+    });
+  }
+
+  function clearConversation() {
+    history = [];
+    transcript.replaceChildren();
+    appendMessage('assistant', copy.welcome);
   }
 
   function tokens(value) {
@@ -126,31 +129,29 @@
     return { answer: copy.staticPrefix + match.document.answer, sources: [match.document] };
   }
 
-  function renderSources(sources) {
-    citations.replaceChildren();
-    sources.forEach((source) => {
-      const item = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = source.href || '#';
-      link.textContent = `${copy.source}: ${source.label}`;
-      item.appendChild(link);
-      citations.appendChild(item);
+  function setSelectOptions(select, entries, initial, format) {
+    const previous = select.value;
+    select.replaceChildren(initial);
+    entries.forEach((entry) => {
+      const option = document.createElement('option');
+      option.value = entry.id;
+      option.textContent = format(entry);
+      select.appendChild(option);
     });
+    if ([...select.options].some((option) => option.value === previous)) select.value = previous;
   }
 
   async function loadModels() {
     if (!endpoint) return;
     try {
-      const response = await fetch(`${endpoint}/api/models`, { headers: { accept: 'application/json' } });
+      const response = await fetch(`${endpoint}/api/models?source=${encodeURIComponent(source.value)}`, { headers: { accept: 'application/json' } });
       if (!response.ok) return;
       const payload = await response.json();
+      const gateways = Array.isArray(payload.gateways) ? payload.gateways : [];
+      setSelectOptions(source, gateways, new Option(copy.autoSource, 'auto'), (entry) => entry.label);
+      source.disabled = gateways.length <= 1;
       const models = Array.isArray(payload.models) ? payload.models : [];
-      models.forEach((entry) => {
-        const option = document.createElement('option');
-        option.value = entry.id;
-        option.textContent = `${entry.label} · ${entry.model}`;
-        model.appendChild(option);
-      });
+      setSelectOptions(model, models, new Option(copy.autoModel, 'auto'), (entry) => `${entry.label} · ${entry.model}`);
       model.disabled = models.length === 0;
       setMode(models.length ? 'rag' : 'static', models.length ? copy.readyRag : copy.readyStatic);
     } catch {
@@ -158,11 +159,11 @@
     }
   }
 
-  async function askRag(value) {
+  async function askRag(value, message) {
     const response = await fetch(`${endpoint}/api/chat`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', accept: 'text/event-stream, application/json' },
-      body: JSON.stringify({ query: value, model: model.value, locale }),
+      body: JSON.stringify({ query: value, model: model.value, source: source.value, locale, history }),
     });
     if (!response.ok) throw new Error('rag_unavailable');
 
@@ -170,7 +171,7 @@
     if (contentType.includes('application/json')) {
       const payload = await response.json();
       if (payload.answer) {
-        renderSources(Array.isArray(payload.citations) ? payload.citations : []);
+        renderSources(message.sources, Array.isArray(payload.citations) ? payload.citations : []);
         return payload.answer;
       }
       throw new Error(payload.reason || 'degraded');
@@ -182,7 +183,6 @@
     let buffer = '';
     let result = '';
     const sources = [];
-
     while (true) {
       const part = await reader.read();
       if (part.done) break;
@@ -195,10 +195,11 @@
         const payload = JSON.parse(data);
         if (payload.type === 'delta' && payload.text) {
           result += payload.text;
-          answer.textContent = result;
+          message.content.textContent = result;
+          scrollTranscript();
         } else if (payload.type === 'citation') {
           sources.push({ label: payload.label, href: payload.href });
-          renderSources(sources);
+          renderSources(message.sources, sources);
         } else if (payload.type === 'degraded') {
           throw new Error('stream_degraded');
         }
@@ -215,28 +216,39 @@
     });
   });
 
+  source.addEventListener('change', loadModels);
+  reset.addEventListener('click', clearConversation);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const value = question.value.trim();
     if (!value) return;
+    appendMessage('user', value);
+    question.value = '';
+    const reply = appendMessage('assistant', copy.working);
     submit.disabled = true;
     submit.textContent = copy.working;
-    answer.textContent = '';
-    citations.replaceChildren();
     try {
       if (!endpoint) throw new Error('static');
-      answer.textContent = await askRag(value);
+      const answer = await askRag(value, reply);
+      reply.content.textContent = answer;
+      history.push({ role: 'user', content: value }, { role: 'assistant', content: answer });
+      history = history.slice(-6);
       setMode('rag', copy.readyRag);
     } catch {
       const result = staticSearch(value);
-      answer.textContent = result.answer;
-      renderSources(result.sources);
+      reply.content.textContent = result.answer;
+      renderSources(reply.sources, result.sources);
+      history.push({ role: 'user', content: value }, { role: 'assistant', content: result.answer });
+      history = history.slice(-6);
       setMode('static', copy.readyStatic);
     } finally {
       submit.disabled = false;
       submit.textContent = copy.ask;
+      scrollTranscript();
     }
   });
 
+  clearConversation();
   loadModels();
 })();

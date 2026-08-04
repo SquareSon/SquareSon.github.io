@@ -1,6 +1,6 @@
-import { getProviderCandidates, getProviderCatalog, normalizeProviderStream, requestProvider } from "./providers";
+import { getGatewayCatalog, getProviderCandidates, getProviderCatalog, normalizeProviderStream, requestProvider } from "./providers";
 import { retrieveEvidence } from "./retrieval";
-import type { Locale, RagEnv, WorkerContext } from "./types";
+import type { ChatHistoryMessage, GatewayId, Locale, RagEnv, WorkerContext } from "./types";
 
 const localRateWindow = new Map<string, { hour: string; count: number }>();
 
@@ -28,6 +28,7 @@ export async function handleRagRequest(
           reranker: Boolean(env.AI),
         },
         providers: getProviderCatalog(env).map(({ id, label }) => ({ id, label })),
+        gateways: getGatewayCatalog(env),
       },
       200,
       cors,
@@ -35,14 +36,23 @@ export async function handleRagRequest(
   }
 
   if (url.pathname === "/api/models" && request.method === "GET") {
-    return json({ models: getProviderCatalog(env) }, 200, cors);
+    const source = parseGateway(url.searchParams.get("source"));
+    return json(
+      {
+        models: getProviderCatalog(env, source),
+        gateways: getGatewayCatalog(env),
+        source,
+      },
+      200,
+      cors,
+    );
   }
 
   if (url.pathname !== "/api/chat" || request.method !== "POST") {
     return json({ error: "not_found" }, 404, cors);
   }
 
-  let body: { query?: unknown; model?: unknown; locale?: unknown; turnstileToken?: unknown };
+  let body: { query?: unknown; model?: unknown; source?: unknown; locale?: unknown; history?: unknown; turnstileToken?: unknown };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -51,8 +61,15 @@ export async function handleRagRequest(
 
   const question = typeof body.query === "string" ? body.query.trim() : "";
   const requestedModel = typeof body.model === "string" ? body.model : "auto";
+  const requestedGateway = parseGateway(body.source);
   const locale: Locale = body.locale === "en" ? "en" : "zh";
+  const history = normalizeHistory(body.history);
   if (!question || question.length > 1000) return json({ error: "invalid_query" }, 400, cors);
+
+  const modelAnswer = getModelAnswer(question, requestedModel, requestedGateway, locale, env);
+  if (modelAnswer) {
+    return json({ answer: modelAnswer, mode: "system", citations: [] }, 200, cors);
+  }
 
   const policyAnswer = getPolicyAnswer(question, locale);
   if (policyAnswer) {
@@ -81,7 +98,7 @@ export async function handleRagRequest(
     return json({ degraded: true, reason: "budget_or_rate_limit" }, 200, cors);
   }
 
-  const providers = getProviderCandidates(requestedModel, env);
+  const providers = getProviderCandidates(requestedModel, env, requestedGateway);
   if (!providers.length) return json({ degraded: true, reason: "model_unavailable" }, 200, cors);
 
   const evidence = await retrieveEvidence(question, locale, env);
@@ -89,7 +106,7 @@ export async function handleRagRequest(
 
   for (const provider of providers) {
     try {
-      const upstream = await requestProvider(provider, question, locale, evidence);
+      const upstream = await requestProvider(provider, question, locale, evidence, history);
       const stream = normalizeProviderStream(upstream, provider, evidence, ({ answerLength, status }) => {
         ctx.waitUntil(
           recordUsage(env, {
@@ -111,7 +128,16 @@ export async function handleRagRequest(
           "x-content-type-options": "nosniff",
         },
       });
-    } catch {
+    } catch (error) {
+      console.warn(
+        JSON.stringify({
+          event: "model_provider_request_failed",
+          provider: provider.id,
+          model: provider.model,
+          gateway: provider.gateway,
+          detail: error instanceof Error ? error.message : "unknown_error",
+        }),
+      );
       if (requestedModel !== "auto") break;
     }
   }
@@ -128,6 +154,58 @@ export async function handleRagRequest(
     }),
   );
   return json({ degraded: true, reason: "provider_error" }, 200, cors);
+}
+
+function getModelAnswer(question: string, requestedModel: string, requestedGateway: GatewayId, locale: Locale, env: RagEnv) {
+  const normalized = question.normalize("NFKC").toLocaleLowerCase();
+  const asksAboutModel = /(现在.{0,12}(哪个|什么).{0,8}模型|当前.{0,8}模型|正在.{0,8}模型|模型.{0,8}(名称|版本|身份)|which model|what model|current model|model (?:name|version))/i.test(
+    normalized,
+  );
+  if (!asksAboutModel) return null;
+
+  const candidates = getProviderCandidates(requestedModel, env, requestedGateway);
+  if (!candidates.length) {
+    return locale === "zh"
+      ? "当前没有可用的在线模型，系统会使用静态 FAQ 与站内资料搜索。"
+      : "No online model is currently available; the site will use its static FAQ and material search.";
+  }
+
+  const [selected] = candidates;
+  if (requestedModel === "auto") {
+    return locale === "zh"
+      ? `当前为自动模式，首选模型是 ${selected.label}（${selected.model}）。若该模型不可用，系统会按预设顺序切换到下一个模型；实际回答所用模型会在完成时标记。`
+      : `Automatic mode is active. Its first-choice model is ${selected.label} (${selected.model}). If unavailable, the system tries the next approved model and marks the model used when the answer completes.`;
+  }
+  return locale === "zh"
+    ? `当前选择的是 ${selected.label}（${selected.model}）。这是一条系统运行状态信息，不需要从个人公开材料中检索。`
+    : `The selected model is ${selected.label} (${selected.model}). This is a system-status response and does not require retrieval from the public materials.`;
+}
+
+function parseGateway(value: unknown): GatewayId {
+  return value === "openrouter" || value === "bailian" ? value : "auto";
+}
+
+function normalizeHistory(value: unknown): ChatHistoryMessage[] {
+  if (!Array.isArray(value)) return [];
+  const history = value
+    .filter(
+      (item): item is { role: "user" | "assistant"; content: string } =>
+        typeof item === "object" &&
+        item !== null &&
+        ((item as { role?: unknown }).role === "user" || (item as { role?: unknown }).role === "assistant") &&
+        typeof (item as { content?: unknown }).content === "string",
+    )
+    .map((item) => ({ role: item.role, content: item.content.trim().slice(0, 1200) }))
+    .filter((item) => item.content.length > 0)
+    .slice(-6);
+
+  let remaining = 4_800;
+  return history.reverse().flatMap((item) => {
+    if (remaining <= 0) return [];
+    const content = item.content.slice(Math.max(0, item.content.length - remaining));
+    remaining -= content.length;
+    return [{ ...item, content }];
+  }).reverse();
 }
 
 function getPolicyAnswer(question: string, locale: Locale) {

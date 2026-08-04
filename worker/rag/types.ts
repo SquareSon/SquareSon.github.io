@@ -1,5 +1,11 @@
 export type Locale = "zh" | "en";
 export type ProviderId = "qwen" | "glm" | "deepseek" | "kimi";
+export type GatewayId = "auto" | "bailian" | "openrouter";
+
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export interface KnowledgeChunk {
   id: string;
