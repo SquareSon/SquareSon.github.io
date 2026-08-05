@@ -472,7 +472,15 @@ function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderC
   const apiKey = env.DASHSCOPE_API_KEY;
   const baseUrl = env.DASHSCOPE_BASE_URL ?? "https://dashscope.aliyuncs.com/compatible-mode/v1";
   return [
-    { id: "qwen", label: "Qwen", apiKey, baseUrl, model: env.QWEN_MODEL ?? "qwen3.7-flash", gateway: "bailian" },
+    {
+      id: "qwen",
+      label: "Qwen",
+      apiKey,
+      baseUrl,
+      model: env.QWEN_MODEL ?? "qwen3.7-flash",
+      gateway: "bailian",
+      enableThinking: false,
+    },
     {
       id: "deepseek",
       label: "DeepSeek",
