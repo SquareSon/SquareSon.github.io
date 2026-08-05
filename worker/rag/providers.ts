@@ -224,6 +224,62 @@ export function normalizeProviderStream(
   });
 }
 
+/**
+ * Collect an upstream SSE answer before replying. This is used for embedded
+ * WebViews that can issue fetch requests but cannot reliably consume a
+ * cross-origin ReadableStream (notably some WeChat and commerce-app browsers).
+ */
+export async function collectProviderAnswer(
+  upstream: Response,
+  provider: ProviderConfig,
+  onComplete: (result: { answerLength: number; status: "ok" | "stream_error" }) => void,
+) {
+  const decoder = new TextDecoder();
+  const reader = upstream.body!.getReader();
+  let buffer = "";
+  let answer = "";
+
+  const consume = (event: string) => {
+    const data = event
+      .split(/\r?\n/)
+      .filter((line) => line.startsWith("data:"))
+      .map((line) => line.slice(5).trim())
+      .join("");
+    if (!data || data === "[DONE]") return;
+    try {
+      const payload = JSON.parse(data) as { choices?: Array<{ delta?: { content?: string | null } }> };
+      const text = payload.choices?.[0]?.delta?.content;
+      if (typeof text === "string") answer += text;
+    } catch {
+      // Vendor keep-alives and non-content events do not form an answer.
+    }
+  };
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split(/\r?\n\r?\n/);
+      buffer = events.pop() ?? "";
+      events.forEach(consume);
+    }
+    buffer += decoder.decode();
+    if (buffer.trim()) consume(buffer);
+  } catch (error) {
+    onComplete({ answerLength: answer.length, status: "stream_error" });
+    throw error;
+  }
+
+  if (!answer) {
+    console.warn(JSON.stringify({ event: "model_buffered_response_empty", provider: provider.id, model: provider.model }));
+    onComplete({ answerLength: 0, status: "stream_error" });
+    throw new Error("empty_model_response");
+  }
+  onComplete({ answerLength: answer.length, status: "ok" });
+  return answer;
+}
+
 function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderConfig[] {
   const gateway = resolveGateway(env, requestedGateway);
   if (gateway === "openrouter" && env.OPENROUTER_API_KEY) {

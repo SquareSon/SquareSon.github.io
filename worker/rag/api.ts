@@ -1,4 +1,4 @@
-import { getGatewayCatalog, getProviderCandidates, getProviderCatalog, normalizeProviderStream, requestProvider } from "./providers";
+import { collectProviderAnswer, getGatewayCatalog, getProviderCandidates, getProviderCatalog, normalizeProviderStream, requestProvider } from "./providers";
 import { LocalRetrievalUnavailable, retrieveEvidence } from "./retrieval";
 import type { ChatHistoryMessage, GatewayId, Locale, RagEnv, WorkerContext } from "./types";
 
@@ -50,7 +50,7 @@ export async function handleRagRequest(
     return json({ error: "not_found" }, 404, cors);
   }
 
-  let body: { query?: unknown; model?: unknown; source?: unknown; locale?: unknown; history?: unknown; turnstileToken?: unknown };
+  let body: { query?: unknown; model?: unknown; source?: unknown; locale?: unknown; history?: unknown; stream?: unknown; turnstileToken?: unknown };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -62,6 +62,7 @@ export async function handleRagRequest(
   const requestedGateway = parseGateway(body.source);
   const locale: Locale = body.locale === "en" ? "en" : "zh";
   const history = normalizeHistory(body.history);
+  const wantsStreaming = body.stream !== false;
   if (!question || question.length > 1000) return json({ error: "invalid_query" }, 400, cors);
 
   const modelAnswer = getModelAnswer(question, requestedModel, requestedGateway, locale, env);
@@ -110,9 +111,39 @@ export async function handleRagRequest(
   }
   if (!evidence.length) return json({ degraded: true, reason: "insufficient_evidence" }, 200, cors);
 
+  let providerFailure = "provider_error";
   for (const provider of providers) {
     try {
       const upstream = await requestProvider(provider, question, locale, evidence, history);
+      if (!wantsStreaming) {
+        const answer = await collectProviderAnswer(upstream, provider, ({ answerLength, status }) => {
+          ctx.waitUntil(
+            recordUsage(env, {
+              clientHash,
+              provider: provider.id,
+              model: provider.model,
+              mode: "rag-buffered",
+              status,
+              promptChars: question.length + evidence.reduce((total, item) => total + item.content.length, 0),
+              completionChars: answerLength,
+            }),
+          );
+        });
+        return json(
+          {
+            answer,
+            mode: "rag-buffered",
+            provider: provider.id,
+            model: provider.model,
+            citations: evidence.slice(0, 1).map((item) => ({
+              label: `${item.sourceTitle} · ${item.titlePath}`,
+              href: item.url,
+            })),
+          },
+          200,
+          cors,
+        );
+      }
       const stream = normalizeProviderStream(upstream, provider, evidence, ({ answerLength, status }) => {
         ctx.waitUntil(
           recordUsage(env, {
@@ -135,6 +166,7 @@ export async function handleRagRequest(
         },
       });
     } catch (error) {
+      if (error instanceof Error && error.message === "empty_model_response") providerFailure = "empty_model_response";
       console.warn(
         JSON.stringify({
           event: "model_provider_request_failed",
@@ -159,7 +191,7 @@ export async function handleRagRequest(
       completionChars: 0,
     }),
   );
-  return json({ degraded: true, reason: "provider_error" }, 200, cors);
+  return json({ degraded: true, reason: providerFailure }, 200, cors);
 }
 
 function getModelAnswer(question: string, requestedModel: string, requestedGateway: GatewayId, locale: Locale, env: RagEnv) {

@@ -4,6 +4,7 @@
   data-assistant
   data-locale="{% if is_en %}en{% else %}zh{% endif %}"
   data-rag-endpoint="{{ site.rag_api_url }}"
+  data-rag-fallback-endpoint="{{ site.rag_api_fallback_url }}"
 >
   <form data-assistant-form>
     <div class="assistant-config">

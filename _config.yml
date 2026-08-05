@@ -23,7 +23,10 @@ author:
 
 # Populated after the standalone Cloudflare Worker is deployed. The assistant
 # remains useful as static FAQ and on-page search while this is empty.
-rag_api_url: "https://zi-fang-research-assistant.zi-fang-research.workers.dev"
+# Use the first-party API hostname in browsers. The workers.dev hostname stays
+# as a transparent fallback for networks that have not yet refreshed DNS.
+rag_api_url: "https://api.square-son.com"
+rag_api_fallback_url: "https://zi-fang-research-assistant.zi-fang-research.workers.dev"
 
 collections:
   pages:

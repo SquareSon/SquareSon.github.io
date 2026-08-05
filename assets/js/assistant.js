@@ -3,7 +3,13 @@
   if (!root) return;
 
   const locale = root.dataset.locale === 'en' ? 'en' : 'zh';
-  const endpoint = (root.dataset.ragEndpoint || '').replace(/\/$/, '');
+  const endpoints = Array.from(new Set([
+    root.dataset.ragEndpoint,
+    root.dataset.ragFallbackEndpoint,
+  ].filter(Boolean).map((value) => value.replace(/\/$/, ''))));
+  let activeEndpoint = endpoints[0] || '';
+  const embeddedWebView = /MicroMessenger|QQ\/|AlipayClient|AliApp|Taobao|TBS|; wv\)|WebView/i.test(navigator.userAgent || '');
+  const bufferedResponses = embeddedWebView || typeof ReadableStream !== 'function';
   const form = root.querySelector('[data-assistant-form]');
   const source = root.querySelector('[data-assistant-source]');
   const model = root.querySelector('[data-assistant-model]');
@@ -24,6 +30,7 @@
       localUnavailableAnswer: '目前无法连接本地资料检索服务。为避免没有依据的生成回答，系统未调用模型。请稍后重试，或使用站内资料搜索。',
       localProcessingFailed: '本地 RAG 编码或重排发生错误，系统未调用模型。请稍后重试；若持续出现，请检查本机检索服务日志。',
       requestFailed: '本次请求未完成：',
+      connectionFailed: '无法连接聊天服务；请检查网络，或在系统浏览器中打开本站后重试。',
       emptyModelResponse: '模型未返回可显示的内容。本次请求未形成回答，请重试或切换模型。',
       providerError: '所选模型服务返回错误，系统未生成回答。请更换模型或 API 来源后重试。',
       modelUnavailable: '所选模型当前不可用，系统未生成回答。请更换模型或 API 来源后重试。',
@@ -48,6 +55,7 @@
       localUnavailableAnswer: 'The local material retrieval service is unavailable. To avoid an unsupported generated answer, no model was called. Please try again later or use the on-page material search.',
       localProcessingFailed: 'Local RAG encoding or reranking failed. No model was called; please retry later and check the local retrieval service logs if it persists.',
       requestFailed: 'The request did not complete: ',
+      connectionFailed: 'The chat service could not be reached. Check the network or open this site in the system browser and retry.',
       emptyModelResponse: 'The model returned no displayable content. No answer was produced; please retry or switch models.',
       providerError: 'The selected model service returned an error. No answer was generated; choose another model or API source and retry.',
       modelUnavailable: 'The selected model is unavailable. No answer was generated; choose another model or API source and retry.',
@@ -163,11 +171,37 @@
     if ([...select.options].some((option) => option.value === previous)) select.value = previous;
   }
 
+  function wait(milliseconds) {
+    return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+  }
+
+  async function fetchApi(path, options = {}, retries = 0) {
+    if (!endpoints.length) throw new Error('network_unavailable');
+    let failure = new Error('network_unavailable');
+    const ordered = [activeEndpoint, ...endpoints.filter((item) => item !== activeEndpoint)];
+    for (const baseUrl of ordered) {
+      for (let attempt = 0; attempt <= retries; attempt += 1) {
+        try {
+          const response = await fetch(`${baseUrl}${path}`, options);
+          if (response.ok) {
+            activeEndpoint = baseUrl;
+            return response;
+          }
+          failure = new Error(`http_${response.status}`);
+          break;
+        } catch {
+          failure = new Error('network_unavailable');
+          if (attempt < retries) await wait(350 * (attempt + 1));
+        }
+      }
+    }
+    throw failure;
+  }
+
   async function loadModels() {
-    if (!endpoint) return;
+    if (!activeEndpoint) return;
     try {
-      const response = await fetch(`${endpoint}/api/models?source=${encodeURIComponent(source.value)}`, { headers: { accept: 'application/json' } });
-      if (!response.ok) return;
+      const response = await fetchApi(`/api/models?source=${encodeURIComponent(source.value)}`, { headers: { accept: 'application/json' } }, 2);
       const payload = await response.json();
       const gateways = Array.isArray(payload.gateways) ? payload.gateways : [];
       setSelectOptions(source, gateways, new Option(copy.autoSource, 'auto'), (entry) => entry.label);
@@ -177,17 +211,27 @@
       model.disabled = models.length === 0;
       setMode(models.length ? 'rag' : 'static', models.length ? copy.readyRag : copy.readyStatic);
     } catch {
-      setMode('static', copy.readyStatic);
+      source.disabled = true;
+      model.disabled = true;
+      setMode('error', copy.connectionFailed);
     }
   }
 
   async function askRag(value, message) {
-    const response = await fetch(`${endpoint}/api/chat`, {
+    const response = await fetchApi('/api/chat', {
       method: 'POST',
       headers: { 'content-type': 'application/json', accept: 'text/event-stream, application/json' },
-      body: JSON.stringify({ query: value, model: model.value, source: source.value, locale, history }),
+      body: JSON.stringify({
+        query: value,
+        model: model.value,
+        source: source.value,
+        locale,
+        history,
+        // Embedded WebViews receive a complete JSON answer, avoiding their
+        // inconsistent handling of cross-origin streaming response bodies.
+        stream: !bufferedResponses,
+      }),
     });
-    if (!response.ok) throw new Error('rag_unavailable');
 
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -251,7 +295,7 @@
     submit.disabled = true;
     submit.textContent = copy.working;
     try {
-      if (!endpoint) throw new Error('static');
+      if (!activeEndpoint) throw new Error('network_unavailable');
       const answer = await askRag(value, reply);
       reply.content.textContent = answer;
       history.push({ role: 'user', content: value }, { role: 'assistant', content: answer });
@@ -269,6 +313,8 @@
         insufficient_evidence: copy.insufficientEvidence,
         empty_model_response: copy.emptyModelResponse,
         stream_error: copy.providerError,
+        network_unavailable: copy.connectionFailed,
+        rag_unavailable: copy.connectionFailed,
       };
       const errorAnswer = messages[code] || `${copy.requestFailed}${code}`;
       reply.content.textContent = errorAnswer;
