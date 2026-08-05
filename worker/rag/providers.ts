@@ -46,7 +46,7 @@ export function getProviderCandidates(requested: string, env: RagEnv, requestedG
       : [];
   }
 
-  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "bailian:qwen,openrouter:deepseek,bailian:deepseek,bailian:glm,bailian:kimi,openrouter:glm,openrouter:kimi")
+  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "bailian:deepseek,openrouter:glm,openrouter:deepseek,bailian:qwen")
     .split(",")
     .map((value) => value.trim())
     .filter((value) => /^(bailian|openrouter):(qwen|deepseek|glm|kimi)$/.test(value));
@@ -55,16 +55,10 @@ export function getProviderCandidates(requested: string, env: RagEnv, requestedG
     const match = available.find((provider) => `${provider.gateway}:${provider.id}` === route);
     return match ? [match] : [];
   });
-  const selectedKeys = new Set(selected.map((provider) => `${provider.gateway}:${provider.id}`));
-  // OpenRouter Qwen is intentionally excluded from automatic routing: the
-  // current account/model route returns provider errors in production. It
-  // remains available for an explicit user selection and clear diagnostics.
-  return [
-    ...selected,
-    ...available.filter((provider) => provider.gateway !== "openrouter" || provider.id !== "qwen").filter(
-      (provider) => !selectedKeys.has(`${provider.gateway}:${provider.id}`),
-    ),
-  ];
+  // Automatic routing is intentionally limited to the reviewed fast routes.
+  // Models outside this list remain available through an explicit visitor
+  // selection, but will not silently add long failure paths to auto mode.
+  return selected;
 }
 
 export async function requestProvider(
@@ -91,6 +85,7 @@ export async function requestProvider(
             provider: {
               data_collection: "deny",
               zdr: true,
+              sort: "latency",
             },
           }
         : {}),
@@ -282,11 +277,13 @@ export async function collectProviderAnswer(
   upstream: Response,
   provider: ProviderConfig,
   onComplete: (result: { answerLength: number; status: "ok" | "stream_error" }) => void,
+  startedAt = performance.now(),
 ) {
   const decoder = new TextDecoder();
   const reader = upstream.body!.getReader();
   let buffer = "";
   let answer = "";
+  let firstContentMs: number | undefined;
   let terminal = false;
   let outputTruncated = false;
 
@@ -309,7 +306,10 @@ export async function collectProviderAnswer(
         terminal = true;
         outputTruncated ||= finishReason === "length";
       }
-      if (typeof text === "string") answer += text;
+      if (typeof text === "string") {
+        if (text && firstContentMs === undefined) firstContentMs = elapsedMs(startedAt);
+        answer += text;
+      }
     } catch {
       // Vendor keep-alives and non-content events do not form an answer.
     }
@@ -345,7 +345,11 @@ export async function collectProviderAnswer(
     throw new Error("stream_incomplete");
   }
   onComplete({ answerLength: answer.length, status: "ok" });
-  return answer;
+  return { answer, firstContentMs };
+}
+
+function elapsedMs(startedAt: number) {
+  return Math.round((performance.now() - startedAt) * 10) / 10;
 }
 
 function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderConfig[] {

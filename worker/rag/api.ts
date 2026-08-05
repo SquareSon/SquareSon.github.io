@@ -65,6 +65,7 @@ export async function handleRagRequest(
   const history = normalizeHistory(body.history);
   const wantsStreaming = body.stream !== false;
   const requestId = crypto.randomUUID();
+  const requestStartedAt = performance.now();
   if (!question || question.length > 1000) return json({ error: "invalid_query" }, 400, cors);
 
   const modelAnswer = getModelAnswer(question, requestedModel, requestedGateway, locale, env);
@@ -102,23 +103,35 @@ export async function handleRagRequest(
   if (!providers.length) return json({ degraded: true, reason: "model_unavailable" }, 200, cors);
 
   let evidence;
+  let retrievalMs: number | undefined;
+  const retrievalStartedAt = performance.now();
   try {
     evidence = await retrieveEvidence(question, locale, env);
+    retrievalMs = elapsedMs(retrievalStartedAt);
   } catch (error) {
+    retrievalMs = elapsedMs(retrievalStartedAt);
+    console.warn(JSON.stringify({ event: "rag_retrieval_failed", requestId, retrievalMs, elapsedMs: elapsedMs(requestStartedAt) }));
     if (error instanceof LocalRetrievalUnavailable) {
-      return json({ degraded: true, reason: error.reason }, 200, cors);
+      return json({ degraded: true, reason: error.reason, requestId }, 200, timingHeaders(cors, { retrievalMs, totalMs: elapsedMs(requestStartedAt) }));
     }
-    return json({ degraded: true, reason: "local_retrieval_unavailable" }, 200, cors);
+    return json({ degraded: true, reason: "local_retrieval_unavailable", requestId }, 200, timingHeaders(cors, { retrievalMs, totalMs: elapsedMs(requestStartedAt) }));
   }
-  if (!evidence.length) return json({ degraded: true, reason: "insufficient_evidence" }, 200, cors);
+  if (!evidence.length) {
+    return json(
+      { degraded: true, reason: "insufficient_evidence", requestId },
+      200,
+      timingHeaders(cors, { retrievalMs, totalMs: elapsedMs(requestStartedAt) }),
+    );
+  }
 
   let providerFailure = "provider_error";
   for (const provider of providers) {
     for (let attempt = 1; attempt <= 2; attempt += 1) {
+      const modelStartedAt = performance.now();
       try {
         const upstream = await requestProvider(provider, question, locale, evidence, history);
         if (!wantsStreaming) {
-          const answer = await collectProviderAnswer(upstream, provider, ({ answerLength, status }) => {
+          const collected = await collectProviderAnswer(upstream, provider, ({ answerLength, status }) => {
             ctx.waitUntil(
               recordUsage(env, {
                 clientHash,
@@ -130,11 +143,25 @@ export async function handleRagRequest(
                 completionChars: answerLength,
               }),
             );
-          });
-          console.log(JSON.stringify({ event: "rag_completed", requestId, provider: provider.id, model: provider.model, gateway: provider.gateway, attempt, answerLength: answer.length }));
+          }, modelStartedAt);
+          const modelCompletionMs = elapsedMs(modelStartedAt);
+          const totalMs = elapsedMs(requestStartedAt);
+          const timing = { retrievalMs, modelFirstTokenMs: collected.firstContentMs, modelCompletionMs, totalMs };
+          console.log(
+            JSON.stringify({
+              event: "rag_completed",
+              requestId,
+              provider: provider.id,
+              model: provider.model,
+              gateway: provider.gateway,
+              attempt,
+              answerLength: collected.answer.length,
+              ...timing,
+            }),
+          );
           return json(
             {
-              answer,
+              answer: collected.answer,
               mode: "rag-buffered",
               provider: provider.id,
               model: provider.model,
@@ -143,7 +170,7 @@ export async function handleRagRequest(
               citations: publicCitations(evidence),
             },
             200,
-            cors,
+            timingHeaders(cors, timing),
           );
         }
         const stream = normalizeProviderStream(upstream, provider, evidence, ({ answerLength, status }) => {
@@ -177,6 +204,9 @@ export async function handleRagRequest(
             model: provider.model,
             gateway: provider.gateway,
             attempt,
+            retrievalMs,
+            providerElapsedMs: elapsedMs(modelStartedAt),
+            elapsedMs: elapsedMs(requestStartedAt),
             detail: error instanceof Error ? error.message : "unknown_error",
           }),
         );
@@ -211,12 +241,38 @@ function providerFailureReason(error: unknown) {
 }
 
 function shouldRetryProvider(error: unknown) {
-  if (!(error instanceof Error)) return true;
-  return !/returned (400|401|403|404)/.test(error.message);
+  if (!(error instanceof Error)) return false;
+  if (["empty_model_response", "stream_incomplete", "output_truncated"].includes(error.message)) return false;
+  const providerStatus = /returned (\d{3})/.exec(error.message);
+  if (providerStatus) {
+    const status = Number.parseInt(providerStatus[1], 10);
+    return status >= 500 && status <= 599;
+  }
+  return /abort|timeout|timed out|network|fetch failed/i.test(error.message);
 }
 
 function wait(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function elapsedMs(startedAt: number) {
+  return Math.round((performance.now() - startedAt) * 10) / 10;
+}
+
+function timingHeaders(
+  cors: Record<string, string>,
+  timing: { retrievalMs?: number; modelFirstTokenMs?: number; modelCompletionMs?: number; totalMs: number },
+) {
+  const measurements: Array<[string, number | undefined]> = [
+    ["rag-retrieval", timing.retrievalMs],
+    ["model-first-token", timing.modelFirstTokenMs],
+    ["model-completion", timing.modelCompletionMs],
+    ["total", timing.totalMs],
+  ];
+  const entries = measurements
+    .filter((entry): entry is [string, number] => typeof entry[1] === "number")
+    .map(([name, duration]) => `${name};dur=${duration}`);
+  return entries.length ? { ...cors, "server-timing": entries.join(", ") } : cors;
 }
 
 function getModelAnswer(question: string, requestedModel: string, requestedGateway: GatewayId, locale: Locale, env: RagEnv) {
