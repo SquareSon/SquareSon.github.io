@@ -110,7 +110,7 @@
     const content = document.createElement('div');
     content.className = 'assistant-message-content';
     setMessageContent(content, text, role === 'assistant');
-    const sources = document.createElement('ul');
+    const sources = document.createElement('details');
     sources.className = 'assistant-message-sources';
     message.append(label, content, sources);
     transcript.appendChild(message);
@@ -118,16 +118,34 @@
     return { content, sources };
   }
 
+  function materialBasisLabel(count) {
+    return locale === 'zh' ? `资料依据（${count}）` : `Material basis (${count})`;
+  }
+
+  function introductionMessage() {
+    return locale === 'zh'
+      ? '你好，我是方子的研究助理。我只基于本站公开的个人资料回答问题。\n\n你可以直接询问研究方向、博士论文、项目、论文、教育经历或技能。我会先检索相关材料，再给出有依据的回答；回答下方的“资料依据”可按需展开查看。若资料检索或模型服务异常，我会直接说明原因。\n\n请在下方输入问题，我会在这里等待你的提问。'
+      : 'Hello, I am Zi Fang\'s research assistant. I answer questions only from the public materials on this site.\n\nYou can ask directly about research interests, the dissertation, projects, publications, education, or skills. I will retrieve relevant materials first and then provide a grounded answer; the material basis below an answer can be expanded when needed. If retrieval or a model service fails, I will state the reason clearly.\n\nPlease enter a question below. I am ready for your question.';
+  }
+
   function renderSources(container, sources) {
     container.replaceChildren();
-    sources.forEach((item) => {
+    const labels = Array.from(new Set(
+      sources
+        .map((item) => typeof item?.label === 'string' ? item.label.trim() : '')
+        .filter(Boolean),
+    ));
+    if (!labels.length) return;
+
+    const summary = document.createElement('summary');
+    summary.textContent = materialBasisLabel(labels.length);
+    const list = document.createElement('ul');
+    labels.forEach((label) => {
       const row = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = item.href || '#';
-      link.textContent = `${copy.source}: ${item.label}`;
-      row.appendChild(link);
-      container.appendChild(row);
+      row.textContent = label;
+      list.appendChild(row);
     });
+    container.append(summary, list);
   }
 
   function cleanAssistantText(value) {
@@ -171,6 +189,7 @@
   function clearConversation() {
     history = [];
     transcript.replaceChildren();
+    appendMessage('assistant', introductionMessage());
     question.focus();
   }
 
@@ -308,7 +327,7 @@
           setMessageContent(message.content, result, true);
           scrollTranscript();
         } else if (payload.type === 'citation') {
-          sources.push({ label: payload.label, href: payload.href });
+          sources.push({ label: payload.label });
           renderSources(message.sources, sources);
         } else if (payload.type === 'degraded') {
           throw new Error(payload.reason || 'stream_degraded');

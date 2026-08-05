@@ -79,7 +79,6 @@ export async function handleRagRequest(
         citations: [
           {
             label: locale === "zh" ? "公开信息与回答边界" : "Public-information and answer policy",
-            href: locale === "zh" ? "/#research" : "/en/#research",
           },
         ],
       },
@@ -220,11 +219,22 @@ function parseGateway(value: unknown): GatewayId {
   return value === "openrouter" || value === "bailian" ? value : "auto";
 }
 
-function publicCitations(evidence: Array<{ sourceTitle: string; titlePath: string; url: string }>) {
-  return evidence.slice(0, 3).map((item) => ({
-    label: `${item.sourceTitle} · ${item.titlePath}`,
-    href: item.url,
-  }));
+function publicCitations(evidence: Array<{ sourceTitle: string; titlePath: string }>) {
+  const seenSources = new Set<string>();
+  return evidence
+    .filter((item) => {
+      if (seenSources.has(item.sourceTitle)) return false;
+      seenSources.add(item.sourceTitle);
+      return true;
+    })
+    .slice(0, 3)
+    .map((item) => ({
+      label: `${shortSourceTitle(item.sourceTitle)}｜${item.titlePath}`,
+    }));
+}
+
+function shortSourceTitle(value: string) {
+  return value.startsWith("博士论文：") ? "博士论文" : value;
 }
 
 function normalizeHistory(value: unknown): ChatHistoryMessage[] {

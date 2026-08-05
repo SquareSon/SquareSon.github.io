@@ -855,12 +855,29 @@ li { margin-bottom: 0.38em; }
 
 .assistant-message-sources {
   margin: 0.58rem 0 0;
-  padding: 0;
-  list-style: none;
+  color: #5d6a75;
+  font-size: 0.82rem;
 }
 
 .assistant-message-sources:empty { display: none; }
-.assistant-message-sources li { display: inline; margin-right: 0.75rem; font-size: 0.82rem; }
+
+.assistant-message-sources summary {
+  display: inline-block;
+  color: var(--link);
+  cursor: pointer;
+  user-select: none;
+}
+
+.assistant-message-sources summary:hover { text-decoration: underline; }
+
+.assistant-message-sources ul {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.assistant-message-sources li { overflow-wrap: anywhere; }
 
 .assistant-suggestions {
   display: flex;

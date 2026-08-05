@@ -121,13 +121,12 @@ export function normalizeProviderStream(
 
   return new ReadableStream<Uint8Array>({
     async start(controller) {
-      evidence.slice(0, 3).forEach((item) => {
+      publicEvidenceSources(evidence).forEach((item) => {
         controller.enqueue(
           encodeEvent(encoder, {
             type: "citation",
             id: item.id,
-            label: `${item.sourceTitle} · ${item.titlePath}`,
-            href: item.url,
+            label: `${shortSourceTitle(item.sourceTitle)}｜${item.titlePath}`,
           }),
         );
       });
@@ -222,6 +221,19 @@ export function normalizeProviderStream(
       void reader.cancel();
     },
   });
+}
+
+function publicEvidenceSources(evidence: Evidence[]) {
+  const seenSources = new Set<string>();
+  return evidence.filter((item) => {
+    if (seenSources.has(item.sourceTitle)) return false;
+    seenSources.add(item.sourceTitle);
+    return true;
+  }).slice(0, 3);
+}
+
+function shortSourceTitle(value: string) {
+  return value.startsWith("博士论文：") ? "博士论文" : value;
 }
 
 /**
