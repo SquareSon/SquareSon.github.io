@@ -3,6 +3,8 @@ import { getLocalRetrievalHealth, LocalRetrievalUnavailable, retrieveEvidence } 
 import type { ChatHistoryMessage, GatewayId, Locale, RagEnv, WorkerContext } from "./types";
 
 const localRateWindow = new Map<string, { hour: string; count: number }>();
+const DEFAULT_AUTO_MODEL_BUDGET_MS = 20_000;
+const MIN_AUTO_ROUTE_TIMEOUT_MS = 1_000;
 
 export async function handleRagRequest(
   request: Request,
@@ -125,11 +127,23 @@ export async function handleRagRequest(
   }
 
   let providerFailure = "provider_error";
+  const automaticRouting = requestedModel === "auto";
+  const autoModelBudgetMs = positiveInteger(env.AUTO_MODEL_BUDGET_MS, DEFAULT_AUTO_MODEL_BUDGET_MS);
+  const autoModelStartedAt = performance.now();
   for (const provider of providers) {
-    for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const remainingAutoBudgetMs = automaticRouting ? autoModelBudgetMs - elapsedMs(autoModelStartedAt) : undefined;
+    if (automaticRouting && (remainingAutoBudgetMs === undefined || remainingAutoBudgetMs < MIN_AUTO_ROUTE_TIMEOUT_MS)) {
+      providerFailure = "auto_time_budget_exhausted";
+      break;
+    }
+    const maxAttempts = automaticRouting ? 1 : 2;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       const modelStartedAt = performance.now();
       try {
-        const upstream = await requestProvider(provider, question, locale, evidence, history);
+        const routeTimeoutMs = automaticRouting
+          ? Math.min(provider.autoTimeoutMs ?? remainingAutoBudgetMs!, remainingAutoBudgetMs!)
+          : undefined;
+        const upstream = await requestProvider(provider, question, locale, evidence, history, routeTimeoutMs);
         if (!wantsStreaming) {
           const collected = await collectProviderAnswer(upstream, provider, ({ answerLength, status }) => {
             ctx.waitUntil(
@@ -210,15 +224,17 @@ export async function handleRagRequest(
             detail: error instanceof Error ? error.message : "unknown_error",
           }),
         );
-        if (attempt < 2 && shouldRetryProvider(error)) {
+        if (attempt < maxAttempts && shouldRetryProvider(error)) {
           await wait(250 * attempt);
           continue;
         }
         break;
       }
     }
-    if (requestedModel !== "auto") break;
+    if (!automaticRouting) break;
   }
+
+  if (automaticRouting && providerFailure === "provider_error") providerFailure = "auto_route_unavailable";
 
   ctx.waitUntil(
     recordUsage(env, {
@@ -226,7 +242,7 @@ export async function handleRagRequest(
       provider: requestedModel,
       model: requestedModel,
       mode: "degraded",
-      status: "provider_error",
+      status: providerFailure,
       promptChars: question.length,
       completionChars: 0,
     }),

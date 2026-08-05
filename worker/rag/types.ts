@@ -58,6 +58,7 @@ export interface RagEnv {
   DEEPSEEK_MODEL?: string;
   KIMI_MODEL?: string;
   AUTO_PROVIDER_ORDER?: string;
+  AUTO_MODEL_BUDGET_MS?: string;
   ALLOWED_ORIGINS?: string;
   TURNSTILE_SECRET_KEY?: string;
   RATE_LIMIT_SALT?: string;

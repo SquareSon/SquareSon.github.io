@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-test("automatic routing starts with the fastest verified Bailian DeepSeek route", async () => {
+test("automatic routing starts with the fastest verified Bailian Qwen route", async () => {
   const workerUrl = new URL("../dist/worker.js", import.meta.url);
   workerUrl.searchParams.set("automatic-route", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
@@ -15,12 +15,13 @@ test("automatic routing starts with the fastest verified Bailian DeepSeek route"
       DASHSCOPE_API_KEY: "test-key",
       OPENROUTER_API_KEY: "test-key",
       MODEL_GATEWAY: "bailian",
-      AUTO_PROVIDER_ORDER: "bailian:deepseek,openrouter:deepseek,bailian:qwen",
+      AUTO_PROVIDER_ORDER: "bailian:qwen,bailian:deepseek,bailian:glm",
+      AUTO_MODEL_BUDGET_MS: "20000",
     },
     { waitUntil() {}, passThroughOnException() {} },
   );
   const payload = await response.json();
   assert.equal(payload.mode, "system");
-  assert.match(payload.answer, /DeepSeek/);
-  assert.match(payload.answer, /deepseek-v4-flash/);
+  assert.match(payload.answer, /Qwen/);
+  assert.match(payload.answer, /qwen3\.7-flash/);
 });

@@ -9,6 +9,7 @@ export interface ProviderConfig {
   gateway: "bailian" | "openrouter";
   maxTokens?: number;
   timeoutMs?: number;
+  autoTimeoutMs?: number;
   temperature?: number;
   enableThinking?: boolean;
   reasoningEffort?: "max";
@@ -65,7 +66,7 @@ export function getProviderCandidates(requested: string, env: RagEnv, requestedG
       : [];
   }
 
-  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "bailian:deepseek,openrouter:deepseek,bailian:qwen")
+  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "bailian:qwen,bailian:deepseek,bailian:glm")
     .split(",")
     .map((value) => value.trim())
     .filter((value) => /^(bailian|openrouter):(qwen|deepseek|glm|kimi)$/.test(value));
@@ -93,6 +94,7 @@ export async function requestProvider(
   locale: Locale,
   evidence: Evidence[],
   history: ChatHistoryMessage[],
+  timeoutMs?: number,
 ) {
   const requestBody: Record<string, unknown> = {
     model: provider.model,
@@ -120,7 +122,7 @@ export async function requestProvider(
       "content-type": "application/json",
     },
     body: JSON.stringify(requestBody),
-    signal: AbortSignal.timeout(provider.timeoutMs ?? 35_000),
+    signal: AbortSignal.timeout(timeoutMs ?? provider.timeoutMs ?? 35_000),
   });
 
   if (!response.ok || !response.body) {
@@ -480,6 +482,7 @@ function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderC
       model: env.QWEN_MODEL ?? "qwen3.7-flash",
       gateway: "bailian",
       enableThinking: false,
+      autoTimeoutMs: 7_000,
     },
     {
       id: "deepseek",
@@ -488,6 +491,7 @@ function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderC
       baseUrl,
       model: env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
       gateway: "bailian",
+      autoTimeoutMs: 7_000,
     },
     {
       id: "glm",
@@ -497,6 +501,7 @@ function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderC
       model: env.GLM_MODEL ?? "glm-5.2",
       gateway: "bailian",
       enableThinking: false,
+      autoTimeoutMs: 6_000,
     },
     {
       id: "kimi",
