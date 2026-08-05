@@ -15,7 +15,7 @@ test("automatic routing starts with the fastest verified Bailian DeepSeek route"
       DASHSCOPE_API_KEY: "test-key",
       OPENROUTER_API_KEY: "test-key",
       MODEL_GATEWAY: "bailian",
-      AUTO_PROVIDER_ORDER: "bailian:deepseek,openrouter:glm,openrouter:deepseek,bailian:qwen",
+      AUTO_PROVIDER_ORDER: "bailian:deepseek,openrouter:deepseek,bailian:qwen",
     },
     { waitUntil() {}, passThroughOnException() {} },
   );

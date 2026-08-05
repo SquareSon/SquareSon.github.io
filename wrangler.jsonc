@@ -25,7 +25,7 @@
   ],
   "vars": {
     "MODEL_GATEWAY": "bailian",
-    "AUTO_PROVIDER_ORDER": "bailian:deepseek,openrouter:glm,openrouter:deepseek,bailian:qwen",
+    "AUTO_PROVIDER_ORDER": "bailian:deepseek,openrouter:deepseek,bailian:qwen",
     "ALLOWED_ORIGINS": "https://squareson.github.io,https://www.square-son.com,https://square-son.com,http://localhost:4000,http://127.0.0.1:4000",
     "LOCAL_RAG_URL": "https://rag.square-son.com",
     "LOCAL_RAG_TIMEOUT_MS": "12000",

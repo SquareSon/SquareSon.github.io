@@ -46,7 +46,7 @@ export function getProviderCandidates(requested: string, env: RagEnv, requestedG
       : [];
   }
 
-  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "bailian:deepseek,openrouter:glm,openrouter:deepseek,bailian:qwen")
+  const requestedOrder = (env.AUTO_PROVIDER_ORDER ?? "bailian:deepseek,openrouter:deepseek,bailian:qwen")
     .split(",")
     .map((value) => value.trim())
     .filter((value) => /^(bailian|openrouter):(qwen|deepseek|glm|kimi)$/.test(value));
