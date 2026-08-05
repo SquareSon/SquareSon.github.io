@@ -434,4 +434,4 @@ PersonalHomePage-0.0.00/
 - [x] 重写中英文主页定位，突出三维感知与具身智能，将医疗影像作为应用与验证场景。
 - [x] 将博士课题概述和关键词从“关于我”移至“研究方向”，按概述、三条主线、关键词排列。
 - [x] 为 PLLBJ 与 Neural-Guided RRT* 补充静态问答及 RAG 资料，并更新检索评测。
-- [ ] 完成构建、测试、远端检索验证与 GitHub Pages / Cloudflare Worker 部署。
+- [x] 完成构建、测试、远端检索验证与 GitHub Pages / Cloudflare Worker 部署。
