@@ -24,8 +24,8 @@
     }
   ],
   "vars": {
-    "MODEL_GATEWAY": "openrouter",
-    "AUTO_PROVIDER_ORDER": "qwen,deepseek,glm,kimi",
+    "MODEL_GATEWAY": "bailian",
+    "AUTO_PROVIDER_ORDER": "bailian:qwen,openrouter:deepseek,bailian:deepseek,bailian:glm,bailian:kimi,openrouter:glm,openrouter:kimi",
     "ALLOWED_ORIGINS": "https://squareson.github.io,https://www.square-son.com,https://square-son.com,http://localhost:4000,http://127.0.0.1:4000",
     "LOCAL_RAG_URL": "https://rag.square-son.com",
     "LOCAL_RAG_TIMEOUT_MS": "12000",

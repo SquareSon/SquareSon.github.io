@@ -6,6 +6,42 @@ export class LocalRetrievalUnavailable extends Error {
   }
 }
 
+export async function getLocalRetrievalHealth(env: RagEnv) {
+  const baseUrl = env.LOCAL_RAG_URL?.replace(/\/$/, "");
+  const secret = env.LOCAL_RAG_HMAC_SECRET;
+  if (!baseUrl || !secret) return { configured: false, online: false };
+
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const nonce = crypto.randomUUID();
+  const signature = await signRequest("GET", "/v1/health", timestamp, nonce, "", secret);
+  const controller = new AbortController();
+  const timeout = setTimeout(controller.abort.bind(controller), 4_000);
+  const started = Date.now();
+  try {
+    const response = await fetch(`${baseUrl}/v1/health`, {
+      signal: controller.signal,
+      headers: {
+        "user-agent": "ZiFangResearchAssistant/1.0",
+        "x-rag-timestamp": timestamp,
+        "x-rag-nonce": nonce,
+        "x-rag-signature": signature,
+      },
+    });
+    if (!response.ok) return { configured: true, online: false };
+    const payload = (await response.json()) as { ok?: unknown; retrieval?: { ready?: unknown; chunkCount?: unknown } };
+    return {
+      configured: true,
+      online: payload.ok === true && payload.retrieval?.ready === true,
+      latencyMs: Date.now() - started,
+      chunkCount: typeof payload.retrieval?.chunkCount === "number" ? payload.retrieval.chunkCount : undefined,
+    };
+  } catch {
+    return { configured: true, online: false };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function retrieveEvidence(question: string, locale: Locale, env: RagEnv): Promise<Evidence[]> {
   const baseUrl = env.LOCAL_RAG_URL?.replace(/\/$/, "");
   const secret = env.LOCAL_RAG_HMAC_SECRET;

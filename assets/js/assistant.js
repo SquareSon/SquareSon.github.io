@@ -9,7 +9,9 @@
   ].filter(Boolean).map((value) => value.replace(/\/$/, ''))));
   let activeEndpoint = endpoints[0] || '';
   const embeddedWebView = /MicroMessenger|QQ\/|AlipayClient|AliApp|Taobao|TBS|; wv\)|WebView/i.test(navigator.userAgent || '');
-  const bufferedResponses = embeddedWebView || typeof ReadableStream !== 'function';
+  // Reliability takes precedence over token-by-token rendering. The Worker
+  // validates the provider's terminal event before returning a complete answer.
+  const bufferedResponses = true;
   const form = root.querySelector('[data-assistant-form]');
   const source = root.querySelector('[data-assistant-source]');
   const model = root.querySelector('[data-assistant-model]');
@@ -24,7 +26,7 @@
   const copy = {
     zh: {
       readyStatic: '静态 FAQ 与站内资料搜索已就绪',
-      readyRag: 'RAG 已连接；异常时将明确说明原因',
+      readyRag: '本地 RAG 已连接；将完整生成后显示回答',
       localUnavailable: '本地资料检索服务暂不可用',
       requestFailedStatus: '请求处理失败',
       localUnavailableAnswer: '目前无法连接本地资料检索服务。为避免没有依据的生成回答，系统未调用模型。请稍后重试，或使用站内资料搜索。',
@@ -32,12 +34,15 @@
       requestFailed: '本次请求未完成：',
       connectionFailed: '无法连接聊天服务；请检查网络，或在系统浏览器中打开本站后重试。',
       emptyModelResponse: '模型未返回可显示的内容。本次请求未形成回答，请重试或切换模型。',
+      streamIncomplete: '模型响应在完成前中断，系统未显示不完整答案。请重试或切换模型。',
+      outputTruncated: '模型回答达到长度上限，系统未显示不完整答案。请换一种更具体的问法后重试。',
       providerError: '所选模型服务返回错误，系统未生成回答。请更换模型或 API 来源后重试。',
       modelUnavailable: '所选模型当前不可用，系统未生成回答。请更换模型或 API 来源后重试。',
       budgetOrRateLimit: '当前请求触发了预算或访问频率限制，系统未生成回答。请稍后重试。',
       turnstile: '人机验证未通过或已过期，系统未生成回答。请刷新页面后重试。',
       insufficientEvidence: '公开资料中没有足够证据支持回答，系统未调用模型。请换一种问法。',
-      working: '正在检索公开材料……',
+      working: '正在检索公开材料并生成完整回答，请稍候……',
+      generating: '生成中……',
       noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、项目、论文列表、教育经历或技能。',
       staticPrefix: '静态资料检索：',
       source: '来源',
@@ -49,7 +54,7 @@
     },
     en: {
       readyStatic: 'Static FAQ and on-page search are ready',
-      readyRag: 'RAG is connected; any error will be shown clearly',
+      readyRag: 'Local RAG is connected; answers are shown only after completion',
       localUnavailable: 'Local material retrieval is temporarily unavailable',
       requestFailedStatus: 'Request processing failed',
       localUnavailableAnswer: 'The local material retrieval service is unavailable. To avoid an unsupported generated answer, no model was called. Please try again later or use the on-page material search.',
@@ -57,12 +62,15 @@
       requestFailed: 'The request did not complete: ',
       connectionFailed: 'The chat service could not be reached. Check the network or open this site in the system browser and retry.',
       emptyModelResponse: 'The model returned no displayable content. No answer was produced; please retry or switch models.',
+      streamIncomplete: 'The model response ended before completion, so no partial answer was shown. Please retry or switch models.',
+      outputTruncated: 'The model reached its output limit, so no incomplete answer was shown. Please ask a more specific question and retry.',
       providerError: 'The selected model service returned an error. No answer was generated; choose another model or API source and retry.',
       modelUnavailable: 'The selected model is unavailable. No answer was generated; choose another model or API source and retry.',
       budgetOrRateLimit: 'The request hit a budget or rate limit. No answer was generated; please retry later.',
       turnstile: 'Human verification failed or expired. No answer was generated; refresh the page and retry.',
       insufficientEvidence: 'The public materials do not provide enough evidence for an answer, so no model was called. Please rephrase the question.',
-      working: 'Searching public materials…',
+      working: 'Searching public materials and preparing a complete answer…',
+      generating: 'Generating…',
       noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, projects, publications, education, or skills.',
       staticPrefix: 'Static material search: ',
       source: 'Source',
@@ -95,6 +103,12 @@
   function setMode(mode, text) {
     status.dataset.mode = mode;
     statusText.textContent = text;
+  }
+
+  function completedStatus(payload) {
+    const gateway = payload.gateway === 'bailian' ? (locale === 'zh' ? '阿里云百炼' : 'Bailian') : 'OpenRouter';
+    const modelName = payload.provider && payload.model ? `${payload.provider} · ${payload.model}` : (locale === 'zh' ? '已完成' : 'Completed');
+    return locale === 'zh' ? `回答完成：${gateway} · ${modelName}` : `Answer complete: ${gateway} · ${modelName}`;
   }
 
   function scrollTranscript() {
@@ -280,6 +294,20 @@
     }
   }
 
+  async function refreshHealth() {
+    if (!activeEndpoint) return false;
+    try {
+      const response = await fetchApi('/api/health', { headers: { accept: 'application/json' } }, 0);
+      const payload = await response.json();
+      const online = payload?.retrieval?.online === true;
+      setMode(online ? 'rag' : 'error', online ? copy.readyRag : copy.localUnavailable);
+      return online;
+    } catch {
+      setMode('error', copy.connectionFailed);
+      return false;
+    }
+  }
+
   async function askRag(value, message) {
     const response = await fetchApi('/api/chat', {
       method: 'POST',
@@ -301,7 +329,12 @@
       const payload = await response.json();
       if (payload.answer) {
         renderSources(message.sources, Array.isArray(payload.citations) ? payload.citations : []);
-        return cleanAssistantText(payload.answer);
+        return {
+          answer: cleanAssistantText(payload.answer),
+          provider: payload.provider,
+          model: payload.model,
+          gateway: payload.gateway,
+        };
       }
       throw new Error(payload.reason || 'degraded');
     }
@@ -335,7 +368,7 @@
       }
     }
     if (!result) throw new Error('empty_answer');
-    return cleanAssistantText(result);
+    return { answer: cleanAssistantText(result) };
   }
 
   root.querySelectorAll('[data-question]').forEach((button) => {
@@ -356,14 +389,15 @@
     question.value = '';
     const reply = appendMessage('assistant', copy.working);
     submit.disabled = true;
-    submit.textContent = copy.working;
+    submit.textContent = copy.generating;
+    setMode('rag', copy.working);
     try {
       if (!activeEndpoint) throw new Error('network_unavailable');
-      const answer = await askRag(value, reply);
-      setMessageContent(reply.content, answer, true);
-      history.push({ role: 'user', content: value }, { role: 'assistant', content: answer });
+      const result = await askRag(value, reply);
+      setMessageContent(reply.content, result.answer, true);
+      history.push({ role: 'user', content: value }, { role: 'assistant', content: result.answer });
       history = history.slice(-6);
-      setMode('rag', copy.readyRag);
+      setMode('rag', completedStatus(result));
     } catch (error) {
       const code = error instanceof Error ? error.message : 'request_failed';
       const messages = {
@@ -375,6 +409,8 @@
         turnstile: copy.turnstile,
         insufficient_evidence: copy.insufficientEvidence,
         empty_model_response: copy.emptyModelResponse,
+        stream_incomplete: copy.streamIncomplete,
+        output_truncated: copy.outputTruncated,
         stream_error: copy.providerError,
         network_unavailable: copy.connectionFailed,
         rag_unavailable: copy.connectionFailed,
@@ -393,5 +429,5 @@
   });
 
   clearConversation();
-  loadModels();
+  loadModels().then(refreshHealth);
 })();
