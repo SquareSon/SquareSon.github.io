@@ -205,6 +205,12 @@
       const payload = await response.json();
       const gateways = Array.isArray(payload.gateways) ? payload.gateways : [];
       setSelectOptions(source, gateways, new Option(copy.autoSource, 'auto'), (entry) => entry.label);
+      // The buffered mobile path should start from the verified provider rather
+      // than serially probing the automatic cross-provider fallback chain.
+      if (embeddedWebView && source.value === 'auto' && gateways.some((entry) => entry.id === 'bailian')) {
+        source.value = 'bailian';
+        return loadModels();
+      }
       source.disabled = gateways.length <= 1;
       const models = Array.isArray(payload.models) ? payload.models : [];
       setSelectOptions(model, models, new Option(copy.autoModel, 'auto'), (entry) => `${entry.label} · ${entry.model}`);
