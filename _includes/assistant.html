@@ -14,18 +14,18 @@
           <option value="auto">{% if is_en %}Auto / resilient routing{% else %}自动 / 可靠路由{% endif %}</option>
         </select>
       </div>
+      <div class="assistant-field">
+        <label for="assistant-model">{% if is_en %}Model{% else %}模型{% endif %}</label>
+        <select id="assistant-model" data-assistant-model disabled>
+          <option value="auto">{% if is_en %}Auto / static fallback{% else %}自动 / 静态降级{% endif %}</option>
+        </select>
+      </div>
       <div class="assistant-status-field">
         <span class="assistant-config-label">{% if is_en %}RAG status{% else %}RAG 状态{% endif %}</span>
         <div class="assistant-status" data-mode="static" aria-live="polite">
           <span class="status-dot" aria-hidden="true"></span>
           <span data-assistant-status>{% if is_en %}Static search ready{% else %}静态检索已就绪{% endif %}</span>
         </div>
-      </div>
-      <div class="assistant-field">
-        <label for="assistant-model">{% if is_en %}Model{% else %}模型{% endif %}</label>
-        <select id="assistant-model" data-assistant-model disabled>
-          <option value="auto">{% if is_en %}Auto / static fallback{% else %}自动 / 静态降级{% endif %}</option>
-        </select>
       </div>
     </div>
     <div class="assistant-chat-window">
@@ -60,10 +60,18 @@
       <button type="button" data-question="What are Zi Fang's main research areas?">Research areas</button>
       <button type="button" data-question="What is the core idea behind GLA-NeRF?">GLA-NeRF</button>
       <button type="button" data-question="How does UPI-NeRF use acoustic physics?">UPI-NeRF</button>
+      <button type="button" data-question="How does PLLBJ predict bolted-joint loosening life?">PLLBJ</button>
+      <button type="button" data-question="How does Neural-Guided RRT* plan entry points and paths?">Neural-Guided RRT*</button>
+      <button type="button" data-question="What is Zi Fang's education background?">Education</button>
+      <button type="button" data-question="What skills does Zi Fang have?">Skills</button>
     {% else %}
       <button type="button" data-question="方子的主要研究方向是什么？">研究方向</button>
       <button type="button" data-question="GLA-NeRF 的核心思路是什么？">GLA-NeRF</button>
       <button type="button" data-question="UPI-NeRF 如何引入声学物理先验？">UPI-NeRF</button>
+      <button type="button" data-question="PLLBJ 如何预测螺栓连接的松动寿命？">PLLBJ</button>
+      <button type="button" data-question="Neural-Guided RRT* 如何规划入针点和路径？">Neural-Guided RRT*</button>
+      <button type="button" data-question="方子的教育经历是什么？">教育经历</button>
+      <button type="button" data-question="方子掌握哪些技能？">技能</button>
     {% endif %}
   </div>
 </div>

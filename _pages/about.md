@@ -1,6 +1,6 @@
 ---
-title: "方子 | 三维感知、具身智能与医疗机器人"
-description: "方子的学术主页：三维感知、具身智能、医学影像与医疗机器人研究。"
+title: "方子 | 三维感知与具身智能"
+description: "方子的学术主页：三维感知、具身智能、神经场与机器人学习研究。"
 permalink: /
 lang: zh-CN
 nav_key: zh
@@ -12,32 +12,32 @@ profile_label: 作者资料
 
 <h1 id="about" class="section-title">关于我</h1>
 
-<p class="page__lead"><strong>我正在寻找算法/研究岗位，重点关注三维感知与具身智能，也希望把这些能力用于医疗机器人等真实物理系统。</strong>我是方子（Zi Fang），上海交通大学机械与动力工程学院机器人研究所机械工程博士研究生，预计 2026 年 12 月毕业。</p>
+<p class="page__lead"><strong>我正在寻找算法/研究岗位，重点关注三维感知与具身智能，以及相关技术在真实物理系统中的落地。</strong>我是方子（Zi Fang），上海交通大学机械与动力工程学院机器人研究所机械工程博士生，预计 2026 年 12 月毕业。</p>
 
 <p class="profile-actions"><a class="button-link" href="/files/Zi-Fang-CV.pdf" download>下载公开版简历（PDF）</a><a href="mailto:fangzi508@sjtu.edu.cn">邮件联系</a><a href="https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&amp;hl=zh-CN">Google Scholar</a></p>
 
-<p>我的博士课题面向甲状腺超声引导穿刺，将自由手超声观测、连续三维重建、多扫查空间统一、组织—器械语义建模与导航坐标链连成一条完整方法链。我关心的不只是数据集上的算法结果，也包括它们在标定、假体实验和机器人原理样机中能否组成可验证的系统。</p>
-
-<ul class="research-keywords" aria-label="研究关键词">
-  <li>3D Perception</li><li>Embodied Intelligence</li><li>Medical Robotics</li><li>Freehand Ultrasound</li><li>Neural Fields</li><li>Robot Navigation</li>
-</ul>
-
 <h1 id="research" class="section-title">研究方向</h1>
+
+<p>我的博士课题面向甲状腺超声引导穿刺，将自由手超声观测、连续三维重建、多扫查空间统一、组织—器械语义建模与导航坐标链连成一条完整方法链。我关心的不只是数据集上的算法结果，也包括它们在标定、假体实验和机器人原理样机中能否组成可验证的系统。</p>
 
 <div class="research-list">
   <section>
-    <h2>三维医学感知</h2>
-    <p>研究自由手超声中的有效接触、设备域差异、连续神经场、多扫查配准与三维语义重建。</p>
+    <h2>三维感知与连续表征</h2>
+    <p>研究多传感器位姿估计、2D/3D 配准、NeRF/3DGS、连续神经场与三维语义重建。</p>
   </section>
   <section>
     <h2>具身空间智能</h2>
     <p>把图像、位姿、连续场景表征与组织—器械几何统一到可供机器人理解、规划和执行的空间坐标中。</p>
   </section>
   <section>
-    <h2>医疗机器人系统</h2>
-    <p>围绕穿刺与介入任务开展路径规划、器械设计、传感标定、导航软件与假体实验验证。</p>
+    <h2>机器人系统与自主规划</h2>
+    <p>研究学习引导的路径规划、机器人机构与状态感知，并在真实物理任务中验证感知、规划与执行闭环。</p>
   </section>
 </div>
+
+<ul class="research-keywords" aria-label="研究关键词">
+  <li>3D Perception</li><li>Embodied Intelligence</li><li>Multi-sensor Fusion</li><li>Neural Fields</li><li>Robot Planning</li><li>Robot Learning</li>
+</ul>
 
 <h1 id="assistant" class="section-title">研究问答</h1>
 
@@ -45,9 +45,9 @@ profile_label: 作者资料
 
 {% include assistant.html %}
 
-<h1 id="selected-work" class="section-title">代表研究</h1>
+<h1 id="selected-work" class="section-title">项目经历</h1>
 
-<p>我的博士研究围绕医学影像中的观测、位姿、形变和连续三维表征展开，并进一步连接穿刺路径规划与小型机器人系统。以下四条主线与简历中的项目经历保持一致。</p>
+<p>我的项目沿着“多传感状态感知—位姿与形变优化—连续三维表征—规划与物理执行”的技术链展开。以下四条主线与简历中的项目经历保持一致，并以自由手超声和小型机器人系统作为具体实验载体。</p>
 
 <div class="paper-box research-project-card">
   <div class="paper-box-image">

@@ -4,7 +4,7 @@
     "locale": "zh",
     "sourceTitle": "公开个人资料",
     "titlePath": "个人简介",
-    "content": "方子，英文名 Zi Fang，上海交通大学机械与动力工程学院机器人研究所机械工程直博生，预计 2026 年 12 月毕业。他目前正在求职、找工作，寻找算法/研究岗位，重点关注三维感知与具身智能，并希望将这些能力用于医疗机器人等真实物理系统。公开机构邮箱为 fangzi508@sjtu.edu.cn。",
+    "content": "方子，英文名 Zi Fang，上海交通大学机械与动力工程学院机器人研究所机械工程直博生，预计 2026 年 12 月毕业。他目前正在求职、找工作，寻找算法/研究岗位，重点关注三维感知与具身智能，以及相关技术在真实物理系统中的落地。公开机构邮箱为 fangzi508@sjtu.edu.cn。",
     "url": "/#about",
     "evidenceLevel": "public-profile"
   },
@@ -13,7 +13,7 @@
     "locale": "zh",
     "sourceTitle": "公开求职信息",
     "titlePath": "求职方向 / 工作意向",
-    "content": "方子目前正在求职、找工作，寻找算法或研究类岗位。他的求职方向和工作兴趣重点是三维感知与具身智能，也希望把这些能力用于医疗机器人等真实物理系统。预计毕业时间为 2026 年 12 月，可通过公开机构邮箱 fangzi508@sjtu.edu.cn 联系。",
+    "content": "方子目前正在求职、找工作，寻找算法或研究类岗位。他的求职方向和工作兴趣重点是三维感知与具身智能，尤其关注相关技术在真实物理系统中的落地。预计毕业时间为 2026 年 12 月，可通过公开机构邮箱 fangzi508@sjtu.edu.cn 联系。",
     "url": "/#about",
     "evidenceLevel": "public-profile"
   },
@@ -40,7 +40,7 @@
     "locale": "zh",
     "sourceTitle": "博士研究主线",
     "titlePath": "研究主线",
-    "content": "博士研究由四条相互连接的项目主线构成：器械与影像位姿估计及位姿、形变、表征联合优化的 2D/3D 可变形配准；超声规范化增强与多任务二维语义分割；结合 NeRF/3DGS 和声学物理先验的三维逆渲染与语义场；折纸穿刺手术机器人与穿刺路径规划。",
+    "content": "方子的研究重点是三维感知与具身智能，形成了从多传感器位姿估计、2D/3D 配准和连续三维表征，到语义理解、路径规划与机器人执行的技术链。具体项目包括位姿、形变与 NeRF/3DGS 表征联合优化，三维逆渲染与连续语义场，以及学习引导的路径规划；自由手超声和小型机器人系统是这些方法的重要验证场景。",
     "url": "/#research",
     "evidenceLevel": "thesis-synthesis"
   },
@@ -57,7 +57,7 @@
     "id": "fact-project-neural-field",
     "locale": "zh",
     "sourceTitle": "三维逆渲染与语义场",
-    "titlePath": "代表研究 / NeRF、3DGS 与声学物理",
+    "titlePath": "项目经历 / NeRF、3DGS 与声学物理",
     "content": "NeRF/3DGS 和声学物理先验的三维逆渲染与语义场研究利用位姿—图像对建立连续三维表征，将衰减、瑞利背散射、微表面反射与方向参数化纳入可微渲染，并以连续语义场替代离散体素写入，形成可供路径规划查询的三维解剖结构。UPI-NeRF 是该方向的研究稿件。",
     "url": "/#selected-work",
     "evidenceLevel": "doctoral-research"
@@ -66,7 +66,7 @@
     "id": "fact-project-gla",
     "locale": "zh",
     "sourceTitle": "位姿估计与 2D/3D 可变形配准",
-    "titlePath": "代表研究 / 位姿、形变与表征联合优化",
+    "titlePath": "项目经历 / 位姿、形变与表征联合优化",
     "content": "器械、影像位姿估计与 2D/3D 可变形配准研究融合双目近红外相机、IMU 与 N 线探头标定，把多扫查偏差分为 sweep 级全局刚性偏差、frame 级高频抖动和受力条件微分同胚形变场，并通过分层匹配、Lie 群 B 样条、Morph 场与 NeRF/3DGS 联合优化映射到规范空间。GLA-NeRF 发表于 Physics in Medicine & Biology，年份为 2026。",
     "url": "/#selected-work",
     "evidenceLevel": "published-paper"
@@ -75,7 +75,7 @@
     "id": "fact-project-semantics",
     "locale": "zh",
     "sourceTitle": "超声规范化与多任务二维语义",
-    "titlePath": "代表研究 / 规范化增强与二维分割",
+    "titlePath": "项目经历 / 规范化增强与二维分割",
     "content": "超声规范化增强与多任务二维语义分割先通过高维表征的流形分析筛除低质量接触，再以 EIDC 图像域成像响应建模和采集条件模拟获得规范回声强度代理；共享编码器与任务分支联合分割甲状腺、结节、血管和穿刺针，并加入语义引导、解剖几何约束与细长针体拓扑监督。",
     "url": "/#selected-work",
     "evidenceLevel": "doctoral-research"
@@ -84,17 +84,35 @@
     "id": "fact-project-prototype",
     "locale": "zh",
     "sourceTitle": "折纸穿刺机器人与路径规划",
-    "titlePath": "代表研究 / 具身系统",
+    "titlePath": "项目经历 / 具身系统",
     "content": "折纸穿刺手术机器人与穿刺路径规划研究面向头颈部设计小尺寸五自由度机器人，由折纸支链三自由度并联机构与下层五杆二自由度机构组成。规划部分使用 BiT* 搜索满足柔性针运动约束并避开风险组织的路径，并通过学习模型预测候选入针点与非均匀采样区域。",
     "url": "/#selected-work",
     "evidenceLevel": "prototype-evidence"
+  },
+  {
+    "id": "fact-project-pllbj",
+    "locale": "zh",
+    "sourceTitle": "PLLBJ 螺栓松动寿命预测",
+    "titlePath": "项目经历 / 状态监测与寿命预测",
+    "content": "PLLBJ 指论文 Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction。该工作从粘贴式 IMU 的振动信号提取时域、频域等多域特征，依次完成异常处理、去噪、缺失值填补、标准化与降维，再预测螺栓连接的剩余松动寿命，用于复杂装备的状态监测和主动维护。论文发表于 IEEE Transactions on Instrumentation and Measurement，年份为 2023。",
+    "url": "/#publications",
+    "evidenceLevel": "published-paper"
+  },
+  {
+    "id": "fact-project-neural-rrt",
+    "locale": "zh",
+    "sourceTitle": "Neural-Guided RRT* 路径规划",
+    "titlePath": "项目经历 / 学习引导的路径规划",
+    "content": "Neural-Guided RRT* 使用三维 U-Net 预测候选入针点和路径概率分布，以此引导 RRT* 在三维空间中进行非均匀采样，并使用满足斜尖柔性针运动学约束的空间圆弧扩展搜索树。该方法把学习得到的先验与采样式规划结合，用于同时选择入针点和规划避开风险结构的穿刺路径。论文发表于 IEEE Robotics and Automation Letters，年份为 2025。",
+    "url": "/#publications",
+    "evidenceLevel": "published-paper"
   },
   {
     "id": "fact-publications",
     "locale": "zh",
     "sourceTitle": "公开论文与研究稿件",
     "titlePath": "论文成果",
-    "content": "个人主页连续展示 13 项论文与研究稿件，其中 5 项配图工作按顺序为 GLA-NeRF、UPI-NeRF、EIDC、基于 IMU 与降维的螺栓松动寿命预测、Neural-Guided RRT*。UPI-NeRF 在主页中标记为研究稿件；EIDC 的题目为 From B-Mode Images to Canonical Echo-Intensity Representations for Robust Thyroid Ultrasound Segmentation。其余公开论文以紧凑文本形式展示。",
+    "content": "个人主页连续展示 13 项论文与研究稿件，其中 5 项配图工作按顺序为 GLA-NeRF、UPI-NeRF、EIDC、基于 IMU 与降维的螺栓松动寿命预测（PLLBJ）、Neural-Guided RRT*。UPI-NeRF 在主页中标记为研究稿件；EIDC 的题目为 From B-Mode Images to Canonical Echo-Intensity Representations for Robust Thyroid Ultrasound Segmentation。其余公开论文以紧凑文本形式展示。",
     "url": "https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&hl=zh-CN",
     "evidenceLevel": "google-scholar"
   },
@@ -103,7 +121,7 @@
     "locale": "en",
     "sourceTitle": "Public profile",
     "titlePath": "Biography",
-    "content": "Zi Fang is a direct-entry Ph.D. candidate in Mechanical Engineering at the Robotics Institute, School of Mechanical Engineering, Shanghai Jiao Tong University, expecting to graduate in December 2026. He is actively seeking research and algorithm roles in 3D perception and embodied intelligence, with medical robotics as a key application area. His public institutional email is fangzi508@sjtu.edu.cn.",
+    "content": "Zi Fang is a direct-entry Ph.D. candidate in Mechanical Engineering at the Robotics Institute, School of Mechanical Engineering, Shanghai Jiao Tong University, expecting to graduate in December 2026. He is actively seeking research and algorithm roles in 3D perception and embodied intelligence, especially work that brings these capabilities into real-world physical systems. His public institutional email is fangzi508@sjtu.edu.cn.",
     "url": "/en/#about",
     "evidenceLevel": "public-profile"
   },
@@ -112,7 +130,7 @@
     "locale": "en",
     "sourceTitle": "Public job-search information",
     "titlePath": "Job search / career interests",
-    "content": "Zi Fang is actively seeking research or algorithm roles. His main job-search and career interests are 3D perception and embodied intelligence, with medical robotics and other real-world physical systems as important application areas. He expects to graduate in December 2026 and can be contacted through his public institutional email, fangzi508@sjtu.edu.cn.",
+    "content": "Zi Fang is actively seeking research or algorithm roles. His main job-search and career interests are 3D perception and embodied intelligence, especially work that brings these capabilities into real-world physical systems. He expects to graduate in December 2026 and can be contacted through his public institutional email, fangzi508@sjtu.edu.cn.",
     "url": "/en/#about",
     "evidenceLevel": "public-profile"
   },
@@ -139,7 +157,7 @@
     "locale": "en",
     "sourceTitle": "Doctoral research thread",
     "titlePath": "Research thread",
-    "content": "The doctoral work has four connected project directions: instrument and image pose estimation with joint pose, deformation, and representation optimization for 2D/3D deformable registration; ultrasound canonicalization and multi-task 2D semantic segmentation; 3D inverse rendering and semantic fields with NeRF/3DGS and acoustic priors; and an origami puncture robot with puncture-path planning.",
+    "content": "Zi Fang focuses on 3D perception and embodied intelligence through a technical chain spanning multi-sensor pose estimation, 2D/3D registration, continuous 3D representation, semantic understanding, path planning, and robot execution. Projects include joint optimization of pose, deformation, and NeRF/3DGS representations; 3D inverse rendering and continuous semantic fields; and learning-guided planning. Freehand ultrasound and compact robotic systems are important testbeds for these methods.",
     "url": "/en/#research",
     "evidenceLevel": "thesis-synthesis"
   },
@@ -156,7 +174,7 @@
     "id": "fact-project-neural-field-en",
     "locale": "en",
     "sourceTitle": "3D inverse rendering and semantic fields",
-    "titlePath": "Selected research / NeRF, 3DGS, and acoustic physics",
+    "titlePath": "Project experience / NeRF, 3DGS, and acoustic physics",
     "content": "The 3D inverse-rendering and semantic-field direction builds continuous representations from image-pose pairs, introduces attenuation, Rayleigh backscatter, microfacet reflection, and direction parameterization into differentiable rendering, and replaces discrete voxel writing with a continuous semantic field for path-planning queries. UPI-NeRF is shown as a research manuscript in this direction.",
     "url": "/en/#selected-work",
     "evidenceLevel": "doctoral-research"
@@ -165,7 +183,7 @@
     "id": "fact-project-gla-en",
     "locale": "en",
     "sourceTitle": "Pose estimation and 2D/3D deformable registration",
-    "titlePath": "Selected research / Joint pose, deformation, and representation optimization",
+    "titlePath": "Project experience / Joint pose, deformation, and representation optimization",
     "content": "The instrument/image pose-estimation and 2D/3D deformable-registration direction combines stereo NIR cameras, an IMU, and N-wire probe calibration. It separates discrepancy into sweep-level rigid bias, frame-level jitter, and force-conditioned diffeomorphic deformation, then combines hierarchical matching, Lie-group B-splines, Morph fields, and NeRF/3DGS optimization in canonical space. GLA-NeRF appeared in Physics in Medicine & Biology in 2026.",
     "url": "/en/#selected-work",
     "evidenceLevel": "published-paper"
@@ -174,7 +192,7 @@
     "id": "fact-project-semantics-en",
     "locale": "en",
     "sourceTitle": "Ultrasound canonicalization and multi-task 2D semantics",
-    "titlePath": "Selected research / Canonicalization and segmentation",
+    "titlePath": "Project experience / Canonicalization and segmentation",
     "content": "The ultrasound-canonicalization and multi-task 2D segmentation direction uses manifold analysis to screen poor contact, EIDC image-domain response modeling and acquisition simulation to form a canonical echo-intensity proxy, and shared-encoder task branches with semantic guidance, anatomical constraints, and needle-topology supervision to segment the thyroid, nodules, vessels, and needle.",
     "url": "/en/#selected-work",
     "evidenceLevel": "doctoral-research"
@@ -183,10 +201,28 @@
     "id": "fact-project-prototype-en",
     "locale": "en",
     "sourceTitle": "Origami puncture robot and path planning",
-    "titlePath": "Selected research / Embodied system",
+    "titlePath": "Project experience / Embodied system",
     "content": "The origami puncture-robot and path-planning direction develops a compact five-DoF head-and-neck puncture robot from an origami-chain three-DoF parallel stage and a lower five-bar two-DoF mechanism. BiT* searches for flexible-needle paths that avoid risk structures, while learned models predict candidate entry points and non-uniform sampling regions.",
     "url": "/en/#selected-work",
     "evidenceLevel": "prototype-evidence"
+  },
+  {
+    "id": "fact-project-pllbj-en",
+    "locale": "en",
+    "sourceTitle": "PLLBJ bolted-joint loosening-life prediction",
+    "titlePath": "Project experience / Condition monitoring and life prediction",
+    "content": "PLLBJ refers to Prediction for Loosening Life of Bolted Joints Using IMUs With Dimensionality Reduction. The method extracts time-, frequency-, and other domain features from adhesive-IMU vibration signals, then performs outlier handling, denoising, missing-value imputation, normalization, and dimensionality reduction before predicting the remaining loosening life of bolted joints for condition-based maintenance. The paper appeared in IEEE Transactions on Instrumentation and Measurement in 2023.",
+    "url": "/en/#publications",
+    "evidenceLevel": "published-paper"
+  },
+  {
+    "id": "fact-project-neural-rrt-en",
+    "locale": "en",
+    "sourceTitle": "Neural-Guided RRT* path planning",
+    "titlePath": "Project experience / Learning-guided path planning",
+    "content": "Neural-Guided RRT* uses a 3D U-Net to predict candidate entry points and a path-probability distribution. These predictions guide non-uniform RRT* sampling in 3D, while spatial-arc tree expansion respects the kinematic constraints of a steerable bevel-tip needle. The method combines learned priors with sampling-based planning to jointly select an entry point and find a puncture path around risk structures. The paper appeared in IEEE Robotics and Automation Letters in 2025.",
+    "url": "/en/#publications",
+    "evidenceLevel": "published-paper"
   },
   {
     "id": "fact-publications-list",

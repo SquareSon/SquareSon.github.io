@@ -1,6 +1,6 @@
 ---
-title: "Zi Fang | 3D Perception, Embodied Intelligence & Medical Robotics"
-description: "Academic homepage of Zi Fang: research in 3D perception, embodied intelligence, medical imaging, and medical robotics."
+title: "Zi Fang | 3D Perception & Embodied Intelligence"
+description: "Academic homepage of Zi Fang: research in 3D perception, embodied intelligence, neural fields, and robot learning."
 permalink: /en/
 lang: en
 nav_key: en
@@ -12,32 +12,32 @@ profile_label: Author profile
 
 <h1 id="about" class="section-title">About Me</h1>
 
-<p class="page__lead"><strong>I am actively seeking research and algorithm roles in 3D perception and embodied intelligence, with medical robotics as a key application area.</strong> I am Zi Fang, a Ph.D. candidate in Mechanical Engineering at the Robotics Institute, Shanghai Jiao Tong University, expecting to graduate in December 2026.</p>
+<p class="page__lead"><strong>I am actively seeking research and algorithm roles in 3D perception and embodied intelligence, especially work that brings these capabilities into real-world physical systems.</strong> I am Zi Fang, a Ph.D. candidate in Mechanical Engineering at the Robotics Institute, Shanghai Jiao Tong University, expecting to graduate in December 2026.</p>
 
 <p class="profile-actions"><a class="button-link" href="/files/Zi-Fang-CV.pdf" download>Download public CV (PDF)</a><a href="mailto:fangzi508@sjtu.edu.cn">Email</a><a href="https://scholar.google.com.hk/citations?user=bEc7mGgAAAAJ&amp;hl=en">Google Scholar</a></p>
 
-<p>My doctoral research focuses on ultrasound-guided thyroid puncture. It connects freehand-ultrasound observation, continuous 3D reconstruction, multi-sweep spatial alignment, tissue–instrument semantic modeling, and a navigation coordinate chain. I care not only about benchmark results, but also about whether these methods form a verifiable system through calibration, phantom experiments, and robotic prototypes.</p>
-
-<ul class="research-keywords" aria-label="Research keywords">
-  <li>3D Perception</li><li>Embodied Intelligence</li><li>Medical Robotics</li><li>Freehand Ultrasound</li><li>Neural Fields</li><li>Robot Navigation</li>
-</ul>
-
 <h1 id="research" class="section-title">Research Interests</h1>
+
+<p>My doctoral research focuses on ultrasound-guided thyroid puncture. It connects freehand-ultrasound observation, continuous 3D reconstruction, multi-sweep spatial alignment, tissue–instrument semantic modeling, and a navigation coordinate chain. I care not only about benchmark results, but also about whether these methods form a verifiable system through calibration, phantom experiments, and robotic prototypes.</p>
 
 <div class="research-list">
   <section>
-    <h2>3D Medical Perception</h2>
-    <p>Freehand-ultrasound contact quality, device-domain variation, continuous neural fields, multi-sweep registration, and 3D semantic reconstruction.</p>
+    <h2>3D Perception and Continuous Representation</h2>
+    <p>Multi-sensor pose estimation, 2D/3D registration, NeRF/3DGS, continuous neural fields, and 3D semantic reconstruction.</p>
   </section>
   <section>
     <h2>Embodied Spatial Intelligence</h2>
     <p>Unifying images, poses, continuous scene representations, and tissue–instrument geometry into spatial coordinates that robots can interpret, plan with, and act upon.</p>
   </section>
   <section>
-    <h2>Medical Robotic Systems</h2>
-    <p>Path planning, instrument design, sensing and calibration, navigation software, and phantom-based validation for puncture and intervention tasks.</p>
+    <h2>Robotic Systems and Autonomous Planning</h2>
+    <p>Learning-guided path planning, robot mechanisms, and state perception, with closed-loop perception, planning, and execution validated in physical tasks.</p>
   </section>
 </div>
+
+<ul class="research-keywords" aria-label="Research keywords">
+  <li>3D Perception</li><li>Embodied Intelligence</li><li>Multi-sensor Fusion</li><li>Neural Fields</li><li>Robot Planning</li><li>Robot Learning</li>
+</ul>
 
 <h1 id="assistant" class="section-title">Research Assistant</h1>
 
@@ -45,9 +45,9 @@ profile_label: Author profile
 
 {% include assistant.html %}
 
-<h1 id="selected-work" class="section-title">Selected Research</h1>
+<h1 id="selected-work" class="section-title">Project Experience</h1>
 
-<p>My Ph.D. research connects observations, pose, deformation, and continuous 3D representations in medical imaging, then carries those representations into puncture-path planning and compact robotic systems. The four directions below mirror the project structure in my CV.</p>
+<p>My projects follow a technical chain from multi-sensor state perception and pose/deformation optimization to continuous 3D representation, planning, and physical execution. The four directions below mirror the project structure in my CV, with freehand ultrasound and compact robotic systems serving as concrete experimental testbeds.</p>
 
 <div class="paper-box research-project-card">
   <div class="paper-box-image">

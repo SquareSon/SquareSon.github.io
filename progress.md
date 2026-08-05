@@ -143,3 +143,13 @@
 - 2026-08-05：主页提交 `4c21cc6` 已推送至 `main`，GitHub Pages Actions `30935095058` 构建与部署成功。线上中英文页面、聊天结构、技能内容与 CSS 均返回 200；被删除的欢迎消息和脚注无残留。规划文件中另一项本地 RAG 迁移修改保持未提交。
 - 2026-08-05：完成本地 GPU RAG 服务实现与实机验证：317 条公开块已建本地 embedding 缓存、FAISS 与 FTS5 索引；BGE-M3 与 BGE reranker 在 RTX 5090 上工作，受 HMAC 签名的实测检索约 296ms 并返回 6 条来源证据。
 - 2026-08-05：创建并启用命名 Tunnel `zi-fang-local-rag` 与两个用户级 systemd 服务；Tunnel ingress 仅指向 127.0.0.1 检索端口。GitHub Pages 已登记 `www.square-son.com`。Cloudflare OAuth 缺少 Zone DNS Edit / Access 编辑权限，DNS、最终 Worker 部署及 Pages HTTPS 强制等待该外部授权或手工记录创建。
+# 2026-08-05：主页定位与快捷问答更新
+
+- 已确认本轮修改范围与内容策略。
+- 正在修改中英文首页、侧栏、聊天快捷问题及问答资料。
+- 已按最新反馈将博士课题概述与关键词移入研究方向，并调整聊天配置栏顺序及默认 Qwen 逻辑。
+- 验证环境中没有全局 `bundle` 命令，首次 Jekyll 构建未执行；已在隔离的 `codex-tools` 环境补齐 Ruby/Jekyll 后成功重建 `_site`。
+- Cloudflare D1 首次同步误用了包含建表语句的完整迁移，因表已存在而被安全拒绝；改为只提取 19 条变更记录。增量文件中的显式事务又被当前远端接口拒绝，已移除事务包装后重试。
+- 已完成 D1 19 条增量写入、Vectorize 19 个向量写入与 Worker 部署；Worker 版本为 `a93c35ec-ad99-4a8a-adc9-857af70d1d61`。
+- 已重建并重启本地 GPU 索引，线上健康检查报告 321 条；Qwen 对 PLLBJ 与 Neural-Guided RRT* 的两次端到端问答均成功。
+- 本地 Jekyll 构建成功；源代码验证、TypeScript 类型检查、38 个检索评测用例和 8 项自动化测试全部通过。

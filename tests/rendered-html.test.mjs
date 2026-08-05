@@ -8,7 +8,7 @@ const projectRoot = new URL("../", import.meta.url);
 test("Jekyll renders the default Chinese academic homepage", async () => {
   const html = await readFile(new URL("index.html", siteRoot), "utf8");
   assert.match(html, /<html lang="zh-CN"/);
-  assert.match(html, /三维感知、具身智能与医疗机器人/);
+  assert.match(html, /方子 三维感知与具身智能/);
   assert.match(html, /class="sidebar sticky"/);
   assert.match(html, /class="paper-box(?:\s|\")/);
   assert.match(html, /研究问答/);
@@ -23,6 +23,15 @@ test("Jekyll renders the default Chinese academic homepage", async () => {
   assert.match(html, /CET-4 595/);
   assert.match(html, /class="assistant-chat-window"/);
   assert.match(html, /class="assistant-status-field"/);
+  assert.ok(html.indexOf("data-assistant-source") < html.indexOf("data-assistant-model"));
+  assert.ok(html.indexOf("data-assistant-model") < html.indexOf("assistant-status-field"));
+  assert.match(html, /上海交通大学机械工程博士生/);
+  assert.match(html, />项目经历</);
+  assert.match(html, /三维感知与连续表征/);
+  assert.doesNotMatch(html, /三维医学感知|医疗机器人系统|上海交通大学机械工程博士研究生/);
+  for (const label of ["研究方向", "GLA-NeRF", "UPI-NeRF", "PLLBJ", "Neural-Guided RRT*", "教育经历", "技能"]) {
+    assert.match(html, new RegExp(`>${label.replace("*", "\\*")}<`));
+  }
   assert.ok(html.indexOf("data-assistant-submit") < html.indexOf("data-assistant-reset"));
   assert.match(html, /publication-gla-nerf\.png/);
   assert.match(html, /publication-upi-nerf\.png/);
@@ -37,7 +46,7 @@ test("Jekyll renders the default Chinese academic homepage", async () => {
 test("Jekyll renders the complete English route and language links", async () => {
   const html = await readFile(new URL("en/index.html", siteRoot), "utf8");
   assert.match(html, /<html lang="en"/);
-  assert.match(html, /3D Medical Perception/);
+  assert.match(html, /3D Perception and Continuous Representation/);
   assert.match(html, /Static search ready/);
   assert.match(html, /Download public CV/);
   assert.match(html, /Zhenhai High School of Ningbo/);
@@ -46,6 +55,11 @@ test("Jekyll renders the complete English route and language links", async () =>
   assert.match(html, /dual-GPU deployment/);
   assert.match(html, /CET-4: 595/);
   assert.match(html, /class="assistant-chat-window"/);
+  assert.match(html, />Project Experience</);
+  assert.doesNotMatch(html, /3D Medical Perception|Medical Robotic Systems|Selected Research/);
+  for (const label of ["Research areas", "GLA-NeRF", "UPI-NeRF", "PLLBJ", "Neural-Guided RRT*", "Education", "Skills"]) {
+    assert.match(html, new RegExp(`>${label.replace("*", "\\*")}<`));
+  }
   assert.match(html, /href="\/"[^>]*>中文</);
   assert.equal((html.match(/class="publication-title"/g) ?? []).length, 13);
   assert.equal((html.match(/class="paper-box featured-publication"/g) ?? []).length, 5);

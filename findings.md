@@ -277,3 +277,13 @@
 - 首次模型下载需要 SOCKS 支持，已在 Env_RAG 安装 `socksio`。BGE-M3 与 reranker 本体均已缓存；常驻服务启动时不再下载语料向量。
 - Cloudflare Tunnel 的 ingress 配置 API 可由现有 connectivity 权限写入，且服务实测 healthy。现有 OAuth token 对 Cloudflare DNS 写入返回 403，Access organization API 也返回 403；这是范围限制，不是域名或 Tunnel 异常。
 - GitHub Pages API 已成功登记 `www.square-son.com` 为仓库自定义域名；DNS 尚未存在，因此暂未启用 HTTPS 强制。
+# 2026-08-05：主页定位与快捷问答更新
+
+- 首页现有求职表述已经把“三维感知、具身智能”放在首位，但页面标题、简介、研究方向卡片和项目导语仍多次以“医学影像 / 医疗机器人”为核心，需要统一改写。
+- 内容策略：把个人研究主线表述为“多传感器位姿估计 → 配准与连续三维表征 → 语义理解与规划 → 机器人执行”，超声与穿刺机器人作为具体的验证环境保留。
+- 聊天快捷问题需要中英文各七项并保持相同顺序；PLLBJ 与 Neural-Guided RRT* 还需要专门的静态回答和可检索事实，避免按钮存在但降级回答不完整。
+- 配置栏应按操作依赖从左到右排列为 API 来源、模型、RAG 状态；模型目录首次成功载入时选择 Qwen，此后保留访客的当前选择。
+- “代表研究”对应简历中的项目经历，因此英文采用 “Project Experience”，比泛化的 “Projects” 更准确。
+- 公开语料由 317 条扩展到 321 条：295 条博士论文切片与 26 条中英文精选事实；新增 PLLBJ 和 Neural-Guided RRT* 中英文专门事实。
+- 本地 GPU 索引重建后为 321 条（302 个缓存命中、19 个新增/变更向量），Cloudflare D1 同样为 321 条，Vectorize 已增量写入 19 个向量。
+- 线上 Qwen 实测能正确回答 PLLBJ 与 Neural-Guided RRT*，并分别返回专门的项目事实作为引用。

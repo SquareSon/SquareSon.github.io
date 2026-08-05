@@ -425,3 +425,13 @@ PersonalHomePage-0.0.00/
 - [x] 命名 Tunnel `zi-fang-local-rag`（`ed07e558-17a4-46ef-a1c7-35e98788e252`）已配置仅转发至 `127.0.0.1:8788`，并由 `zi-fang-tunnel.service` 常驻；接口要求 Worker HMAC 时间戳与 nonce，未签名请求实测返回 401。
 - [x] GitHub Pages 自定义域名已登记为 `www.square-son.com`；Worker 已配置目标 hostname `https://rag.square-son.com` 与同源名单，尚未部署该新 Worker 版本，以避免在 DNS 未创建时让线上问答退化。
 - [ ] Cloudflare 当前 OAuth 令牌只有 Zone 读取权限，无法创建 DNS 记录或 Access 应用；待在 Cloudflare DNS 中创建 `www`、根域和 `rag` 记录后，部署 Worker、推送站点并开启 Pages HTTPS。
+# 主页定位与快捷问答更新（2026-08-05）
+
+- [x] 将聊天快捷询问扩展为研究方向、GLA-NeRF、UPI-NeRF、PLLBJ、Neural-Guided RRT*、教育经历、技能。
+- [x] 将配置栏调整为“API 来源—模型—RAG 状态”，并默认选中 Qwen。
+- [x] 将“代表研究 / Selected Research”统一改为“项目经历 / Project Experience”。
+- [x] 将中文侧栏身份改为“上海交通大学机械工程博士生”。
+- [x] 重写中英文主页定位，突出三维感知与具身智能，将医疗影像作为应用与验证场景。
+- [x] 将博士课题概述和关键词从“关于我”移至“研究方向”，按概述、三条主线、关键词排列。
+- [x] 为 PLLBJ 与 Neural-Guided RRT* 补充静态问答及 RAG 资料，并更新检索评测。
+- [ ] 完成构建、测试、远端检索验证与 GitHub Pages / Cloudflare Worker 部署。

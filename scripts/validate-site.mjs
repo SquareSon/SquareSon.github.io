@@ -23,6 +23,12 @@ assert.doesNotMatch(files.assistant, /welcome:/);
 assert.match(files.assistantInclude, /assistant-chat-window/);
 assert.match(files.assistantInclude, /assistant-status-field/);
 assert.ok(files.assistantInclude.indexOf("data-assistant-submit") < files.assistantInclude.indexOf("data-assistant-reset"));
+assert.ok(files.assistantInclude.indexOf("data-assistant-source") < files.assistantInclude.indexOf("data-assistant-model"));
+assert.ok(files.assistantInclude.indexOf("data-assistant-model") < files.assistantInclude.indexOf("assistant-status-field"));
+assert.match(files.assistant, /models\.some\(\(entry\) => entry\.id === 'qwen'\)/);
+for (const label of ["研究方向", "GLA-NeRF", "UPI-NeRF", "PLLBJ", "Neural-Guided RRT*", "教育经历", "技能"]) {
+  assert.match(files.assistantInclude, new RegExp(`>${label.replace("*", "\\*")}<`));
+}
 assert.doesNotMatch(files.assistantInclude, /assistant-footnote|回答仅限公开材料|Answers are restricted/);
 assert.match(files.license, /Copyright \(c\) 2022 Yi Ren/);
 
@@ -47,5 +53,16 @@ for (const [locale, source] of [["zh", files.zh], ["en", files.en]]) {
 
 assert.match(files.zh, /部署了接入本地资料静态检索与RAG的聊天机器人，可以询问我的研究方向、项目内容等等。/);
 assert.match(files.en, /This chatbot connects local-material static retrieval with RAG/);
+assert.match(files.config, /bio_zh: "上海交通大学机械工程博士生"/);
+assert.match(files.zh, />项目经历</);
+assert.match(files.en, />Project Experience</);
+assert.match(files.zh, /三维感知与连续表征/);
+assert.match(files.en, /3D Perception and Continuous Representation/);
+for (const [locale, source] of [["zh", files.zh], ["en", files.en]]) {
+  assert.ok(source.indexOf('id="research"') < source.indexOf('class="research-list"'), `${locale} research overview precedes directions`);
+  assert.ok(source.indexOf('class="research-list"') < source.indexOf('class="research-keywords"'), `${locale} directions precede keywords`);
+}
+assert.doesNotMatch(files.zh, /三维医学感知|医疗机器人系统/);
+assert.doesNotMatch(files.en, /3D Medical Perception|Medical Robotic Systems/);
 
 console.log("Jekyll source validation passed: bilingual research, skills, 13 unnumbered publications, and conversational assistant UI.");
