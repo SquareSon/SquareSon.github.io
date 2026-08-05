@@ -109,7 +109,7 @@
     label.textContent = role === 'user' ? copy.user : copy.assistant;
     const content = document.createElement('div');
     content.className = 'assistant-message-content';
-    content.textContent = text;
+    setMessageContent(content, text, role === 'assistant');
     const sources = document.createElement('ul');
     sources.className = 'assistant-message-sources';
     message.append(label, content, sources);
@@ -128,6 +128,44 @@
       row.appendChild(link);
       container.appendChild(row);
     });
+  }
+
+  function cleanAssistantText(value) {
+    return String(value)
+      .replace(/\s*\[(?:fact|thesis)-[a-z0-9-]+\]/gi, '')
+      .replace(/[ \t]+\n/g, '\n')
+      .trim();
+  }
+
+  function appendInlineMarkdown(container, value) {
+    const tokens = String(value).split(/(\*\*[^*\n]+\*\*|`[^`\n]+`|\*[^*\n]+\*)/g);
+    tokens.forEach((token) => {
+      if (token.startsWith('**') && token.endsWith('**')) {
+        const strong = document.createElement('strong');
+        strong.textContent = token.slice(2, -2);
+        container.appendChild(strong);
+      } else if (token.startsWith('`') && token.endsWith('`')) {
+        const code = document.createElement('code');
+        code.textContent = token.slice(1, -1);
+        container.appendChild(code);
+      } else if (token.startsWith('*') && token.endsWith('*')) {
+        const emphasis = document.createElement('em');
+        emphasis.textContent = token.slice(1, -1);
+        container.appendChild(emphasis);
+      } else {
+        container.appendChild(document.createTextNode(token));
+      }
+    });
+  }
+
+  function setMessageContent(container, value, stripInternalIds = false) {
+    const text = stripInternalIds ? cleanAssistantText(value) : String(value);
+    const fragment = document.createDocumentFragment();
+    text.split(/\r?\n/).forEach((line, index) => {
+      if (index) fragment.appendChild(document.createElement('br'));
+      appendInlineMarkdown(fragment, line);
+    });
+    container.replaceChildren(fragment);
   }
 
   function clearConversation() {
@@ -244,7 +282,7 @@
       const payload = await response.json();
       if (payload.answer) {
         renderSources(message.sources, Array.isArray(payload.citations) ? payload.citations : []);
-        return payload.answer;
+        return cleanAssistantText(payload.answer);
       }
       throw new Error(payload.reason || 'degraded');
     }
@@ -267,7 +305,7 @@
         const payload = JSON.parse(data);
         if (payload.type === 'delta' && payload.text) {
           result += payload.text;
-          message.content.textContent = result;
+          setMessageContent(message.content, result, true);
           scrollTranscript();
         } else if (payload.type === 'citation') {
           sources.push({ label: payload.label, href: payload.href });
@@ -278,7 +316,7 @@
       }
     }
     if (!result) throw new Error('empty_answer');
-    return result;
+    return cleanAssistantText(result);
   }
 
   root.querySelectorAll('[data-question]').forEach((button) => {
@@ -303,7 +341,7 @@
     try {
       if (!activeEndpoint) throw new Error('network_unavailable');
       const answer = await askRag(value, reply);
-      reply.content.textContent = answer;
+      setMessageContent(reply.content, answer, true);
       history.push({ role: 'user', content: value }, { role: 'assistant', content: answer });
       history = history.slice(-6);
       setMode('rag', copy.readyRag);
@@ -323,7 +361,7 @@
         rag_unavailable: copy.connectionFailed,
       };
       const errorAnswer = messages[code] || `${copy.requestFailed}${code}`;
-      reply.content.textContent = errorAnswer;
+      setMessageContent(reply.content, errorAnswer);
       renderSources(reply.sources, []);
       history.push({ role: 'user', content: value }, { role: 'assistant', content: errorAnswer });
       history = history.slice(-6);

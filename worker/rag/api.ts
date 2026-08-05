@@ -135,10 +135,7 @@ export async function handleRagRequest(
             mode: "rag-buffered",
             provider: provider.id,
             model: provider.model,
-            citations: evidence.slice(0, 1).map((item) => ({
-              label: `${item.sourceTitle} · ${item.titlePath}`,
-              href: item.url,
-            })),
+            citations: publicCitations(evidence),
           },
           200,
           cors,
@@ -221,6 +218,13 @@ function getModelAnswer(question: string, requestedModel: string, requestedGatew
 
 function parseGateway(value: unknown): GatewayId {
   return value === "openrouter" || value === "bailian" ? value : "auto";
+}
+
+function publicCitations(evidence: Array<{ sourceTitle: string; titlePath: string; url: string }>) {
+  return evidence.slice(0, 3).map((item) => ({
+    label: `${item.sourceTitle} · ${item.titlePath}`,
+    href: item.url,
+  }));
 }
 
 function normalizeHistory(value: unknown): ChatHistoryMessage[] {
