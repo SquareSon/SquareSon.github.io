@@ -161,7 +161,27 @@ test("standalone Worker exposes only configured models for each approved API sou
     worker.fetch(new Request("http://localhost/api/models?source=bailian"), env, context),
   ]);
   const [openrouter, bailian] = await Promise.all([openrouterResponse.json(), bailianResponse.json()]);
-  assert.equal(openrouter.models[0].model, "qwen/qwen3.7-flash");
+  assert.ok(!openrouter.models.some((item) => item.id === "qwen"));
+  assert.ok(openrouter.models.some((item) => item.id === "deepseek"));
+  assert.ok(openrouter.models.some((item) => item.id === "glm"));
+  assert.ok(openrouter.models.some((item) => item.id === "kimi"));
   assert.equal(bailian.models[0].model, "qwen3.7-flash");
   assert.deepEqual(openrouter.gateways.map((item) => item.id), ["openrouter", "bailian"]);
+});
+
+test("standalone Worker explains that OpenRouter Qwen is unavailable under strict ZDR", async () => {
+  const workerUrl = new URL("../dist/worker.js", import.meta.url);
+  workerUrl.searchParams.set("openrouter-qwen-zdr", `${process.pid}-${Date.now()}`);
+  const { default: worker } = await import(workerUrl.href);
+  const response = await worker.fetch(
+    new Request("http://localhost/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query: "请介绍研究方向", locale: "zh", model: "qwen", source: "openrouter" }),
+    }),
+    { DASHSCOPE_API_KEY: "test-key", OPENROUTER_API_KEY: "test-key", MODEL_GATEWAY: "bailian" },
+    { waitUntil() {}, passThroughOnException() {} },
+  );
+  const payload = await response.json();
+  assert.equal(payload.reason, "openrouter_qwen_zdr_unavailable");
 });

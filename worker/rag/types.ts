@@ -48,6 +48,7 @@ export interface RagEnv {
   DASHSCOPE_BASE_URL?: string;
   OPENROUTER_API_KEY?: string;
   OPENROUTER_QWEN_MODEL?: string;
+  OPENROUTER_ALLOW_NON_ZDR_QWEN?: string;
   OPENROUTER_DEEPSEEK_MODEL?: string;
   OPENROUTER_GLM_MODEL?: string;
   OPENROUTER_KIMI_MODEL?: string;

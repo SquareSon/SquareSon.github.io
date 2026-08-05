@@ -25,7 +25,8 @@ assert.match(files.assistantInclude, /assistant-status-field/);
 assert.ok(files.assistantInclude.indexOf("data-assistant-submit") < files.assistantInclude.indexOf("data-assistant-reset"));
 assert.ok(files.assistantInclude.indexOf("data-assistant-source") < files.assistantInclude.indexOf("data-assistant-model"));
 assert.ok(files.assistantInclude.indexOf("data-assistant-model") < files.assistantInclude.indexOf("assistant-status-field"));
-assert.match(files.assistant, /models\.some\(\(entry\) => entry\.id === 'qwen'\)/);
+assert.match(files.assistant, /new Option\(copy\.autoModel, 'auto'\)/);
+assert.doesNotMatch(files.assistant, /defaultModelApplied/);
 for (const label of ["研究方向", "GLA-NeRF", "UPI-NeRF", "PLLBJ", "Neural-Guided RRT*", "教育经历", "技能"]) {
   assert.match(files.assistantInclude, new RegExp(`>${label.replace("*", "\\*")}<`));
 }

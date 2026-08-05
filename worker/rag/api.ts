@@ -1,4 +1,4 @@
-import { collectProviderAnswer, getGatewayCatalog, getProviderCandidates, getProviderCatalog, normalizeProviderStream, requestProvider } from "./providers";
+import { collectProviderAnswer, getGatewayCatalog, getProviderCandidates, getProviderCatalog, normalizeProviderStream, ProviderHttpError, requestProvider, unavailableModelReason } from "./providers";
 import { getLocalRetrievalHealth, LocalRetrievalUnavailable, retrieveEvidence } from "./retrieval";
 import type { ChatHistoryMessage, GatewayId, Locale, RagEnv, WorkerContext } from "./types";
 
@@ -100,7 +100,7 @@ export async function handleRagRequest(
   }
 
   const providers = getProviderCandidates(requestedModel, env, requestedGateway);
-  if (!providers.length) return json({ degraded: true, reason: "model_unavailable" }, 200, cors);
+  if (!providers.length) return json({ degraded: true, reason: unavailableModelReason(requestedModel, env, requestedGateway), requestId }, 200, cors);
 
   let evidence;
   let retrievalMs: number | undefined;
@@ -235,14 +235,15 @@ export async function handleRagRequest(
 }
 
 function providerFailureReason(error: unknown) {
+  if (error instanceof ProviderHttpError && error.reason) return error.reason;
   if (!(error instanceof Error)) return "provider_error";
-  if (["empty_model_response", "stream_incomplete", "output_truncated"].includes(error.message)) return error.message;
+  if (["empty_model_response", "stream_incomplete", "output_truncated", "reasoning_budget_exhausted", "reasoning_only_response"].includes(error.message)) return error.message;
   return "provider_error";
 }
 
 function shouldRetryProvider(error: unknown) {
   if (!(error instanceof Error)) return false;
-  if (["empty_model_response", "stream_incomplete", "output_truncated"].includes(error.message)) return false;
+  if (["empty_model_response", "stream_incomplete", "output_truncated", "reasoning_budget_exhausted", "reasoning_only_response"].includes(error.message)) return false;
   const providerStatus = /returned (\d{3})/.exec(error.message);
   if (providerStatus) {
     const status = Number.parseInt(providerStatus[1], 10);

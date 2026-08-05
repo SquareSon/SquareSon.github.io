@@ -7,6 +7,25 @@ export interface ProviderConfig {
   baseUrl: string;
   model: string;
   gateway: "bailian" | "openrouter";
+  maxTokens?: number;
+  timeoutMs?: number;
+  temperature?: number;
+  enableThinking?: boolean;
+  reasoningEffort?: "max";
+  openRouterReasoning?: { effort: "none"; exclude: true };
+  openRouterZdr?: boolean;
+  includeUsage?: boolean;
+}
+
+export class ProviderHttpError extends Error {
+  constructor(
+    readonly provider: ProviderId,
+    readonly status: number,
+    readonly reason?: string,
+  ) {
+    super(`Provider ${provider} returned ${status}`);
+    this.name = "ProviderHttpError";
+  }
 }
 
 const aliases: Record<string, ProviderId> = {
@@ -61,6 +80,13 @@ export function getProviderCandidates(requested: string, env: RagEnv, requestedG
   return selected;
 }
 
+export function unavailableModelReason(requested: string, env: RagEnv, requestedGateway: GatewayId) {
+  if (requestedGateway === "openrouter" && aliases[requested] === "qwen" && !allowsNonZdrOpenRouterQwen(env)) {
+    return "openrouter_qwen_zdr_unavailable";
+  }
+  return "model_unavailable";
+}
+
 export async function requestProvider(
   provider: ProviderConfig,
   question: string,
@@ -68,44 +94,49 @@ export async function requestProvider(
   evidence: Evidence[],
   history: ChatHistoryMessage[],
 ) {
+  const requestBody: Record<string, unknown> = {
+    model: provider.model,
+    messages: buildMessages(question, locale, evidence, history),
+    stream: true,
+    temperature: provider.temperature ?? 0.2,
+    max_tokens: provider.maxTokens ?? 900,
+  };
+  if (provider.enableThinking !== undefined) requestBody.enable_thinking = provider.enableThinking;
+  if (provider.reasoningEffort) requestBody.reasoning_effort = provider.reasoningEffort;
+  if (provider.openRouterReasoning) requestBody.reasoning = provider.openRouterReasoning;
+  if (provider.includeUsage) requestBody.stream_options = { include_usage: true };
+  if (provider.gateway === "openrouter") {
+    requestBody.provider = {
+      data_collection: "deny",
+      zdr: provider.openRouterZdr ?? true,
+      sort: "latency",
+    };
+  }
+
   const response = await fetch(`${provider.baseUrl.replace(/\/$/, "")}/chat/completions`, {
     method: "POST",
     headers: {
       authorization: `Bearer ${provider.apiKey}`,
       "content-type": "application/json",
     },
-    body: JSON.stringify({
-      model: provider.model,
-      messages: buildMessages(question, locale, evidence, history),
-      stream: true,
-      temperature: 0.2,
-      max_tokens: 900,
-      ...(provider.gateway === "openrouter"
-        ? {
-            provider: {
-              data_collection: "deny",
-              zdr: true,
-              sort: "latency",
-            },
-          }
-        : {}),
-    }),
-    signal: AbortSignal.timeout(35_000),
+    body: JSON.stringify(requestBody),
+    signal: AbortSignal.timeout(provider.timeoutMs ?? 35_000),
   });
 
   if (!response.ok || !response.body) {
     const detail = response.body ? (await response.text()).slice(0, 600) : "empty_response_body";
+    const reason = classifyProviderError(provider, response.status, detail);
     console.warn(
       JSON.stringify({
         event: "model_provider_error",
         provider: provider.id,
         model: provider.model,
         status: response.status,
+        reason,
         detail,
       }),
     );
-    await response.body?.cancel();
-    throw new Error(`Provider ${provider.id} returned ${response.status}`);
+    throw new ProviderHttpError(provider.id, response.status, reason);
   }
   return response;
 }
@@ -286,6 +317,12 @@ export async function collectProviderAnswer(
   let firstContentMs: number | undefined;
   let terminal = false;
   let outputTruncated = false;
+  let finishReason: string | null = null;
+  let contentDeltaCount = 0;
+  let nonEmptyContentDeltaCount = 0;
+  let reasoningDeltaCount = 0;
+  let nonEmptyReasoningDeltaCount = 0;
+  let lastPayloadShape = "none";
 
   const consume = (event: string) => {
     const data = event
@@ -299,17 +336,25 @@ export async function collectProviderAnswer(
       return;
     }
     try {
-      const payload = JSON.parse(data) as { choices?: Array<{ delta?: { content?: string | null }; finish_reason?: string | null }> };
-      const text = payload.choices?.[0]?.delta?.content;
-      const finishReason = payload.choices?.[0]?.finish_reason;
-      if (finishReason) {
+      const payload = JSON.parse(data) as { choices?: Array<{ delta?: { content?: string | null; reasoning_content?: string | null }; finish_reason?: string | null }> };
+      lastPayloadShape = describePayload(payload);
+      const delta = payload.choices?.[0]?.delta;
+      const text = delta?.content;
+      const reasoning = delta?.reasoning_content;
+      const eventFinishReason = payload.choices?.[0]?.finish_reason;
+      if (eventFinishReason) {
         terminal = true;
-        outputTruncated ||= finishReason === "length";
+        outputTruncated ||= eventFinishReason === "length";
+        finishReason = eventFinishReason;
       }
+      if (typeof text === "string") contentDeltaCount += 1;
       if (typeof text === "string") {
+        if (text) nonEmptyContentDeltaCount += 1;
         if (text && firstContentMs === undefined) firstContentMs = elapsedMs(startedAt);
         answer += text;
       }
+      if (typeof reasoning === "string") reasoningDeltaCount += 1;
+      if (reasoning) nonEmptyReasoningDeltaCount += 1;
     } catch {
       // Vendor keep-alives and non-content events do not form an answer.
     }
@@ -332,9 +377,29 @@ export async function collectProviderAnswer(
   }
 
   if (!answer) {
-    console.warn(JSON.stringify({ event: "model_buffered_response_empty", provider: provider.id, model: provider.model }));
+    const reason = outputTruncated && nonEmptyReasoningDeltaCount > 0
+      ? "reasoning_budget_exhausted"
+      : nonEmptyReasoningDeltaCount > 0
+        ? "reasoning_only_response"
+        : "empty_model_response";
+    console.warn(
+      JSON.stringify({
+        event: "model_buffered_response_empty",
+        provider: provider.id,
+        model: provider.model,
+        reason,
+        finishReason,
+        terminal,
+        outputTruncated,
+        contentDeltaCount,
+        nonEmptyContentDeltaCount,
+        reasoningDeltaCount,
+        nonEmptyReasoningDeltaCount,
+        lastPayloadShape,
+      }),
+    );
     onComplete({ answerLength: 0, status: "stream_error" });
-    throw new Error("empty_model_response");
+    throw new Error(reason);
   }
   if (outputTruncated) {
     onComplete({ answerLength: answer.length, status: "stream_error" });
@@ -355,15 +420,7 @@ function elapsedMs(startedAt: number) {
 function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderConfig[] {
   const gateway = resolveGateway(env, requestedGateway);
   if (gateway === "openrouter" && env.OPENROUTER_API_KEY) {
-    return [
-      {
-        id: "qwen",
-        label: "Qwen",
-        apiKey: env.OPENROUTER_API_KEY,
-        baseUrl: "https://openrouter.ai/api/v1",
-        model: env.OPENROUTER_QWEN_MODEL ?? "qwen/qwen3.7-flash",
-        gateway: "openrouter",
-      },
+    const providers: ProviderConfig[] = [
       {
         id: "deepseek",
         label: "DeepSeek",
@@ -379,6 +436,7 @@ function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderC
         baseUrl: "https://openrouter.ai/api/v1",
         model: env.OPENROUTER_GLM_MODEL ?? "z-ai/glm-5.2",
         gateway: "openrouter",
+        openRouterReasoning: { effort: "none", exclude: true },
       },
       {
         id: "kimi",
@@ -387,8 +445,23 @@ function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderC
         baseUrl: "https://openrouter.ai/api/v1",
         model: env.OPENROUTER_KIMI_MODEL ?? "moonshotai/kimi-k3",
         gateway: "openrouter",
+        maxTokens: 1600,
+        timeoutMs: 50_000,
+        temperature: 1,
       },
     ];
+    if (allowsNonZdrOpenRouterQwen(env)) {
+      providers.unshift({
+        id: "qwen",
+        label: "Qwen",
+        apiKey: env.OPENROUTER_API_KEY,
+        baseUrl: "https://openrouter.ai/api/v1",
+        model: env.OPENROUTER_QWEN_MODEL ?? "qwen/qwen3.7-flash",
+        gateway: "openrouter",
+        openRouterZdr: false,
+      });
+    }
+    return providers;
   }
 
   if (gateway !== "bailian" || !env.DASHSCOPE_API_KEY) return [];
@@ -408,9 +481,45 @@ function getProviderConfigs(env: RagEnv, requestedGateway: GatewayId): ProviderC
       model: env.DEEPSEEK_MODEL ?? "deepseek-v4-flash",
       gateway: "bailian",
     },
-    { id: "glm", label: "GLM", apiKey, baseUrl, model: env.GLM_MODEL ?? "glm-5.2", gateway: "bailian" },
-    { id: "kimi", label: "Kimi", apiKey, baseUrl, model: env.KIMI_MODEL ?? "kimi/kimi-k3", gateway: "bailian" },
+    {
+      id: "glm",
+      label: "GLM",
+      apiKey,
+      baseUrl,
+      model: env.GLM_MODEL ?? "glm-5.2",
+      gateway: "bailian",
+      enableThinking: false,
+    },
+    {
+      id: "kimi",
+      label: "Kimi",
+      apiKey,
+      baseUrl,
+      model: env.KIMI_MODEL ?? "kimi/kimi-k3",
+      gateway: "bailian",
+      maxTokens: 1600,
+      timeoutMs: 50_000,
+      temperature: 1,
+      reasoningEffort: "max",
+      includeUsage: true,
+    },
   ];
+}
+
+function allowsNonZdrOpenRouterQwen(env: RagEnv) {
+  return env.OPENROUTER_ALLOW_NON_ZDR_QWEN === "true";
+}
+
+function classifyProviderError(provider: ProviderConfig, status: number, detail: string) {
+  if (
+    provider.gateway === "openrouter" &&
+    provider.id === "qwen" &&
+    status === 404 &&
+    /zero data retention|data policy/i.test(detail)
+  ) {
+    return "openrouter_qwen_zdr_unavailable";
+  }
+  return undefined;
 }
 
 function getFallbackProviderConfigs(env: RagEnv) {

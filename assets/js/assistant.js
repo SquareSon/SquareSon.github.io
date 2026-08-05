@@ -22,7 +22,6 @@
   const status = root.querySelector('.assistant-status');
   const statusText = root.querySelector('[data-assistant-status]');
   let history = [];
-  let defaultModelApplied = false;
 
   const copy = {
     zh: {
@@ -35,14 +34,18 @@
       requestFailed: '本次请求未完成：',
       connectionFailed: '无法连接聊天服务；请检查网络，或在系统浏览器中打开本站后重试。',
       emptyModelResponse: '模型未返回可显示的内容。本次请求未形成回答，请重试或切换模型。',
+      reasoningBudgetExhausted: '模型的推理过程耗尽了输出预算，未返回最终回答。系统不会显示内部推理内容；请重试或切换模型。',
+      reasoningOnlyResponse: '模型只返回了内部推理过程，未返回可展示的最终回答。系统不会显示内部推理内容；请重试或切换模型。',
       streamIncomplete: '模型响应在完成前中断，系统未显示不完整答案。请重试或切换模型。',
       outputTruncated: '模型回答达到长度上限，系统未显示不完整答案。请换一种更具体的问法后重试。',
       providerError: '所选模型服务返回错误，系统未生成回答。请更换模型或 API 来源后重试。',
       modelUnavailable: '所选模型当前不可用，系统未生成回答。请更换模型或 API 来源后重试。',
+      openRouterQwenZdrUnavailable: 'OpenRouter 的 Qwen 在本站“零数据保留”隐私策略下没有可用上游，因此未调用。可选择 DeepSeek、GLM、Kimi 或切换至阿里云百炼。',
       budgetOrRateLimit: '当前请求触发了预算或访问频率限制，系统未生成回答。请稍后重试。',
       turnstile: '人机验证未通过或已过期，系统未生成回答。请刷新页面后重试。',
       insufficientEvidence: '公开资料中没有足够证据支持回答，系统未调用模型。请换一种问法。',
       working: '正在检索公开材料并生成完整回答，请稍候……',
+      kimiWorking: 'Kimi 正在进行深度推理并生成完整回答，通常需要更长时间，请稍候……',
       generating: '生成中……',
       noResult: '静态资料中没有找到足够相关的内容。可尝试询问研究方向、博士论文、项目、论文列表、教育经历或技能。',
       staticPrefix: '静态资料检索：',
@@ -63,14 +66,18 @@
       requestFailed: 'The request did not complete: ',
       connectionFailed: 'The chat service could not be reached. Check the network or open this site in the system browser and retry.',
       emptyModelResponse: 'The model returned no displayable content. No answer was produced; please retry or switch models.',
+      reasoningBudgetExhausted: 'The model used its output budget for internal reasoning and returned no final answer. Internal reasoning is not shown; please retry or switch models.',
+      reasoningOnlyResponse: 'The model returned internal reasoning but no displayable final answer. Internal reasoning is not shown; please retry or switch models.',
       streamIncomplete: 'The model response ended before completion, so no partial answer was shown. Please retry or switch models.',
       outputTruncated: 'The model reached its output limit, so no incomplete answer was shown. Please ask a more specific question and retry.',
       providerError: 'The selected model service returned an error. No answer was generated; choose another model or API source and retry.',
       modelUnavailable: 'The selected model is unavailable. No answer was generated; choose another model or API source and retry.',
+      openRouterQwenZdrUnavailable: 'OpenRouter Qwen has no available upstream under this site’s zero-data-retention privacy policy, so it was not called. Choose DeepSeek, GLM, Kimi, or Bailian instead.',
       budgetOrRateLimit: 'The request hit a budget or rate limit. No answer was generated; please retry later.',
       turnstile: 'Human verification failed or expired. No answer was generated; refresh the page and retry.',
       insufficientEvidence: 'The public materials do not provide enough evidence for an answer, so no model was called. Please rephrase the question.',
       working: 'Searching public materials and preparing a complete answer…',
+      kimiWorking: 'Kimi is performing deep reasoning and preparing a complete answer. This can take longer; please wait…',
       generating: 'Generating…',
       noResult: 'The static materials do not contain a sufficiently relevant answer. Try asking about research areas, the dissertation, projects, publications, education, or skills.',
       staticPrefix: 'Static material search: ',
@@ -290,10 +297,6 @@
       source.disabled = gateways.length <= 1;
       const models = Array.isArray(payload.models) ? payload.models : [];
       setSelectOptions(model, models, new Option(copy.autoModel, 'auto'), (entry) => `${entry.label} · ${entry.model}`);
-      if (!defaultModelApplied && models.some((entry) => entry.id === 'qwen')) {
-        model.value = 'qwen';
-        defaultModelApplied = true;
-      }
       model.disabled = models.length === 0;
       setMode(models.length ? 'rag' : 'static', models.length ? copy.readyRag : copy.readyStatic);
     } catch {
@@ -399,7 +402,8 @@
     const reply = appendMessage('assistant', copy.working);
     submit.disabled = true;
     submit.textContent = copy.generating;
-    setMode('rag', copy.working);
+    const workingText = model.value === 'kimi' ? copy.kimiWorking : copy.working;
+    setMode('rag', workingText);
     try {
       if (!activeEndpoint) throw new Error('network_unavailable');
       const result = await askRag(value, reply);
@@ -418,8 +422,11 @@
         turnstile: copy.turnstile,
         insufficient_evidence: copy.insufficientEvidence,
         empty_model_response: copy.emptyModelResponse,
+        reasoning_budget_exhausted: copy.reasoningBudgetExhausted,
+        reasoning_only_response: copy.reasoningOnlyResponse,
         stream_incomplete: copy.streamIncomplete,
         output_truncated: copy.outputTruncated,
+        openrouter_qwen_zdr_unavailable: copy.openRouterQwenZdrUnavailable,
         stream_error: copy.providerError,
         network_unavailable: copy.connectionFailed,
         rag_unavailable: copy.connectionFailed,
